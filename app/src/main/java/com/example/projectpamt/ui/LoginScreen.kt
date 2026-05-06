@@ -6,8 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.projectpamt.viewmodel.AuthUiState
-
+import com.example.projectpamt.viewmodel.auth.AuthUiState
 
 @Composable
 fun LoginScreen(
@@ -19,11 +18,6 @@ fun LoginScreen(
     onLoginClick: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
-    /*
-     * LoginScreen tidak menyimpan state email/password sendiri.
-     * State dikirim dari luar, yaitu dari ViewModel.
-     * Inilah konsep state hoisting.
-     */
     Column(
         modifier = Modifier
             .fillMaxSize()

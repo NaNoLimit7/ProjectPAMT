@@ -1,4 +1,4 @@
-package com.example.projectpamt.viewmodel
+package com.example.projectpamt.viewmodel.auth
 
 sealed class AuthCheckState {
     object Checking : AuthCheckState()

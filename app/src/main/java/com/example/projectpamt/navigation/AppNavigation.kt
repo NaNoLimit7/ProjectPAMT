@@ -13,9 +13,9 @@ import androidx.navigation.compose.*
 import com.example.projectpamt.ui.LoginScreen
 import com.example.projectpamt.ui.RegisterScreen
 import com.example.projectpamt.ui.DashboardScreen
-import com.example.projectpamt.viewmodel.AuthCheckState
-import com.example.projectpamt.viewmodel.AuthUiState
-import com.example.projectpamt.viewmodel.AuthViewModel
+import com.example.projectpamt.viewmodel.auth.AuthCheckState
+import com.example.projectpamt.viewmodel.auth.AuthUiState
+import com.example.projectpamt.viewmodel.auth.AuthViewModel
 
 
 @Composable
@@ -24,11 +24,14 @@ fun AppNavigation(
 ) {
     val authCheckState = authViewModel.authCheckState.collectAsStateWithLifecycle()
 
-    /*
-     * Saat aplikasi baru dibuka, cek dulu apakah user masih login.
-     * Jangan langsung tampilkan LoginScreen.
-     */
     when (authCheckState.value) {
+        is AuthCheckState.Authenticated -> {
+            MainNavHost(
+                authViewModel = authViewModel,
+                startDestination = Screen.Dashboard.route
+            )
+        }
+
         is AuthCheckState.Checking -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -38,12 +41,6 @@ fun AppNavigation(
             }
         }
 
-        is AuthCheckState.Authenticated -> {
-            MainNavHost(
-                authViewModel = authViewModel,
-                startDestination = Screen.Dashboard.route
-            )
-        }
 
         is AuthCheckState.NotAuthenticated -> {
             MainNavHost(
@@ -64,7 +61,7 @@ fun MainNavHost(
 
     val email = authViewModel.email.collectAsStateWithLifecycle()
     val password = authViewModel.password.collectAsStateWithLifecycle()
-    val name = authViewModel.name.collectAsStateWithLifecycle()
+    val fullname = authViewModel.fullname.collectAsStateWithLifecycle()
     val uiState = authViewModel.uiState.collectAsStateWithLifecycle()
 
 
@@ -104,7 +101,7 @@ fun MainNavHost(
             RegisterScreen(
                 email = email.value,
                 password = password.value,
-                name = name.value,
+                name = fullname.value,
                 uiState = uiState.value,
                 onEmailChange = authViewModel::onEmailChange,
                 onPasswordChange = authViewModel::onPasswordChange,
@@ -128,7 +125,9 @@ fun MainNavHost(
                             inclusive = true
                         }
                     }
-                }
+                },
+                fullname = fullname.value,
+                email = email.value
             )
         }
     }

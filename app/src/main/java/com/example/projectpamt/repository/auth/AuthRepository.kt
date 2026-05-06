@@ -1,38 +1,30 @@
-package com.example.projectpamt.repository
+package com.example.projectpamt.repository.auth
 
 import com.example.projectpamt.data.SupabaseClientProvider
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
-
 import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class AuthRepository {
 
-    /*
-     * Mengambil client Supabase yang sudah dibuat sebelumnya.
-     */
     private val supabase = SupabaseClientProvider.client
 
-    /*
-     * Flow untuk memantau perubahan status session (Authenticated, NotAuthenticated, dll)
-     */
     val sessionStatus: Flow<SessionStatus> = supabase.auth.sessionStatus
 
-    /*
-     * Fungsi register user baru menggunakan email dan password.
-     * Fungsi ini suspend karena prosesnya berjalan secara asynchronous/network.
-     */
-    suspend fun register(email: String, password: String) {
+    suspend fun register(fullname: String, email: String, password: String) {
         supabase.auth.signUpWith(Email) {
             this.email = email
             this.password = password
+            data = buildJsonObject {
+                put("full_name", fullname)
+                put("negara", "Indonesia")
+            }
         }
     }
 
-    /*
-     * Fungsi login user menggunakan email dan password.
-     */
     suspend fun login(email: String, password: String) {
         supabase.auth.signInWith(Email) {
             this.email = email
@@ -40,25 +32,15 @@ class AuthRepository {
         }
     }
 
-    /*
-     * Fungsi logout user dari aplikasi.
-     */
     suspend fun logout() {
         supabase.auth.signOut()
     }
 
-    suspend fun createName() {
-
-    }
-    /*
-     * Fungsi untuk mengecek apakah user sudah login atau belum.
-     * Kita buat suspend agar bisa menunggu inisialisasi Supabase selesai.
-     */
     suspend fun isLoggedIn(): Boolean {
         // Menunggu Supabase selesai memuat session dari storage lokal (SharedPreferences/Settings)
         // Jika tidak ditunggu, currentSessionOrNull() mungkin masih null saat app baru dibuka.
         try {
-            supabase.auth.awaitInitialization()
+            awaitAuthInitialization()
         } catch (e: Exception) {
             // Jika gagal inisialisasi, anggap belum login
         }
@@ -66,9 +48,6 @@ class AuthRepository {
         return supabase.auth.currentSessionOrNull() != null
     }
 
-    /*
-     * Menunggu inisialisasi Auth selesai.
-     */
     suspend fun awaitAuthInitialization() {
         supabase.auth.awaitInitialization()
     }

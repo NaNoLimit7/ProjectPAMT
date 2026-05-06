@@ -6,8 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.projectpamt.viewmodel.AuthUiState
-
+import com.example.projectpamt.viewmodel.auth.AuthUiState
 
 @Composable
 fun RegisterScreen(
@@ -19,7 +18,7 @@ fun RegisterScreen(
     onPasswordChange: (String) -> Unit,
     onNameChange: (String) -> Unit,
     onRegisterClick: () -> Unit,
-    onNavigateToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -34,6 +33,17 @@ fun RegisterScreen(
         )
 
         Spacer(modifier = Modifier.height(24.dp))
+
+        OutlinedTextField(
+            value = name,
+            onValueChange = onNameChange,
+            label = {
+                Text("Fullname")
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = email,
@@ -57,17 +67,6 @@ fun RegisterScreen(
         )
 
         Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = name,
-            onValueChange = onNameChange,
-            label = {
-                Text("Name")
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = onRegisterClick,

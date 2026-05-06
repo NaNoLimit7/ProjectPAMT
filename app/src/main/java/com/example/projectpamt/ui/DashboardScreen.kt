@@ -9,7 +9,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun DashboardScreen(
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    fullname: String,
+    email: String,
 ) {
     Column(
         modifier = Modifier
@@ -20,17 +22,23 @@ fun DashboardScreen(
     ) {
 
         Text(
-            text = "Dashboard",
+            "Dashboard",
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
-        Text(
-            text = "Anda berhasil login ke aplikasi."
-        )
+        Text("Anda berhasil login ke aplikasi.")
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(Modifier.height(12.dp))
+
+        Text("Fullname: $fullname")
+
+        Spacer(Modifier.height(12.dp))
+
+        Text("Email: $email")
+
+        Spacer(Modifier.height(24.dp))
 
         Button(
             onClick = onLogoutClick
