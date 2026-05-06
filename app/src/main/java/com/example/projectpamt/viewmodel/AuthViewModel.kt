@@ -1,5 +1,6 @@
 package com.example.projectpamt.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.repository.AuthRepository
@@ -154,6 +155,8 @@ class AuthViewModel : ViewModel() {
                 _uiState.value = AuthUiState.Error(
                     message = e.message ?: "Register gagal"
                 )
+
+                Log.d("SUPABASE_REGISTER",e.toString())
             }
         }
     }
