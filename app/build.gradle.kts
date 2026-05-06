@@ -1,9 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+//    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 
-    kotlin("plugin.serialization") version "2.0.21"
+    kotlin("plugin.serialization") version libs.versions.kotlin.get()
 }
 
 android {
@@ -35,9 +35,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+//    kotlinOptions {
+//        jvmTarget = "11"
+//    }
     buildFeatures {
         compose = true
     }
@@ -45,22 +45,22 @@ android {
 
 dependencies {
     // Navigation Compose
-    implementation("androidx.navigation:navigation-compose:2.8.9")
+    implementation(libs.androidx.navigation.compose)
 
     // ViewModel Compose
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     // Runtime Compose agar bisa collect state dengan lifecycle
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     // Supabase BOM
-    implementation(platform("io.github.jan-tennert.supabase:bom:3.1.4"))
+    implementation(platform(libs.bom))
 
     // Supabase Auth
-    implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation(libs.auth.kt)
 
     // Ktor Android Client
-    implementation("io.ktor:ktor-client-android:3.0.3")
+    implementation(libs.ktor.client.android)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
