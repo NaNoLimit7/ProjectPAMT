@@ -45,6 +45,13 @@ class AuthViewModel : ViewModel() {
     private val _password = MutableStateFlow("")
     val password: StateFlow<String> = _password
 
+    /*
+    * State untuk input nama.
+    */
+    private val _name = MutableStateFlow("")
+
+    val name: StateFlow<String> = _name
+
     init {
         observeAuthStatus()
     }
@@ -83,6 +90,13 @@ class AuthViewModel : ViewModel() {
      */
     fun onPasswordChange(value: String) {
         _password.value = value
+    }
+
+    /*
+     * Fungsi ini dipanggil dari UI ketika user mengetik password.
+    */
+    fun onNameChange(value: String) {
+        _name.value = value
     }
 
     /*

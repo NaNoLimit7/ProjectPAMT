@@ -13,9 +13,11 @@ import com.example.projectpamt.viewmodel.AuthUiState
 fun RegisterScreen(
     email: String,
     password: String,
+    name: String,
     uiState: AuthUiState,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
+    onNameChange: (String) -> Unit,
     onRegisterClick: () -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
@@ -51,6 +53,17 @@ fun RegisterScreen(
                 Text("Password")
             },
             visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = name,
+            onValueChange = onNameChange,
+            label = {
+                Text("Name")
+            },
             modifier = Modifier.fillMaxWidth()
         )
 

@@ -47,6 +47,9 @@ class AuthRepository {
         supabase.auth.signOut()
     }
 
+    suspend fun createName() {
+
+    }
     /*
      * Fungsi untuk mengecek apakah user sudah login atau belum.
      * Kita buat suspend agar bisa menunggu inisialisasi Supabase selesai.

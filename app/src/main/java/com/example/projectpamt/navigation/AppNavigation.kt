@@ -64,6 +64,7 @@ fun MainNavHost(
 
     val email = authViewModel.email.collectAsStateWithLifecycle()
     val password = authViewModel.password.collectAsStateWithLifecycle()
+    val name = authViewModel.name.collectAsStateWithLifecycle()
     val uiState = authViewModel.uiState.collectAsStateWithLifecycle()
 
 
@@ -103,9 +104,11 @@ fun MainNavHost(
             RegisterScreen(
                 email = email.value,
                 password = password.value,
+                name = name.value,
                 uiState = uiState.value,
                 onEmailChange = authViewModel::onEmailChange,
                 onPasswordChange = authViewModel::onPasswordChange,
+                onNameChange = authViewModel::onNameChange,
                 onRegisterClick = {
                     authViewModel.register()
                 },
