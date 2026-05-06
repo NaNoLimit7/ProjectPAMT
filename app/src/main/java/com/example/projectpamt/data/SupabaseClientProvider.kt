@@ -10,8 +10,8 @@ object SupabaseClientProvider {
      * Ini mirip singleton sederhana di Kotlin.
      */
     val client = createSupabaseClient(
-        supabaseUrl = "Project_URL",
-        supabaseKey = "Publishable key"
+        supabaseUrl = "https://vlztibrknxtahkhaymgp.supabase.co",
+        supabaseKey = "sb_publishable_634vuzEDNyyuy6trrAcL7A_jCeBZs6t"
     ) {
         /*
          * install(Auth) digunakan agar aplikasi bisa memakai fitur autentikasi,

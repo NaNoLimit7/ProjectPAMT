@@ -11,9 +11,6 @@ import androidx.compose.ui.unit.dp
 fun DashboardScreen(
     onLogoutClick: () -> Unit
 ) {
-    /*
-     * Dashboard sederhana yang muncul setelah user berhasil login.
-     */
     Column(
         modifier = Modifier
             .fillMaxSize()

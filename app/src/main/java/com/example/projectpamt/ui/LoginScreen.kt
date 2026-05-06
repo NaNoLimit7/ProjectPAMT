@@ -85,9 +85,7 @@ fun LoginScreen(
             Text("Belum punya akun? Register")
         }
 
-        /*
-         * Jika state Error, tampilkan pesan error.
-         */
+        // Jika state Error, tampilkan pesan error.
         if (uiState is AuthUiState.Error) {
             Spacer(modifier = Modifier.height(12.dp))
 
