@@ -3,7 +3,7 @@ package com.example.projectpamt.viewmodel.auth
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectpamt.repository.auth.AuthRepository
+import com.example.projectpamt.data.repository.AuthRepository
 import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

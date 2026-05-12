@@ -1,4 +1,4 @@
-package com.example.projectpamt.repository.auth
+package com.example.projectpamt.data.repository
 
 import com.example.projectpamt.data.SupabaseClientProvider
 import io.github.jan.supabase.auth.auth
@@ -20,7 +20,6 @@ class AuthRepository {
             this.password = password
             data = buildJsonObject {
                 put("full_name", fullname)
-                put("negara", "Indonesia")
             }
         }
     }
