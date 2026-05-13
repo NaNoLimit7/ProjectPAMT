@@ -9,7 +9,7 @@ import kotlinx.serialization.json.put
 class KasRepository {
     private val supabase = SupabaseClientProvider.client
 
-    suspend fun getActiveKas(): List<Kas> {
+    suspend fun getKasAktif(): List<Kas> {
         return supabase.postgrest["kas"].select { filter { eq("aktif", true) } }.decodeList<Kas>()
     }
 
@@ -31,8 +31,7 @@ class KasRepository {
                 put("id_kas", idKas)
                 put("perubahan_saldo", perubahanSaldo)
                 put("keterangan", keterangan)
-            }
-        )
+            })
     }
 
     suspend fun nonaktifkanKas(idKas: String) {

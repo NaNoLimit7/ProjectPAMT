@@ -17,11 +17,6 @@ class PelangganRepository {
     }
 
     suspend fun updatePelanggan(pelangganLama: Pelanggan, pelangganBaru: Pelanggan) {
-        val log = LogPelanggan(
-            idPelanggan = pelangganLama.idPelanggan,
-            namaLama = pelangganLama.nama,
-            teleponLama = pelangganLama.telepon,
-            aktifLama = pelangganLama.aktif
-        )
+
     }
 }
