@@ -56,6 +56,9 @@ dependencies {
     // Supabase BOM
     implementation(platform(libs.bom))
 
+    // Supabase Postgres
+    implementation(libs.postgrest.kt)
+
     // Supabase Auth
     implementation(libs.auth.kt)
 

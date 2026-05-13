@@ -1,13 +1,13 @@
 package com.example.projectpamt.data.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlin.time.Instant
 
 @Serializable
 data class Pelanggan(
-    val idPelanggan: String,
+    @SerialName("id_pelanggan") val idPelanggan: String? = null,
     val nama: String,
     val telepon: String,
-    val aktif: Boolean,
-    val createdAt: Instant
+    val aktif: Boolean = true,
+    @SerialName("created_at") val createdAt: String? = null
 )

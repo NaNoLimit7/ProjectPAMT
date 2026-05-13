@@ -1,12 +1,13 @@
 package com.example.projectpamt.data.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class DetailPenjualan(
-    val idDetailPenjualan: String,
-    val idPenjualan: String,
-    val idProduk: String,
+    @SerialName("id_detail_penjualan") val idDetailPenjualan: String? = null,
+    @SerialName("id_penjualan") val idPenjualan: String,
+    @SerialName("id_produk") val idProduk: String,
     val kuantitas: Double,
-    val hargaSatuan: Double
+    @SerialName("harga_satuan") val hargaSatuan: Double
 )
