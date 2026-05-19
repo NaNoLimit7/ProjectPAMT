@@ -9,11 +9,15 @@ import com.example.projectpamt.data.model.Pelanggan
 import com.example.projectpamt.data.repository.PelangganRepository
 import kotlinx.coroutines.launch
 
-class PelangganViewModel(private val repository: PelangganRepository): ViewModel() {
+class PelangganViewModel(): ViewModel() {
+    private val repository = PelangganRepository()
+
     var pelangganList by mutableStateOf<List<Pelanggan>>(emptyList())
         private set
+
     var isLoading by mutableStateOf(false)
         private set
+
     var errormessage by mutableStateOf<String?>(null)
         private set
 
@@ -41,6 +45,8 @@ class PelangganViewModel(private val repository: PelangganRepository): ViewModel
             try {
                 val pelangganBaru = Pelanggan(nama = nama, telepon = telepon, aktif = true)
                 repository.insertPelanggan(pelangganBaru)
+
+                fetchPelanggan()
             } catch (e: Exception) {
                 errormessage = "Gagal menambah pelanggan ${e.message}"
             } finally {

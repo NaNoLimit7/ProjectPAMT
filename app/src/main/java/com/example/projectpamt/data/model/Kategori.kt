@@ -7,6 +7,6 @@ import kotlin.time.Instant
 @Serializable
 data class Kategori(
     @SerialName("id_kategori") val idKategori: String? = null,
-    val nama: String,
+    val name: String,
     @SerialName("created_at") val createdAt: String? = null
 )
