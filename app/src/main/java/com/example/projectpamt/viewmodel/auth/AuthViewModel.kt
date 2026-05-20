@@ -79,9 +79,18 @@ class AuthViewModel : ViewModel() {
                 _uiState.value = AuthUiState.Success
 
             } catch (e: Exception) {
-                _uiState.value = AuthUiState.Error(
-                    message = e.message ?: "Login gagal"
-                )
+                val errorMessage = when {
+                    e.message?.contains("Invalid login credentials", ignoreCase = true) == true -> 
+                        "Email atau kata sandi salah"
+                    e.message?.contains("Email not confirmed", ignoreCase = true) == true -> 
+                        "Email belum dikonfirmasi"
+                    e.message?.contains("Unable to resolve host", ignoreCase = true) == true || 
+                    e.message?.contains("timeout", ignoreCase = true) == true -> 
+                        "Koneksi internet bermasalah"
+                    else -> "Gagal masuk. Silakan coba lagi nanti"
+                }
+                _uiState.value = AuthUiState.Error(errorMessage)
+                Log.e("AUTH_LOGIN", "Login error: ${e.message}", e)
             }
         }
     }
@@ -101,10 +110,18 @@ class AuthViewModel : ViewModel() {
                 _uiState.value = AuthUiState.Success
 
             } catch (e: Exception) {
-                _uiState.value = AuthUiState.Error(
-                    message = e.message ?: "Register gagal"
-                )
-                Log.d("SUPABASE_REGISTER", e.toString())
+                val errorMessage = when {
+                    e.message?.contains("User already registered", ignoreCase = true) == true -> 
+                        "Email sudah terdaftar"
+                    e.message?.contains("Password should be at least", ignoreCase = true) == true -> 
+                        "Kata sandi terlalu pendek (min. 6 karakter)"
+                    e.message?.contains("Unable to resolve host", ignoreCase = true) == true || 
+                    e.message?.contains("timeout", ignoreCase = true) == true -> 
+                        "Koneksi internet bermasalah"
+                    else -> "Pendaftaran gagal. Silakan coba lagi nanti"
+                }
+                _uiState.value = AuthUiState.Error(errorMessage)
+                Log.e("AUTH_REGISTER", "Register error: ${e.message}", e)
             }
         }
     }

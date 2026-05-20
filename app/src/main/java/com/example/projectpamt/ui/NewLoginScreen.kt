@@ -234,6 +234,9 @@ fun AuthForm(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
+            cursorColor = primaryGreen,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White,
             unfocusedBorderColor = borderColor,
