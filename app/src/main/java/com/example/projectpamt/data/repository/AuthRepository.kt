@@ -14,12 +14,13 @@ class AuthRepository {
 
     val sessionStatus: Flow<SessionStatus> = supabase.auth.sessionStatus
 
-    suspend fun register(fullname: String, email: String, password: String) {
+    suspend fun register(fullname: String, email: String, password: String, phone: String) {
         supabase.auth.signUpWith(Email) {
             this.email = email
             this.password = password
             data = buildJsonObject {
                 put("full_name", fullname)
+                put("phone", phone)
             }
         }
     }

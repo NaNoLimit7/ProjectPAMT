@@ -9,10 +9,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.*
-import com.example.projectpamt.ui.LoginScreen
-import com.example.projectpamt.ui.RegisterScreen
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.projectpamt.ui.DashboardScreen
+import com.example.projectpamt.ui.NewLoginScreen
+import com.example.projectpamt.ui.NewRegisterScreen
 import com.example.projectpamt.viewmodel.auth.AuthCheckState
 import com.example.projectpamt.viewmodel.auth.AuthUiState
 import com.example.projectpamt.viewmodel.auth.AuthViewModel
@@ -20,6 +22,7 @@ import com.example.projectpamt.viewmodel.auth.AuthViewModel
 
 @Composable
 fun AppNavigation(
+    modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = viewModel()
 ) {
     val authCheckState = authViewModel.authCheckState.collectAsStateWithLifecycle()
@@ -27,6 +30,7 @@ fun AppNavigation(
     when (authCheckState.value) {
         is AuthCheckState.Authenticated -> {
             MainNavHost(
+                modifier = modifier,
                 authViewModel = authViewModel,
                 startDestination = Screen.Dashboard.route
             )
@@ -44,6 +48,7 @@ fun AppNavigation(
 
         is AuthCheckState.NotAuthenticated -> {
             MainNavHost(
+                modifier = modifier,
                 authViewModel = authViewModel,
                 startDestination = Screen.Login.route
             )
@@ -51,19 +56,18 @@ fun AppNavigation(
     }
 }
 
-
 @Composable
 fun MainNavHost(
+    modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
     startDestination: String
 ) {
     val navController = rememberNavController()
-
     val email = authViewModel.email.collectAsStateWithLifecycle()
     val password = authViewModel.password.collectAsStateWithLifecycle()
     val fullname = authViewModel.fullname.collectAsStateWithLifecycle()
+    val phone = authViewModel.phone.collectAsStateWithLifecycle()
     val uiState = authViewModel.uiState.collectAsStateWithLifecycle()
-
 
     LaunchedEffect(uiState.value) {
         if (uiState.value is AuthUiState.Success) {
@@ -79,10 +83,12 @@ fun MainNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
     ) {
         composable(Screen.Login.route) {
-            LoginScreen(
+
+            NewLoginScreen(
+                modifier = modifier,
                 email = email.value,
                 password = password.value,
                 uiState = uiState.value,
@@ -98,20 +104,23 @@ fun MainNavHost(
         }
 
         composable(Screen.Register.route) {
-            RegisterScreen(
+            NewRegisterScreen(
+                modifier = Modifier.fillMaxSize(),
                 email = email.value,
                 password = password.value,
                 name = fullname.value,
+                phone = phone.value,
                 uiState = uiState.value,
                 onEmailChange = authViewModel::onEmailChange,
                 onPasswordChange = authViewModel::onPasswordChange,
                 onNameChange = authViewModel::onNameChange,
+                onPhoneChange = authViewModel::onPhoneChange,
                 onRegisterClick = {
                     authViewModel.register()
                 },
                 onNavigateToLogin = {
                     navController.popBackStack()
-                }
+                },
             )
         }
 

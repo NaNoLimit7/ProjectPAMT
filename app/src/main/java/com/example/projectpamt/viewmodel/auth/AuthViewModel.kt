@@ -27,6 +27,9 @@ class AuthViewModel : ViewModel() {
     private val _name = MutableStateFlow("")
     val fullname: StateFlow<String> = _name
 
+    private val _phone = MutableStateFlow("")
+    val phone: StateFlow<String> = _phone
+
     init {
         observeAuthStatus()
     }
@@ -61,6 +64,10 @@ class AuthViewModel : ViewModel() {
         _name.value = value
     }
 
+    fun onPhoneChange(value: String) {
+        _phone.value = value
+    }
+
     fun login() {
         viewModelScope.launch {
             try {
@@ -88,6 +95,7 @@ class AuthViewModel : ViewModel() {
                     fullname = _name.value,
                     email = _email.value,
                     password = _password.value,
+                    phone = _phone.value
                 )
 
                 _uiState.value = AuthUiState.Success

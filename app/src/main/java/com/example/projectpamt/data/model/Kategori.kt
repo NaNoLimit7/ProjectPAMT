@@ -2,7 +2,6 @@ package com.example.projectpamt.data.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlin.time.Instant
 
 @Serializable
 data class Kategori(

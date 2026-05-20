@@ -5,11 +5,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.projectpamt.ui.theme.ProjectPAMTTheme
 import com.example.projectpamt.viewmodel.auth.AuthUiState
 
 @Composable
 fun LoginScreen(
+    modifier: Modifier = Modifier,
     email: String,
     password: String,
     uiState: AuthUiState,
@@ -19,7 +22,7 @@ fun LoginScreen(
     onNavigateToRegister: () -> Unit
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
@@ -86,6 +89,25 @@ fun LoginScreen(
             Text(
                 text = uiState.message,
                 color = MaterialTheme.colorScheme.error
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun LoginScreenPreview() {
+    ProjectPAMTTheme {
+        Scaffold(Modifier.fillMaxSize()) { innerPadding ->
+            LoginScreen(
+                modifier = Modifier.padding(innerPadding),
+                email = "",
+                password = "",
+                uiState = AuthUiState.Idle,
+                onEmailChange = {},
+                onPasswordChange = {},
+                onLoginClick = {},
+                onNavigateToRegister = {}
             )
         }
     }
