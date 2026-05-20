@@ -35,18 +35,4 @@ class PengeluaranRepository {
             filter { eq("id_pengeluaran", id) }
         }
     }
-
-//    private val kasRepository = KasRepository()
-//
-//    suspend fun getPengeluaran(): List<Pengeluaran> {
-//        return supabase.postgrest["pengeluaran"].select().decodeList<Pengeluaran>()
-//    }
-//
-//    suspend fun getDaftarKategori(): List<Kategori> {
-//        return supabase.postgrest["kategori"].select().decodeList<Kategori>()
-//    }
-//
-//    suspend fun tambahPengeluaran(pengeluaran: Pengeluaran) {
-//        supabase.postgrest["pengeluaran"].insert(pengeluaran)
-//    }
 }

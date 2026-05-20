@@ -23,27 +23,25 @@ val andika = FontFamily(
 )
 
 val Typography = Typography(
+    displayLarge = TextStyle(fontFamily = andika),
+    displayMedium = TextStyle(fontFamily = andika),
+    displaySmall = TextStyle(fontFamily = andika),
+    headlineLarge = TextStyle(fontFamily = andika),
+    headlineMedium = TextStyle(fontFamily = andika),
+    headlineSmall = TextStyle(fontFamily = andika),
+    titleLarge = TextStyle(fontFamily = andika),
+    titleMedium = TextStyle(fontFamily = andika),
+    titleSmall = TextStyle(fontFamily = andika),
     bodyLarge = TextStyle(
         fontFamily = andika,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
     ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
+    bodyMedium = TextStyle(fontFamily = andika),
+    bodySmall = TextStyle(fontFamily = andika),
+    labelLarge = TextStyle(fontFamily = andika),
+    labelMedium = TextStyle(fontFamily = andika),
+    labelSmall = TextStyle(fontFamily = andika)
 )
