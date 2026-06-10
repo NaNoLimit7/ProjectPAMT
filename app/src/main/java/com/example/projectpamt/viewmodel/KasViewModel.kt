@@ -56,7 +56,7 @@ class KasViewModel : ViewModel() {
         }
     }
 
-    fun updateNamaKas(id: String, nama: String, saldo: Double) {
+    fun updateNamaKas(id: String, nama: String) {
         viewModelScope.launch {
             isLoading = true
             errorMessage = null

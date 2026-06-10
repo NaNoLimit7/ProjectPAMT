@@ -9,7 +9,7 @@ data class Pengeluaran(
     @SerialName("id_pengeluaran") val idPengeluaran: String? = null,
     @SerialName("id_kategori") val idKategori: String,
     @SerialName("id_kas") val idKas: String,
-    val deskripsi: String?,
+    val deskripsi: String? = null,
     val total: Double,
     @SerialName("created_at") val createdAt: String? = null
 )

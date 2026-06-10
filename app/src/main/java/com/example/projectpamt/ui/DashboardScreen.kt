@@ -6,12 +6,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.projectpamt.viewmodel.KategoriViewModel
 
 @Composable
 fun DashboardScreen(
     onLogoutClick: () -> Unit,
     fullname: String,
     email: String,
+    viewModel: KategoriViewModel = viewModel()
 ) {
     Column(
         modifier = Modifier
@@ -39,6 +42,14 @@ fun DashboardScreen(
         Text("Email: $email")
 
         Spacer(Modifier.height(24.dp))
+
+        Button(
+            onClick = { viewModel.addKategori("gorengan") }
+        ) {
+            Text("Tambah kategori gorengan")
+        }
+
+        Spacer(Modifier.height(12.dp))
 
         Button(
             onClick = onLogoutClick
