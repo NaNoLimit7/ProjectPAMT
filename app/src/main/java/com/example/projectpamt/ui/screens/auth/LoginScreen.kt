@@ -27,10 +27,12 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -39,16 +41,48 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.example.projectpamt.R
+import com.example.projectpamt.ui.components.AuthForm
+import com.example.projectpamt.ui.navigation.Register
 import com.example.projectpamt.ui.theme.ProjectPAMTTheme
 import com.example.projectpamt.viewmodel.auth.AuthUiState
+import com.example.projectpamt.viewmodel.auth.AuthViewModel
 
 @Composable
 fun LoginScreen(
+    modifier: Modifier,
+    authViewModel: AuthViewModel,
+    navController: NavController,
+) {
+    val email by authViewModel.email.collectAsStateWithLifecycle()
+    val password by authViewModel.password.collectAsStateWithLifecycle()
+    val authUiState by authViewModel.uiState.collectAsStateWithLifecycle()
+
+    LoginContent(
+        modifier = modifier,
+        email = email,
+        password = password,
+        uiState = authUiState,
+        onEmailChange = authViewModel::onEmailChange,
+        onPasswordChange = authViewModel::onPasswordChange,
+        onLoginClick = {
+            authViewModel.login()
+        },
+        onNavigateToRegister = {
+            navController.navigate(Register)
+        }
+    )
+}
+
+@Composable
+private fun LoginContent(
     modifier: Modifier = Modifier,
     email: String,
     password: String,
@@ -58,17 +92,8 @@ fun LoginScreen(
     onLoginClick: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
-
-    val backgroundColor = Color(0xFFF2F0EB)
-    val brandGreen = Color(0xFF006241)
-    val primaryGreen = Color(0xFF00754A)
-    val borderColor = Color(0xFFD6DBDE)
-    val secondaryTextColor = Color(0x94000000)
-
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(backgroundColor)
+        modifier = modifier.fillMaxSize()
     ) {
         Column(
             modifier = Modifier
@@ -89,7 +114,7 @@ fun LoginScreen(
                 text = "GriyaArta",
                 fontSize = 36.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = brandGreen,
+                color = Color(0xFF006241),
                 textAlign = TextAlign.Center,
                 letterSpacing = (-0.9).sp
             )
@@ -97,7 +122,7 @@ fun LoginScreen(
                 text = "Selamat datang kembali",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Normal,
-                color = secondaryTextColor,
+                color = Color(0x94000000),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 8.dp, bottom = 48.dp),
                 letterSpacing = (-0.16).sp
@@ -138,13 +163,12 @@ fun LoginScreen(
                     text = "Lupa kata sandi?",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = primaryGreen,
+                    color = Color(0xFF00754A),
                     modifier = Modifier.clickable { /* Link to Forgot Password */ }
                 )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-
 
             Button(
                 onClick = onLoginClick,
@@ -152,7 +176,7 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .height(50.dp),
                 shape = RoundedCornerShape(9999.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = primaryGreen),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00754A)),
                 enabled = uiState !is AuthUiState.Loading
             ) {
                 if (uiState is AuthUiState.Loading) {
@@ -180,7 +204,6 @@ fun LoginScreen(
                 )
             }
 
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -190,62 +213,28 @@ fun LoginScreen(
                 Text(
                     text = buildAnnotatedString {
                         append("Belum punya akun? ")
-                        withStyle(
-                            style = SpanStyle(
-                                fontWeight = FontWeight.Bold,
-                                color = primaryGreen
+                        withLink(
+                            LinkAnnotation.Clickable(
+                                tag = "REGISTER",
+                                linkInteractionListener = { onNavigateToRegister() }
                             )
                         ) {
-                            append("Daftar")
+                            withStyle(
+                                style = SpanStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF00754A)
+                                )
+                            ) {
+                                append("Daftar")
+                            }
                         }
                     },
                     fontWeight = FontWeight.Medium,
-                    color = secondaryTextColor,
-                    modifier = Modifier.clickable { onNavigateToRegister() }
+                    color = Color(0x94000000),
                 )
             }
         }
     }
-}
-
-@Composable
-fun AuthForm(
-    label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default
-) {
-    val primaryGreen = Color(0xFF00754A)
-    val borderColor = Color(0xFFD6DBDE)
-
-    OutlinedTextField(
-        label = {
-            Text(
-                text = label,
-                color = Color.Gray,
-            )
-        },
-        value = value,
-        onValueChange = onValueChange,
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(8.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = Color.Black,
-            unfocusedTextColor = Color.Black,
-            cursorColor = primaryGreen,
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            unfocusedBorderColor = borderColor,
-            focusedBorderColor = primaryGreen
-        ),
-        visualTransformation = visualTransformation,
-        singleLine = true,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions
-    )
-
 }
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -253,7 +242,7 @@ fun AuthForm(
 private fun LoginScreenPreview() {
     ProjectPAMTTheme {
         Scaffold(Modifier.fillMaxSize()) { innerPadding ->
-            LoginScreen(
+            LoginContent(
                 email = "",
                 password = "",
                 uiState = AuthUiState.Idle,

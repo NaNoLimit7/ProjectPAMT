@@ -15,28 +15,70 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.example.projectpamt.R
+import com.example.projectpamt.ui.components.AuthForm
 import com.example.projectpamt.ui.theme.ProjectPAMTTheme
 import com.example.projectpamt.viewmodel.auth.AuthUiState
+import com.example.projectpamt.viewmodel.auth.AuthViewModel
 
 @Composable
 fun RegisterScreen(
+    modifier: Modifier,
+    authViewModel: AuthViewModel,
+    navController: NavController,
+) {
+    val email by authViewModel.email.collectAsStateWithLifecycle()
+    val password by authViewModel.password.collectAsStateWithLifecycle()
+    val fullname by authViewModel.fullname.collectAsStateWithLifecycle()
+    val phone by authViewModel.phone.collectAsStateWithLifecycle()
+    val authUiState by authViewModel.uiState.collectAsStateWithLifecycle()
+
+    RegisterContent(
+        modifier = modifier,
+        email = email,
+        password = password,
+        fullname = fullname,
+        phone = phone,
+        uiState = authUiState,
+        onEmailChange = authViewModel::onEmailChange,
+        onPasswordChange = authViewModel::onPasswordChange,
+        onNameChange = authViewModel::onNameChange,
+        onPhoneChange = authViewModel::onPhoneChange,
+        onRegisterClick = {
+            authViewModel.register()
+        },
+        onNavigateToLogin = {
+            navController.popBackStack()
+        },
+    )
+}
+
+@Composable
+private fun RegisterContent(
     modifier: Modifier = Modifier,
     email: String,
     password: String,
-    name: String,
+    fullname: String,
     phone: String,
     uiState: AuthUiState,
     onEmailChange: (String) -> Unit,
@@ -46,15 +88,9 @@ fun RegisterScreen(
     onRegisterClick: () -> Unit,
     onNavigateToLogin: () -> Unit,
 ) {
-    val backgroundColor = Color(0xFFF2F0EB)
-    val brandGreen = Color(0xFF00482F)
-    val primaryGreen = Color(0xFF00754A)
-    val secondaryTextColor = Color(0x94000000)
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundColor)
             .imePadding(),
         contentAlignment = Alignment.Center
     ) {
@@ -81,7 +117,7 @@ fun RegisterScreen(
                     text = "Daftar Akun Baru",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = brandGreen,
+                    color = Color(0xFF00482F),
                     letterSpacing = (-0.55).sp,
                     textAlign = TextAlign.Center
                 )
@@ -92,7 +128,7 @@ fun RegisterScreen(
                     text = "Mulai kelola keuangan bisnis Anda dengan\nlebih mudah",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
-                    color = secondaryTextColor,
+                    color = Color(0x94000000),
                     textAlign = TextAlign.Center,
                     lineHeight = 20.sp,
                     letterSpacing = (-0.14).sp
@@ -105,7 +141,7 @@ fun RegisterScreen(
 
                 AuthForm(
                     label = "Nama Lengkap",
-                    value = name,
+                    value = fullname,
                     onValueChange = onNameChange,
                 )
 
@@ -147,7 +183,7 @@ fun RegisterScreen(
                         .height(50.dp)
                         .shadow(elevation = 1.dp, shape = RoundedCornerShape(50.dp)),
                     shape = RoundedCornerShape(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = primaryGreen),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00754A)),
                     enabled = uiState !is AuthUiState.Loading
                 ) {
                     if (uiState is AuthUiState.Loading) {
@@ -176,39 +212,48 @@ fun RegisterScreen(
                 }
             }
 
-            Row(
+            Box(
                 modifier = Modifier
-                    .padding(top = 32.dp)
-                    .clickable { onNavigateToLogin() },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                    .fillMaxWidth()
+                    .padding(top = 24.dp),
+                contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Sudah punya akun? ",
-                    color = secondaryTextColor,
-                    letterSpacing = (-0.14).sp
-                )
-                Text(
-                    text = "Masuk",
-                    fontWeight = FontWeight.SemiBold,
-                    color = brandGreen,
-                    letterSpacing = 0.26.sp
+                    text = buildAnnotatedString {
+                        append("Sudah punya akun? ")
+                        withLink(
+                            LinkAnnotation.Clickable(
+                                tag = "LOGIN",
+                                linkInteractionListener = { onNavigateToLogin() }
+                            )
+                        ) {
+                            withStyle(
+                                style = SpanStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF00754A)
+                                )
+                            ) {
+                                append("Masuk")
+                            }
+                        }
+                    },
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0x94000000),
                 )
             }
         }
     }
 }
 
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun RegisterScreenPreview() {
     ProjectPAMTTheme {
         Scaffold(Modifier.fillMaxSize()) { innerPadding ->
-            RegisterScreen(
+            RegisterContent(
                 email = "",
                 password = "",
-                name = "",
+                fullname = "",
                 phone = "",
                 uiState = AuthUiState.Idle,
                 onEmailChange = {},

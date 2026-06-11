@@ -3,8 +3,10 @@ package com.example.projectpamt.ui.navigation
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -18,25 +20,9 @@ import com.example.projectpamt.viewmodel.auth.AuthViewModel
 fun AppNavHost(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
-    startDestination: Any
+    startDestination: Any,
 ) {
     val navController = rememberNavController()
-    val email = authViewModel.email.collectAsStateWithLifecycle()
-    val password = authViewModel.password.collectAsStateWithLifecycle()
-    val fullname = authViewModel.fullname.collectAsStateWithLifecycle()
-    val phone = authViewModel.phone.collectAsStateWithLifecycle()
-    val uiState = authViewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(uiState.value) {
-        if (uiState.value is AuthUiState.Success) {
-            navController.navigate(Dashboard) {
-                popUpTo(Login) {
-                    inclusive = true
-                }
-            }
-            authViewModel.resetState()
-        }
-    }
 
     NavHost(
         navController = navController,
@@ -45,54 +31,24 @@ fun AppNavHost(
         composable<Login> {
             LoginScreen(
                 modifier = modifier,
-                email = email.value,
-                password = password.value,
-                uiState = uiState.value,
-                onEmailChange = authViewModel::onEmailChange,
-                onPasswordChange = authViewModel::onPasswordChange,
-                onLoginClick = {
-                    authViewModel.login()
-                },
-                onNavigateToRegister = {
-                    navController.navigate(Register)
-                }
+                authViewModel = authViewModel,
+                navController = navController,
             )
         }
 
         composable<Register> {
             RegisterScreen(
-                modifier = Modifier.fillMaxSize(),
-                email = email.value,
-                password = password.value,
-                name = fullname.value,
-                phone = phone.value,
-                uiState = uiState.value,
-                onEmailChange = authViewModel::onEmailChange,
-                onPasswordChange = authViewModel::onPasswordChange,
-                onNameChange = authViewModel::onNameChange,
-                onPhoneChange = authViewModel::onPhoneChange,
-                onRegisterClick = {
-                    authViewModel.register()
-                },
-                onNavigateToLogin = {
-                    navController.popBackStack()
-                },
+                modifier = modifier,
+                authViewModel = authViewModel,
+                navController = navController,
             )
         }
 
         composable<Dashboard> {
             DashboardScreen(
-                onLogoutClick = {
-                    authViewModel.logout()
-
-                    navController.navigate(Login) {
-                        popUpTo(Dashboard) {
-                            inclusive = true
-                        }
-                    }
-                },
-                fullname = fullname.value,
-                email = email.value
+                modifier = modifier,
+                authViewModel = authViewModel,
+                navController = navController
             )
         }
     }
