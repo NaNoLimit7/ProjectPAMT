@@ -9,33 +9,48 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Color(0xFF82D8B1),
+    onPrimary = Color(0xFF003822),
+    secondary = Color(0xFFB1D1C4),
+    onSecondary = Color(0xFF1B3B30),
+    tertiary = Color(0xFF22513F),
+    onTertiary = Color(0xFFD1EBE1),
+    background = Color(0xFF0F172A),
+    onBackground = Color(0xFFF8FAFC),
+    surface = Color(0xFF1E293B),
+    onSurface = Color(0xFFF8FAFC),
+    surfaceVariant = Color(0xFF334155),
+    onSurfaceVariant = Color(0xFF94A3B8),
+    outline = Color(0xFF475569),
+    error = Color(0xFFFFB4AB),
+    onError = Color(0xFF690005)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+    primary = GreenPrimary,
     onPrimary = Color.White,
+    secondary = GreenSecondary,
     onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    tertiary = GreenMintActive,
+    onTertiary = GreenPrimary,
+    background = BackgroundSlate,
+    onBackground = TextDark,
+    surface = Color.White,
+    onSurface = TextDark,
+    surfaceVariant = SurfaceSlate,
+    onSurfaceVariant = TextMuted,
+    outline = BorderSlate,
+    error = DangerRed,
+    onError = Color.White
 )
 
 @Composable
 fun ProjectPAMTTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit

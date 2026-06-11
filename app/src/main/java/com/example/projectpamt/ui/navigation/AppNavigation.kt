@@ -19,7 +19,6 @@ import com.example.projectpamt.viewmodel.auth.AuthCheckState
 import com.example.projectpamt.viewmodel.auth.AuthUiState
 import com.example.projectpamt.viewmodel.auth.AuthViewModel
 
-
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,
