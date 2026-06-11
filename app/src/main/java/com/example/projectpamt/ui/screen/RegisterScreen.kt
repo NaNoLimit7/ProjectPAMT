@@ -1,39 +1,49 @@
-package com.example.projectpamt.ui
+package com.example.projectpamt.ui.screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.projectpamt.ui.theme.ProjectPAMTTheme
 import com.example.projectpamt.viewmodel.auth.AuthUiState
 
 @Composable
-fun LoginScreen(
-    modifier: Modifier = Modifier,
+fun RegisterScreen(
     email: String,
     password: String,
+    name: String,
     uiState: AuthUiState,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
-    onLoginClick: () -> Unit,
-    onNavigateToRegister: () -> Unit
+    onNameChange: (String) -> Unit,
+    onRegisterClick: () -> Unit,
+    onNavigateToLogin: () -> Unit,
 ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
 
         Text(
-            text = "Login",
+            text = "Register",
             style = MaterialTheme.typography.headlineMedium
         )
 
         Spacer(modifier = Modifier.height(24.dp))
+
+        OutlinedTextField(
+            value = name,
+            onValueChange = onNameChange,
+            label = {
+                Text("Fullname")
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = email,
@@ -56,10 +66,10 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Button(
-            onClick = onLoginClick,
+            onClick = onRegisterClick,
             modifier = Modifier.fillMaxWidth(),
             enabled = uiState !is AuthUiState.Loading
         ) {
@@ -69,45 +79,25 @@ fun LoginScreen(
                     strokeWidth = 2.dp
                 )
             } else {
-                Text("Login")
+                Text("Register")
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
         TextButton(
-            onClick = onNavigateToRegister,
+            onClick = onNavigateToLogin,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Belum punya akun? Register")
+            Text("Sudah punya akun? Login")
         }
 
-        // Jika state Error, tampilkan pesan error.
         if (uiState is AuthUiState.Error) {
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = uiState.message,
                 color = MaterialTheme.colorScheme.error
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun LoginScreenPreview() {
-    ProjectPAMTTheme {
-        Scaffold(Modifier.fillMaxSize()) { innerPadding ->
-            LoginScreen(
-                modifier = Modifier.padding(innerPadding),
-                email = "",
-                password = "",
-                uiState = AuthUiState.Idle,
-                onEmailChange = {},
-                onPasswordChange = {},
-                onLoginClick = {},
-                onNavigateToRegister = {}
             )
         }
     }

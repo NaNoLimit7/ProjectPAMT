@@ -1,4 +1,4 @@
-package com.example.projectpamt.viewmodel
+package com.example.projectpamt.viewmodel.penjualan
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

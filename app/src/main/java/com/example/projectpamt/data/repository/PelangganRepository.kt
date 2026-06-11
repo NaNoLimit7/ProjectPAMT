@@ -1,9 +1,7 @@
 package com.example.projectpamt.data.repository
 
 import com.example.projectpamt.data.SupabaseClientProvider
-import com.example.projectpamt.data.model.LogPelanggan
 import com.example.projectpamt.data.model.Pelanggan
-import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 
 class PelangganRepository {

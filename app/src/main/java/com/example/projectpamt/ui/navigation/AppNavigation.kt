@@ -1,4 +1,4 @@
-package com.example.projectpamt.navigation
+package com.example.projectpamt.ui.navigation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,9 +12,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.projectpamt.ui.DashboardScreen
-import com.example.projectpamt.ui.NewLoginScreen
-import com.example.projectpamt.ui.NewRegisterScreen
+import com.example.projectpamt.ui.screen.DashboardScreen
+import com.example.projectpamt.ui.screen.NewLoginScreen
+import com.example.projectpamt.ui.screen.NewRegisterScreen
 import com.example.projectpamt.viewmodel.auth.AuthCheckState
 import com.example.projectpamt.viewmodel.auth.AuthUiState
 import com.example.projectpamt.viewmodel.auth.AuthViewModel
@@ -32,7 +32,7 @@ fun AppNavigation(
             MainNavHost(
                 modifier = modifier,
                 authViewModel = authViewModel,
-                startDestination = Screen.Dashboard.route
+                startDestination = Destinations.Dashboard.route
             )
         }
 
@@ -50,7 +50,7 @@ fun AppNavigation(
             MainNavHost(
                 modifier = modifier,
                 authViewModel = authViewModel,
-                startDestination = Screen.Login.route
+                startDestination = Destinations.Login.route
             )
         }
     }
@@ -71,12 +71,11 @@ fun MainNavHost(
 
     LaunchedEffect(uiState.value) {
         if (uiState.value is AuthUiState.Success) {
-            navController.navigate(Screen.Dashboard.route) {
-                popUpTo(Screen.Login.route) {
+            navController.navigate(Destinations.Dashboard.route) {
+                popUpTo(Destinations.Login.route) {
                     inclusive = true
                 }
             }
-
             authViewModel.resetState()
         }
     }
@@ -85,7 +84,7 @@ fun MainNavHost(
         navController = navController,
         startDestination = startDestination,
     ) {
-        composable(Screen.Login.route) {
+        composable(Destinations.Login.route) {
 
             NewLoginScreen(
                 modifier = modifier,
@@ -98,12 +97,12 @@ fun MainNavHost(
                     authViewModel.login()
                 },
                 onNavigateToRegister = {
-                    navController.navigate(Screen.Register.route)
+                    navController.navigate(Destinations.Register.route)
                 }
             )
         }
 
-        composable(Screen.Register.route) {
+        composable(Destinations.Register.route) {
             NewRegisterScreen(
                 modifier = Modifier.fillMaxSize(),
                 email = email.value,
@@ -124,13 +123,13 @@ fun MainNavHost(
             )
         }
 
-        composable(Screen.Dashboard.route) {
+        composable(Destinations.Dashboard.route) {
             DashboardScreen(
                 onLogoutClick = {
                     authViewModel.logout()
 
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(Screen.Dashboard.route) {
+                    navController.navigate(Destinations.Login.route) {
+                        popUpTo(Destinations.Dashboard.route) {
                             inclusive = true
                         }
                     }

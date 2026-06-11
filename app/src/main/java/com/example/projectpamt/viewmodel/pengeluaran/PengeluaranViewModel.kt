@@ -1,4 +1,4 @@
-package com.example.projectpamt.viewmodel
+package com.example.projectpamt.viewmodel.pengeluaran
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.model.Pengeluaran
 import com.example.projectpamt.data.repository.PengeluaranRepository
 import kotlinx.coroutines.launch
-import kotlinx.serialization.descriptors.PrimitiveKind
 
 class PengeluaranViewModel : ViewModel() {
 

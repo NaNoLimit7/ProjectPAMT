@@ -1,4 +1,4 @@
-package com.example.projectpamt.viewmodel
+package com.example.projectpamt.viewmodel.kas
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
