@@ -9,9 +9,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class AuthViewModel : ViewModel() {
-    private val repository = AuthRepository()
-
+class AuthViewModel(
+    private val repository: AuthRepository = AuthRepository()
+) : ViewModel() {
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState: StateFlow<AuthUiState> = _uiState
 
@@ -80,13 +80,16 @@ class AuthViewModel : ViewModel() {
 
             } catch (e: Exception) {
                 val errorMessage = when {
-                    e.message?.contains("Invalid login credentials", ignoreCase = true) == true -> 
+                    e.message?.contains("Invalid login credentials", ignoreCase = true) == true ->
                         "Email atau kata sandi salah"
-                    e.message?.contains("Email not confirmed", ignoreCase = true) == true -> 
+
+                    e.message?.contains("Email not confirmed", ignoreCase = true) == true ->
                         "Email belum dikonfirmasi"
-                    e.message?.contains("Unable to resolve host", ignoreCase = true) == true || 
-                    e.message?.contains("timeout", ignoreCase = true) == true -> 
+
+                    e.message?.contains("Unable to resolve host", ignoreCase = true) == true ||
+                            e.message?.contains("timeout", ignoreCase = true) == true ->
                         "Koneksi internet bermasalah"
+
                     else -> "Gagal masuk. Silakan coba lagi nanti"
                 }
                 _uiState.value = AuthUiState.Error(errorMessage)
@@ -111,13 +114,16 @@ class AuthViewModel : ViewModel() {
 
             } catch (e: Exception) {
                 val errorMessage = when {
-                    e.message?.contains("User already registered", ignoreCase = true) == true -> 
+                    e.message?.contains("User already registered", ignoreCase = true) == true ->
                         "Email sudah terdaftar"
-                    e.message?.contains("Password should be at least", ignoreCase = true) == true -> 
+
+                    e.message?.contains("Password should be at least", ignoreCase = true) == true ->
                         "Kata sandi terlalu pendek (min. 6 karakter)"
-                    e.message?.contains("Unable to resolve host", ignoreCase = true) == true || 
-                    e.message?.contains("timeout", ignoreCase = true) == true -> 
+
+                    e.message?.contains("Unable to resolve host", ignoreCase = true) == true ||
+                            e.message?.contains("timeout", ignoreCase = true) == true ->
                         "Koneksi internet bermasalah"
+
                     else -> "Pendaftaran gagal. Silakan coba lagi nanti"
                 }
                 _uiState.value = AuthUiState.Error(errorMessage)

@@ -1,25 +1,20 @@
 package com.example.projectpamt.viewmodel.penjualan
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.model.DetailPenjualan
 import com.example.projectpamt.data.repository.PenjualanRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 
-class PenjualanViewModel : ViewModel() {
-    private val repository = PenjualanRepository()
-
-    var isLoading by mutableStateOf(false)
-        private set
-
-    var errorMessage by mutableStateOf<String?>(null)
-        private set
-
-    var idPenjualanSukses by mutableStateOf<String?>(null)
+class PenjualanViewModel(
+    private val repository: PenjualanRepository = PenjualanRepository()
+) : ViewModel() {
+    private val _uiState = MutableStateFlow<PenjualanUiState>(PenjualanUiState.Idle)
+    val uiState: StateFlow<PenjualanUiState> = _uiState.asStateFlow()
 
     fun runProsesPenjualan(
         idPelanggan: String,
@@ -29,9 +24,7 @@ class PenjualanViewModel : ViewModel() {
         items: List<DetailPenjualan>,
         detailPenjualan: JsonElement?) {
         viewModelScope.launch {
-            isLoading = true
-            errorMessage = null
-            idPenjualanSukses = null
+            _uiState.value = PenjualanUiState.Loading
             try {
                 val idBaru = repository.prosesPenjualan(
                     idPelanggan,
@@ -41,21 +34,14 @@ class PenjualanViewModel : ViewModel() {
                     items,
                     detailPenjualan
                 )
-
-                idPenjualanSukses = idBaru
+                _uiState.value = PenjualanUiState.Success(idBaru)
             } catch (e: Exception) {
-                errorMessage = "Gagal memproses penjualan ${e.message}"
-            } finally {
-                isLoading = false
+                _uiState.value = PenjualanUiState.Error("Gagal memproses penjualan ${e.message}")
             }
         }
     }
 
-    fun clearError() {
-        errorMessage = null
-    }
-
-    fun clearSuccessstatus() {
-        idPenjualanSukses = null
+    fun clearUiState() {
+        _uiState.value = PenjualanUiState.Idle
     }
 }

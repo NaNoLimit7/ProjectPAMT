@@ -1,26 +1,21 @@
 package com.example.projectpamt.viewmodel.produk
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.model.Produk
 import com.example.projectpamt.data.repository.ProdukRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 
-class ProdukViewModel : ViewModel() {
-    private val repository = ProdukRepository()
+class ProdukViewModel(
+    private val repository: ProdukRepository = ProdukRepository()
+) : ViewModel() {
 
-    var produkList by mutableStateOf<List<Produk>>(emptyList())
-        private set
-
-    var isLoading by mutableStateOf(false)
-        private set
-
-    var errorMessage by mutableStateOf<String?>(null)
-        private set
+    private val _uiState = MutableStateFlow<ProdukUiState>(ProdukUiState.Idle)
+    val uiState: StateFlow<ProdukUiState> = _uiState.asStateFlow()
 
     init {
         fetchProdukAktif()
@@ -28,14 +23,12 @@ class ProdukViewModel : ViewModel() {
 
     fun fetchProdukAktif() {
         viewModelScope.launch {
-            isLoading = true
-            errorMessage = null
+            _uiState.value = ProdukUiState.Loading
             try {
-              produkList = repository.getProdukAktif()
+                val result = repository.getProdukAktif()
+                _uiState.value = ProdukUiState.Success(result)
             } catch (e: Exception) {
-                errorMessage = "Gagal menampilkan produk ${e.message}"
-            } finally {
-                isLoading = false
+                _uiState.value = ProdukUiState.Error(e.message ?: "Gagal menampilkan produk")
             }
         }
     }
@@ -45,10 +38,10 @@ class ProdukViewModel : ViewModel() {
         harga: Double,
         stok: Double,
         namaSatuan: String,
-        detailProduk: JsonElement?) {
+        detailProduk: JsonElement?
+    ) {
         viewModelScope.launch {
-            isLoading = true
-            errorMessage = null
+            _uiState.value = ProdukUiState.Loading
             try {
                 val produkBaru = Produk(
                     nama = nama,
@@ -58,69 +51,57 @@ class ProdukViewModel : ViewModel() {
                     detailProduk = detailProduk
                 )
                 repository.tambahProduk(produkBaru)
-
                 fetchProdukAktif()
             } catch (e: Exception) {
-                errorMessage = "Gagal menambahkan produk ${e.message}"
-            } finally {
-                isLoading = false
+                _uiState.value = ProdukUiState.Error(e.message ?: "Gagal menambahkan produk")
             }
         }
     }
 
     fun updateInfoProduk(id: String, nama: String, harga: Double) {
         viewModelScope.launch {
-            isLoading = true
-            errorMessage = null
+            _uiState.value = ProdukUiState.Loading
             try {
                 repository.updateInfoProduk(
                     idProduk = id,
                     namaBaru = nama,
                     hargaBaru = harga
                 )
-
                 fetchProdukAktif()
             } catch (e: Exception) {
-                errorMessage = "Gagal mengubah info Produk ${e.message}"
-            } finally {
-                isLoading = false
+                _uiState.value = ProdukUiState.Error(e.message ?: "Gagal mengubah info Produk")
             }
         }
     }
 
     fun updateStok(id: String, stok: Double) {
         viewModelScope.launch {
-            isLoading = true
-            errorMessage = null
+            _uiState.value = ProdukUiState.Loading
             try {
                 repository.updateStok(idProduk = id, perubahanStok = stok)
-
                 fetchProdukAktif()
             } catch (e: Exception) {
-                errorMessage = "Gagal memperbarui stok ${e.message}"
-            } finally {
-                isLoading = false
+                _uiState.value = ProdukUiState.Error(e.message ?: "Gagal memperbarui stok")
             }
         }
     }
 
     fun nonaktifkanProduk(id: String) {
         viewModelScope.launch {
-            isLoading = true
-            errorMessage = null
+            _uiState.value = ProdukUiState.Loading
             try {
                 repository.nonaktifkanProduk(idProduk = id)
-
                 fetchProdukAktif()
             } catch (e: Exception) {
-                errorMessage = "Gagal menonaktifkan produk ${e.message}"
-            } finally {
-                isLoading = false
+                _uiState.value = ProdukUiState.Error(e.message ?: "Gagal menonaktifkan produk")
             }
         }
     }
 
-    fun clearError() {
-        errorMessage = null
+    fun clearUiState() {
+        if (_uiState.value is ProdukUiState.Error) {
+            _uiState.value = ProdukUiState.Idle
+            fetchProdukAktif()
+        }
     }
 }

@@ -1,26 +1,20 @@
 package com.example.projectpamt.viewmodel.pengeluaran
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.model.Pengeluaran
 import com.example.projectpamt.data.repository.PengeluaranRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class PengeluaranViewModel : ViewModel() {
+class PengeluaranViewModel(
+    private val repository: PengeluaranRepository = PengeluaranRepository()
+) : ViewModel() {
 
-    private val repository = PengeluaranRepository()
-
-    var pengeluaranList by mutableStateOf<List<Pengeluaran>>(emptyList())
-        private set
-
-    var isLoading by mutableStateOf(false)
-        private set
-
-    var errorMessage by mutableStateOf<String?>(null)
-        private set
+    private val _uiState = MutableStateFlow<PengeluaranUiState>(PengeluaranUiState.Idle)
+    val uiState: StateFlow<PengeluaranUiState> = _uiState.asStateFlow()
 
     init {
         fetchPengeluaran()
@@ -28,22 +22,20 @@ class PengeluaranViewModel : ViewModel() {
 
     fun fetchPengeluaran() {
         viewModelScope.launch {
-            isLoading = true
-            errorMessage = null
+            _uiState.value = PengeluaranUiState.Loading
             try {
-                pengeluaranList = repository.getAllPengeluaran()
+                val result = repository.getAllPengeluaran()
+                _uiState.value = PengeluaranUiState.Success(result)
             } catch (e: Exception) {
-                errorMessage = "Gagal memuat data pengeluaran: ${e.message}"
-            } finally {
-                isLoading = false
+                _uiState.value =
+                    PengeluaranUiState.Error("Gagal memuat data pengeluaran: ${e.message}")
             }
         }
     }
 
     fun addPengeluaran(idKategori: String, idKas: String, deskripsi: String, total: Double) {
         viewModelScope.launch {
-            isLoading = true
-            errorMessage = null
+            _uiState.value = PengeluaranUiState.Loading
             try {
                 val pengeluaranBaru = Pengeluaran(
                     idKategori = idKategori,
@@ -52,20 +44,23 @@ class PengeluaranViewModel : ViewModel() {
                     total = total
                 )
                 repository.insertPengeluaran(pengeluaranBaru)
-
                 fetchPengeluaran()
             } catch (e: Exception) {
-                errorMessage = "Gagal mencatat pengeluaran: ${e.message}"
-            } finally {
-                isLoading = false
+                _uiState.value =
+                    PengeluaranUiState.Error("Gagal mencatat pengeluaran: ${e.message}")
             }
         }
     }
 
-    fun updatePengeluaran(idPengeluaran: String, idKategori: String, idKas: String, deskripsi: String, total: Double) {
+    fun updatePengeluaran(
+        idPengeluaran: String,
+        idKategori: String,
+        idKas: String,
+        deskripsi: String,
+        total: Double
+    ) {
         viewModelScope.launch {
-            isLoading = true
-            errorMessage = null
+            _uiState.value = PengeluaranUiState.Loading
             try {
                 val pengeluaranUpdate = Pengeluaran(
                     idKategori = idKategori,
@@ -74,33 +69,31 @@ class PengeluaranViewModel : ViewModel() {
                     total = total
                 )
                 repository.updatePengeluaran(idPengeluaran, pengeluaranUpdate)
-
                 fetchPengeluaran()
             } catch (e: Exception) {
-                errorMessage = "Gagal memperbarui pengeluaran: ${e.message}"
-            } finally {
-                isLoading = false
+                _uiState.value =
+                    PengeluaranUiState.Error("Gagal memperbarui pengeluaran: ${e.message}")
             }
         }
     }
 
     fun deletePengeluaran(idPengeluaran: String) {
         viewModelScope.launch {
-            isLoading = true
-            errorMessage = null
+            _uiState.value = PengeluaranUiState.Loading
             try {
                 repository.deletePengeluaran(idPengeluaran)
-
                 fetchPengeluaran()
             } catch (e: Exception) {
-                errorMessage = "Gagal menghapus pengeluaran ${e.message}"
-            } finally {
-                isLoading = false
+                _uiState.value =
+                    PengeluaranUiState.Error("Gagal menghapus pengeluaran ${e.message}")
             }
         }
     }
 
-    fun clearError() {
-        errorMessage = null
+    fun clearUiState() {
+        if (_uiState.value is PengeluaranUiState.Error) {
+            _uiState.value = PengeluaranUiState.Idle
+            fetchPengeluaran()
+        }
     }
 }
