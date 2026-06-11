@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.screen
+package com.example.projectpamt.ui.screens.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -48,7 +48,7 @@ import com.example.projectpamt.ui.theme.ProjectPAMTTheme
 import com.example.projectpamt.viewmodel.auth.AuthUiState
 
 @Composable
-fun NewLoginScreen(
+fun LoginScreen(
     modifier: Modifier = Modifier,
     email: String,
     password: String,
@@ -250,10 +250,10 @@ fun AuthForm(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun NewLoginScreenPreview() {
+private fun LoginScreenPreview() {
     ProjectPAMTTheme {
         Scaffold(Modifier.fillMaxSize()) { innerPadding ->
-            NewLoginScreen(
+            LoginScreen(
                 email = "",
                 password = "",
                 uiState = AuthUiState.Idle,

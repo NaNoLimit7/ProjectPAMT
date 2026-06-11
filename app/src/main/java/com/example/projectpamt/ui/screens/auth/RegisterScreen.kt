@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.screen
+package com.example.projectpamt.ui.screens.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,7 +32,7 @@ import com.example.projectpamt.ui.theme.ProjectPAMTTheme
 import com.example.projectpamt.viewmodel.auth.AuthUiState
 
 @Composable
-fun NewRegisterScreen(
+fun RegisterScreen(
     modifier: Modifier = Modifier,
     email: String,
     password: String,
@@ -46,7 +46,6 @@ fun NewRegisterScreen(
     onRegisterClick: () -> Unit,
     onNavigateToLogin: () -> Unit,
 ) {
-
     val backgroundColor = Color(0xFFF2F0EB)
     val brandGreen = Color(0xFF00482F)
     val primaryGreen = Color(0xFF00754A)
@@ -203,10 +202,10 @@ fun NewRegisterScreen(
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun NewRegisterScreenPreview() {
+private fun RegisterScreenPreview() {
     ProjectPAMTTheme {
         Scaffold(Modifier.fillMaxSize()) { innerPadding ->
-            NewRegisterScreen(
+            RegisterScreen(
                 email = "",
                 password = "",
                 name = "",

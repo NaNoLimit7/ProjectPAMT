@@ -1,65 +1,24 @@
 package com.example.projectpamt.ui.navigation
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.projectpamt.ui.screen.DashboardScreen
-import com.example.projectpamt.ui.screen.NewLoginScreen
-import com.example.projectpamt.ui.screen.NewRegisterScreen
-import com.example.projectpamt.viewmodel.auth.AuthCheckState
+import com.example.projectpamt.ui.screens.home.DashboardScreen
+import com.example.projectpamt.ui.screens.auth.LoginScreen
+import com.example.projectpamt.ui.screens.auth.RegisterScreen
 import com.example.projectpamt.viewmodel.auth.AuthUiState
 import com.example.projectpamt.viewmodel.auth.AuthViewModel
 
 @Composable
-fun AppNavigation(
-    modifier: Modifier = Modifier,
-    authViewModel: AuthViewModel = viewModel()
-) {
-    val authCheckState = authViewModel.authCheckState.collectAsStateWithLifecycle()
-
-    when (authCheckState.value) {
-        is AuthCheckState.Authenticated -> {
-            MainNavHost(
-                modifier = modifier,
-                authViewModel = authViewModel,
-                startDestination = Destinations.Dashboard.route
-            )
-        }
-
-        is AuthCheckState.Checking -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        }
-
-
-        is AuthCheckState.NotAuthenticated -> {
-            MainNavHost(
-                modifier = modifier,
-                authViewModel = authViewModel,
-                startDestination = Destinations.Login.route
-            )
-        }
-    }
-}
-
-@Composable
-fun MainNavHost(
+fun AppNavHost(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
-    startDestination: String
+    startDestination: Any
 ) {
     val navController = rememberNavController()
     val email = authViewModel.email.collectAsStateWithLifecycle()
@@ -70,8 +29,8 @@ fun MainNavHost(
 
     LaunchedEffect(uiState.value) {
         if (uiState.value is AuthUiState.Success) {
-            navController.navigate(Destinations.Dashboard.route) {
-                popUpTo(Destinations.Login.route) {
+            navController.navigate(Dashboard) {
+                popUpTo(Login) {
                     inclusive = true
                 }
             }
@@ -83,9 +42,8 @@ fun MainNavHost(
         navController = navController,
         startDestination = startDestination,
     ) {
-        composable(Destinations.Login.route) {
-
-            NewLoginScreen(
+        composable<Login> {
+            LoginScreen(
                 modifier = modifier,
                 email = email.value,
                 password = password.value,
@@ -96,13 +54,13 @@ fun MainNavHost(
                     authViewModel.login()
                 },
                 onNavigateToRegister = {
-                    navController.navigate(Destinations.Register.route)
+                    navController.navigate(Register)
                 }
             )
         }
 
-        composable(Destinations.Register.route) {
-            NewRegisterScreen(
+        composable<Register> {
+            RegisterScreen(
                 modifier = Modifier.fillMaxSize(),
                 email = email.value,
                 password = password.value,
@@ -122,13 +80,13 @@ fun MainNavHost(
             )
         }
 
-        composable(Destinations.Dashboard.route) {
+        composable<Dashboard> {
             DashboardScreen(
                 onLogoutClick = {
                     authViewModel.logout()
 
-                    navController.navigate(Destinations.Login.route) {
-                        popUpTo(Destinations.Dashboard.route) {
+                    navController.navigate(Login) {
+                        popUpTo(Dashboard) {
                             inclusive = true
                         }
                     }

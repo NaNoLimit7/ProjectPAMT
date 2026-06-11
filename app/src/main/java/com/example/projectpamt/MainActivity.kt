@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.example.projectpamt.ui.navigation.AppNavigation
 import com.example.projectpamt.ui.theme.ProjectPAMTTheme
 
 class MainActivity : ComponentActivity() {
@@ -24,13 +23,7 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             ProjectPAMTTheme {
-                /*
-                 * AppNavigation menjadi root utama aplikasi.
-                 * Dari sini, aplikasi bisa pindah ke Login, Register, dan Dashboard.
-                 */
-                Scaffold(Modifier.fillMaxSize()) {
-                    AppNavigation(modifier = Modifier.padding(it))
-                }
+                AppEntryPoint()
             }
         }
     }
