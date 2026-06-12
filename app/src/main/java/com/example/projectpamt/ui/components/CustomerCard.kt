@@ -40,7 +40,6 @@ import com.example.projectpamt.ui.utils.formatRupiah
 @Composable
 fun CustomerCard(
     pelanggan: Pelanggan,
-    modifier: Modifier = Modifier,
     onActivityClick: () -> Unit = {},
     onEditClick: () -> Unit = {}
 ) {
@@ -62,7 +61,7 @@ fun CustomerCard(
     }
 
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         border = BorderStroke(1.dp, Color(0xFFF3F4F6)),

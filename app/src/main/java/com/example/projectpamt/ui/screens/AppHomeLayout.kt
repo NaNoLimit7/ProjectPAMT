@@ -45,7 +45,6 @@ fun AppHomeLayout(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = BackgroundSlate,
         bottomBar = {
             val routeWithBottomBar = listOf(
                 Dashboard::class,

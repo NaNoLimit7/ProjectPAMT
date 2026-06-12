@@ -46,6 +46,7 @@ import androidx.navigation.NavController
 import com.example.projectpamt.R
 import com.example.projectpamt.data.model.Pelanggan
 import com.example.projectpamt.ui.components.CustomerCard
+import com.example.projectpamt.ui.navigation.AktivitasPelanggan
 import com.example.projectpamt.ui.navigation.EditPelanggan
 import com.example.projectpamt.ui.navigation.TambahPelanggan
 import com.example.projectpamt.ui.theme.BackgroundSlate
@@ -74,7 +75,7 @@ fun PelangganScreen(
         searchQuery = searchQuery,
         onSearchQueryChange = { searchQuery = it },
         onAddCustomerClick = { navController.navigate(TambahPelanggan) },
-        onActivityClick = { /* TODO: Navigasi riwayat aktivitas */ },
+        onActivityClick = { navController.navigate(AktivitasPelanggan(it)) },
         onEditClick = { navController.navigate(EditPelanggan(it)) }
     )
 }

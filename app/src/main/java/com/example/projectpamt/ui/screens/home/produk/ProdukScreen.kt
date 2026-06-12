@@ -49,6 +49,7 @@ import com.example.projectpamt.ui.components.InventoryProductCard
 import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.TextDark
+import com.example.projectpamt.ui.navigation.TambahProduk
 import com.example.projectpamt.viewmodel.produk.ProdukUiState
 import com.example.projectpamt.viewmodel.produk.ProdukViewModel
 
@@ -71,7 +72,7 @@ fun ProdukScreen(
         uiState = uiState,
         searchQuery = searchQuery,
         onSearchQueryChange = { searchQuery = it },
-        onAddProductClick = { /* TODO: Navigasi tambah produk */ },
+        onAddProductClick = { navController.navigate(TambahProduk) },
         onDetailClick = { /* TODO: Navigasi detail produk */ },
         onEditClick = { /* TODO: Navigasi edit produk */ }
     )

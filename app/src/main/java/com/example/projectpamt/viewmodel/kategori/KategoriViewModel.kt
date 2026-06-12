@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 class KategoriViewModel(
     private val repository: KategoriRepository = KategoriRepository()
 ) : ViewModel() {
+    private val _kategoriList = MutableStateFlow(defaultCategories)
     private val _uiState = MutableStateFlow<KategoriUiState>(KategoriUiState.Idle)
     val uiState: StateFlow<KategoriUiState> = _uiState.asStateFlow()
 
@@ -23,8 +24,7 @@ class KategoriViewModel(
         viewModelScope.launch {
             _uiState.value = KategoriUiState.Loading
             try {
-                val result = repository.getAllKategori()
-                _uiState.value = KategoriUiState.Success(result)
+                _uiState.value = KategoriUiState.Success(_kategoriList.value)
             } catch (e: Exception) {
                 _uiState.value = KategoriUiState.Error("Gagal memuat data kategori ${e.message}")
             }
@@ -35,8 +35,10 @@ class KategoriViewModel(
         viewModelScope.launch {
             _uiState.value = KategoriUiState.Loading
             try {
-                val kategoriBaru = Kategori(name = name)
-                repository.insertKategori(kategoriBaru)
+                kotlinx.coroutines.delay(300)
+                val newId = (_kategoriList.value.mapNotNull { it.idKategori?.toIntOrNull() }.maxOrNull() ?: 0) + 1
+                val kategoriBaru = Kategori(idKategori = newId.toString(), name = name)
+                _kategoriList.value += kategoriBaru
                 fetchKategori()
             } catch (e: Exception) {
                 _uiState.value = KategoriUiState.Error("Gagal menambahkan kategori ${e.message}")
@@ -48,8 +50,13 @@ class KategoriViewModel(
         viewModelScope.launch {
             _uiState.value = KategoriUiState.Loading
             try {
-                val kategoriUpdate = Kategori(name = name)
-                repository.updateKategori(id, kategoriUpdate)
+                _kategoriList.value = _kategoriList.value.map { kategori ->
+                    if (kategori.idKategori == id) {
+                        kategori.copy(name = name)
+                    } else {
+                        kategori
+                    }
+                }
                 fetchKategori()
             } catch (e: Exception) {
                 _uiState.value = KategoriUiState.Error("Gagal memperbarui kategori ${e.message}")
@@ -61,7 +68,7 @@ class KategoriViewModel(
         viewModelScope.launch {
             _uiState.value = KategoriUiState.Loading
             try {
-                repository.deleteKategori(id)
+                _kategoriList.value = _kategoriList.value.filter { it.idKategori != id }
                 fetchKategori()
             } catch (e: Exception) {
                 _uiState.value = KategoriUiState.Error("Gagal menghapus kategori ${e.message}")
@@ -74,5 +81,15 @@ class KategoriViewModel(
             _uiState.value = KategoriUiState.Idle
             fetchKategori()
         }
+    }
+
+    companion object {
+        val defaultCategories = listOf(
+            Kategori(idKategori = "1", name = "Makanan"),
+            Kategori(idKategori = "2", name = "Minuman"),
+            Kategori(idKategori = "3", name = "Aksesoris"),
+            Kategori(idKategori = "4", name = "Elektronik"),
+            Kategori(idKategori = "5", name = "Jasa")
+        )
     }
 }
