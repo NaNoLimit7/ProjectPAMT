@@ -11,6 +11,10 @@ import androidx.navigation.NavType
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+
 @Serializable
 data class Produk(
     @SerialName("id_produk") val idProduk: String? = null,
@@ -22,6 +26,9 @@ data class Produk(
     val aktif: Boolean = true,
     @SerialName("created_at") val createdAt: String? = null
 ) {
+    val imageUrl: String?
+        get() = detailProduk?.jsonObject?.get("image_url")?.jsonPrimitive?.contentOrNull
+
     companion object {
         val ProdukNavType = object : NavType<Produk>(isNullableAllowed = false) {
             override fun get(bundle: Bundle, key: String): Produk? {

@@ -10,6 +10,8 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
 
+import io.github.jan.supabase.postgrest.query.Count
+
 class PenjualanRepository {
     private val supabase = SupabaseClientProvider.client
 
@@ -40,5 +42,11 @@ class PenjualanRepository {
         ).decodeAs<String>()
 
         return idPenjualanBaru
+    }
+
+    suspend fun getTotalTransaksi(): Int {
+        return supabase.postgrest["penjualan"]
+            .select { count(Count.EXACT) }
+            .countOrNull()?.toInt() ?: 0
     }
 }

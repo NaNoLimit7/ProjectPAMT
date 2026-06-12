@@ -1,0 +1,24 @@
+<!--
+  ~ Copyright (C) 2026 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="14dp"
+    android:height="16dp"
+    android:viewportWidth="14"
+    android:viewportHeight="16">
+  <path
+      android:pathData="M5.344,1.625L4.75,2.5H9.281L8.688,1.625C8.625,1.542 8.552,1.5 8.469,1.5H5.531C5.448,1.5 5.375,1.542 5.313,1.625H5.344ZM9.938,0.781L11.063,2.5H11.5H13H13.25C13.708,2.542 13.958,2.792 14,3.25C13.958,3.708 13.708,3.958 13.25,4H13V13.5C12.979,14.208 12.74,14.802 12.281,15.281C11.802,15.74 11.208,15.979 10.5,16H3.5C2.792,15.979 2.198,15.74 1.719,15.281C1.26,14.802 1.021,14.208 1,13.5V4H0.75C0.292,3.958 0.042,3.708 0,3.25C0.042,2.792 0.292,2.542 0.75,2.5H1H2.5H2.938L4.094,0.781C4.448,0.281 4.927,0.021 5.531,0H8.469C9.073,0.021 9.552,0.281 9.906,0.781H9.938ZM2.5,4V13.5C2.5,13.792 2.594,14.031 2.781,14.219C2.969,14.406 3.208,14.5 3.5,14.5H10.5C10.792,14.5 11.031,14.406 11.219,14.219C11.406,14.031 11.5,13.792 11.5,13.5V4H2.5ZM5,6V12.5C4.979,12.813 4.813,12.979 4.5,13C4.188,12.979 4.021,12.813 4,12.5V6C4.021,5.688 4.188,5.521 4.5,5.5C4.813,5.521 4.979,5.688 5,6ZM7.5,6V12.5C7.479,12.813 7.313,12.979 7,13C6.688,12.979 6.521,12.813 6.5,12.5V6C6.521,5.688 6.688,5.521 7,5.5C7.313,5.521 7.479,5.688 7.5,6ZM10,6V12.5C9.979,12.813 9.813,12.979 9.5,13C9.188,12.979 9.021,12.813 9,12.5V6C9.021,5.688 9.188,5.521 9.5,5.5C9.813,5.521 9.979,5.688 10,6Z"
+      android:fillColor="#F87171"/>
+</vector>

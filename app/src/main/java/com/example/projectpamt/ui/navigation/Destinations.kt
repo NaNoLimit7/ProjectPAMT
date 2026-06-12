@@ -38,3 +38,9 @@ data class EditProduk(val produk: Produk)
 
 @Serializable
 data class EditPelanggan(val pelanggan: Pelanggan)
+
+@Serializable
+object TambahPelanggan
+
+@Serializable
+object ProsesPembayaran

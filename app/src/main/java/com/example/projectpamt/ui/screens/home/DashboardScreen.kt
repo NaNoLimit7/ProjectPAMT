@@ -20,7 +20,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Receipt
@@ -50,7 +49,6 @@ import com.example.projectpamt.ui.theme.ActionGreen
 import com.example.projectpamt.ui.theme.ActionOrange
 import com.example.projectpamt.ui.theme.ActionPurple
 import com.example.projectpamt.ui.theme.BackgroundSlate
-import com.example.projectpamt.ui.theme.DynamicStatusBar
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.GreenSecondary
 import com.example.projectpamt.ui.theme.ProjectPAMTTheme
@@ -271,7 +269,7 @@ fun DashboardContent(
                         modifier = Modifier.weight(1f)
                     )
                     QuickActionButton(
-                        icon = ImageVector.vectorResource(R.drawable.tambah_produk),
+                        icon = ImageVector.vectorResource(R.drawable.add),
                         label = "Tambah\nProduk",
                         accentColor = ActionGreen,
                         onClick = onNavigateTambahProduk,
