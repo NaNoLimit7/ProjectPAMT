@@ -54,7 +54,6 @@ fun DashboardScreen(
         email = email,
         onLogoutClick = {
             authViewModel.logout()
-
             navController.navigate(Login) {
                 popUpTo(Dashboard) {
                     inclusive = true

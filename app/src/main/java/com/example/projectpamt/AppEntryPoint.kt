@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -17,9 +18,9 @@ import com.example.projectpamt.viewmodel.auth.AuthViewModel
 fun AppEntryPoint(
     authViewModel: AuthViewModel = viewModel()
 ) {
-    val authCheckState = authViewModel.authCheckState.collectAsStateWithLifecycle()
+    val authCheckState by authViewModel.authCheckState.collectAsStateWithLifecycle()
 
-    when (authCheckState.value) {
+    when (authCheckState) {
         is AuthCheckState.Authenticated -> {
             AppHomeLayout(authViewModel = authViewModel)
         }
