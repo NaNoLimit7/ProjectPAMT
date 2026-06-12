@@ -136,11 +136,11 @@ private fun ProdukContent(
                             .size(40.dp)
                             .clip(CircleShape)
                             .border(BorderStroke(2.dp, Color.White.copy(alpha = 0.3f)), CircleShape)
-                            .clickable { /* TODO: Aksi keranjang/bag */ },
+                            .clickable { /* TODO: MASUK KE LOG INVENTORY SCREEN */ },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.produk_bag),
+                            imageVector = ImageVector.vectorResource(R.drawable.history),
                             contentDescription = "Bag",
                             tint = Color.White,
                             modifier = Modifier.size(18.dp)

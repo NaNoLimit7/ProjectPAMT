@@ -1,10 +1,6 @@
 package com.example.projectpamt.ui.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -22,6 +18,7 @@ import com.example.projectpamt.ui.screens.home.pelanggan.PelangganScreen
 import com.example.projectpamt.ui.screens.home.pelanggan.TambahPelangganScreen
 import com.example.projectpamt.ui.screens.home.penjualan.PenjualanScreen
 import com.example.projectpamt.ui.screens.home.penjualan.ProsesPembayaranScreen
+import com.example.projectpamt.ui.screens.home.penjualan.PembayaranBerhasilScreen
 import com.example.projectpamt.ui.screens.home.produk.DetailProdukScreen
 import com.example.projectpamt.ui.screens.home.produk.EditProdukScreen
 import com.example.projectpamt.ui.screens.home.produk.ProdukScreen
@@ -178,6 +175,18 @@ fun AppNavHost(
                 pelanggan = route.pelanggan,
                 cartItemsJson = route.cartItemsJson,
                 totalHarga = route.totalHarga,
+                navController = navController
+            )
+        }
+
+        composable<InfoPembayaranBerhasil> { backStackEntry ->
+            val route = backStackEntry.toRoute<InfoPembayaranBerhasil>()
+            PembayaranBerhasilScreen(
+                modifier = modifier,
+                idTransaksi = route.idTransaksi,
+                totalPembayaran = route.totalPembayaran,
+                kembalian = route.kembalian,
+                tanggalWaktu = route.tanggalWaktu,
                 navController = navController
             )
         }

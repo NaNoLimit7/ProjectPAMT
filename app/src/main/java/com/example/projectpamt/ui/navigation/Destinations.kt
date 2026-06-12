@@ -57,3 +57,11 @@ data class ProsesPembayaran(
     val cartItemsJson: String,
     val totalHarga: Double
 )
+
+@Serializable
+data class InfoPembayaranBerhasil(
+    val idTransaksi: String,
+    val totalPembayaran: Double,
+    val kembalian: Double,
+    val tanggalWaktu: String
+)

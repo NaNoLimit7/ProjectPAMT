@@ -35,6 +35,11 @@ import com.example.projectpamt.viewmodel.penjualan.CartItem
 import com.example.projectpamt.viewmodel.penjualan.PembayaranUiState
 import com.example.projectpamt.viewmodel.penjualan.PembayaranViewModel
 import kotlinx.serialization.json.Json
+import com.example.projectpamt.ui.navigation.ProsesPembayaran
+import com.example.projectpamt.ui.navigation.InfoPembayaranBerhasil
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,19 +78,29 @@ fun ProsesPembayaranScreen(
 
     // Handle states
     LaunchedEffect(uiState) {
-        when (uiState) {
-            is PembayaranUiState.Success -> {
-                Toast.makeText(context, "Pembayaran Berhasil!", Toast.LENGTH_SHORT).show()
-                // Set parameter to clear the cart in PenjualanScreen
-                navController.previousBackStackEntry?.savedStateHandle?.set("clear_cart", true)
-                navController.popBackStack()
-                viewModel.resetState()
+        if (uiState is PembayaranUiState.Success) {
+            val transactionId = (uiState as PembayaranUiState.Success).transactionId
+            val formattedDate = SimpleDateFormat("d MMMM yyyy HH:mm", Locale("id", "ID")).format(Date())
+            val change = cashReceivedAmount - totalHarga
+            
+            // Set parameter to clear the cart in PenjualanScreen
+            navController.previousBackStackEntry?.savedStateHandle?.set("clear_cart", true)
+            
+            // Navigate to InfoPembayaranBerhasil and pop ProsesPembayaran Screen
+            navController.navigate(
+                InfoPembayaranBerhasil(
+                    idTransaksi = transactionId,
+                    totalPembayaran = totalHarga,
+                    kembalian = change,
+                    tanggalWaktu = formattedDate
+                )
+            ) {
+                popUpTo<ProsesPembayaran> { inclusive = true }
             }
-            is PembayaranUiState.Error -> {
-                Toast.makeText(context, (uiState as PembayaranUiState.Error).message, Toast.LENGTH_SHORT).show()
-                viewModel.resetState()
-            }
-            else -> {}
+            viewModel.resetState()
+        } else if (uiState is PembayaranUiState.Error) {
+            Toast.makeText(context, (uiState as PembayaranUiState.Error).message, Toast.LENGTH_SHORT).show()
+            viewModel.resetState()
         }
     }
 
@@ -93,14 +108,14 @@ fun ProsesPembayaranScreen(
         modifier = modifier
             .fillMaxSize()
             .background(BackgroundSlate)
+            .imePadding()
     ) {
         // Scrollable content area that adjusts with keyboard
         Column(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .imePadding(),
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             // ── HEADER SECTION ────────────────────────────────────────────────

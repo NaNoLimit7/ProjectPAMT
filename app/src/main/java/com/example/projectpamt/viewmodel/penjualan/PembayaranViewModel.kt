@@ -61,8 +61,11 @@ class PembayaranViewModel : ViewModel() {
                 // Simulate network latency
                 delay(1000)
                 
+                // Generate a dummy transaction ID TXN-XXXX
+                val dummyTxnId = "TXN-${(1000..9999).random()}"
+                
                 // Keep it in-memory for now per guidelines
-                _uiState.value = PembayaranUiState.Success
+                _uiState.value = PembayaranUiState.Success(dummyTxnId)
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = PembayaranUiState.Error(e.message ?: "Gagal memproses pembayaran")
