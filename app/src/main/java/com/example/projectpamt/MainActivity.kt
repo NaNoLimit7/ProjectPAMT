@@ -15,12 +15,7 @@ import com.example.projectpamt.ui.theme.ProjectPAMTTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(
-                scrim = Color.TRANSPARENT,
-                darkScrim = Color.TRANSPARENT
-            )
-        )
+        enableEdgeToEdge()
         setContent {
             ProjectPAMTTheme {
                 AppEntryPoint()

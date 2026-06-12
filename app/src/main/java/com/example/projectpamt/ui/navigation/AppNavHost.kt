@@ -10,12 +10,20 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.projectpamt.ui.screens.home.DashboardScreen
+import androidx.navigation.toRoute
+import com.example.projectpamt.data.model.Pelanggan
 import com.example.projectpamt.ui.screens.auth.LoginScreen
 import com.example.projectpamt.ui.screens.auth.RegisterScreen
-import com.example.projectpamt.ui.screens.home.PenjualanScreen
+import com.example.projectpamt.ui.screens.home.dashboard.DashboardScreen
+import com.example.projectpamt.ui.screens.home.kas.KasScreen
+import com.example.projectpamt.ui.screens.home.pelanggan.EditPelangganScreen
+import com.example.projectpamt.ui.screens.home.pelanggan.PelangganScreen
+import com.example.projectpamt.ui.screens.home.pelanggan.TambahPelangganScreen
+import com.example.projectpamt.ui.screens.home.penjualan.PenjualanScreen
+import com.example.projectpamt.ui.screens.home.produk.ProdukScreen
 import com.example.projectpamt.viewmodel.auth.AuthViewModel
-import com.example.projectpamt.viewmodel.penjualan.PenjualanViewModel
+import com.example.projectpamt.viewmodel.pelanggan.PelangganViewModel
+import kotlin.reflect.typeOf
 
 @Composable
 fun AppNavHost(
@@ -24,10 +32,11 @@ fun AppNavHost(
     startDestination: Any,
     navController: NavHostController,
 ) {
+    val pelangganViewModel: PelangganViewModel = viewModel()
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = modifier,
     ) {
         composable<Login> {
             LoginScreen(
@@ -60,10 +69,46 @@ fun AppNavHost(
             )
         }
 
+        composable<ProdukList> {
+            ProdukScreen(
+                modifier = modifier,
+                navController = navController
+            )
+        }
+
+        composable<PelangganList> {
+            PelangganScreen(
+                modifier = modifier,
+                viewModel = pelangganViewModel,
+                navController = navController
+            )
+        }
+
+        composable<KasList> {
+            KasScreen(
+                modifier = modifier,
+                navController = navController
+            )
+        }
+
         composable<TambahPelanggan> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Halaman Tambah Pelanggan")
-            }
+            TambahPelangganScreen(
+                modifier = modifier,
+                viewModel = pelangganViewModel,
+                navController = navController
+            )
+        }
+
+        composable<EditPelanggan>(
+            typeMap = mapOf(typeOf<Pelanggan>() to Pelanggan.PelangganNavType)
+        ) { backStackEntry ->
+            val route = backStackEntry.toRoute<EditPelanggan>()
+            EditPelangganScreen(
+                modifier = modifier,
+                pelanggan = route.pelanggan,
+                viewModel = pelangganViewModel,
+                navController = navController
+            )
         }
 
         composable<ProsesPembayaran> {

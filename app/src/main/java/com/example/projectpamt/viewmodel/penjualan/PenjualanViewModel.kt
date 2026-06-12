@@ -48,7 +48,7 @@ class PenjualanViewModel(
             try {
                 val totalTransaksi = repository.getTotalTransaksi()
                 val pelangganList = pelangganRepository.getAllPelanggan().filter { it.aktif }
-                val produkList = produkRepository.getProdukAktif()
+                val produkList = Produk.dummyList
                 _dataState.value = PenjualanDataUiState.Success(
                     totalTransaksi = totalTransaksi,
                     pelangganList = pelangganList,

@@ -32,5 +32,32 @@ data class Pelanggan(
                 return Uri.encode(Json.encodeToString(value))
             }
         }
+
+        val dummyList = listOf(
+            Pelanggan(
+                idPelanggan = "1",
+                nama = "Sarah Johnson",
+                telepon = "082374638283",
+                aktif = true
+            ),
+            Pelanggan(
+                idPelanggan = "2",
+                nama = "Michael Chen",
+                telepon = "082374639325",
+                aktif = true
+            ),
+            Pelanggan(
+                idPelanggan = "3",
+                nama = "Emily Rodriguez",
+                telepon = "082103843432",
+                aktif = true
+            ),
+            Pelanggan(
+                idPelanggan = "4",
+                nama = "David Kim",
+                telepon = "083283642849",
+                aktif = false
+            )
+        )
     }
 }

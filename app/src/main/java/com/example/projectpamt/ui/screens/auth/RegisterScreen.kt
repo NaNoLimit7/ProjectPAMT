@@ -1,8 +1,6 @@
 package com.example.projectpamt.ui.screens.auth
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,6 +14,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -36,7 +37,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.projectpamt.R
-import com.example.projectpamt.ui.components.AuthForm
+import com.example.projectpamt.ui.components.AppTextField
+import com.example.projectpamt.ui.utils.ValidationUtils
 import com.example.projectpamt.ui.theme.ProjectPAMTTheme
 import com.example.projectpamt.viewmodel.auth.AuthUiState
 import com.example.projectpamt.viewmodel.auth.AuthViewModel
@@ -88,6 +90,15 @@ private fun RegisterContent(
     onRegisterClick: () -> Unit,
     onNavigateToLogin: () -> Unit,
 ) {
+    var nameError by remember { mutableStateOf<String?>(null) }
+    var phoneError by remember { mutableStateOf<String?>(null) }
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+
+    val isButtonEnabled = fullname.isNotBlank() && phone.isNotBlank() && email.isNotBlank() && password.isNotBlank() &&
+            nameError == null && phoneError == null && emailError == null && passwordError == null &&
+            uiState !is AuthUiState.Loading
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -139,34 +150,54 @@ private fun RegisterContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 
-                AuthForm(
+                AppTextField(
                     label = "Nama Lengkap",
                     value = fullname,
-                    onValueChange = onNameChange,
+                    onValueChange = {
+                        onNameChange(it)
+                        nameError = ValidationUtils.validateName(it).errorMessage
+                    },
+                    isError = nameError != null,
+                    errorMessage = nameError
                 )
 
-                AuthForm(
+                AppTextField(
                     label = "Nomor Telepon",
                     value = phone,
-                    onValueChange = onPhoneChange,
+                    onValueChange = {
+                        onPhoneChange(it)
+                        phoneError = ValidationUtils.validatePhone(it).errorMessage
+                    },
+                    isError = phoneError != null,
+                    errorMessage = phoneError,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Phone
                     )
                 )
 
-                AuthForm(
+                AppTextField(
                     value = email,
                     label = "Email",
-                    onValueChange = onEmailChange,
+                    onValueChange = {
+                        onEmailChange(it)
+                        emailError = ValidationUtils.validateEmail(it).errorMessage
+                    },
+                    isError = emailError != null,
+                    errorMessage = emailError,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Email
                     ),
                 )
 
-                AuthForm(
+                AppTextField(
                     value = password,
-                    onValueChange = onPasswordChange,
+                    onValueChange = {
+                        onPasswordChange(it)
+                        passwordError = ValidationUtils.validatePassword(it).errorMessage
+                    },
                     label = "Kata Sandi",
+                    isError = passwordError != null,
+                    errorMessage = passwordError,
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password
@@ -177,14 +208,28 @@ private fun RegisterContent(
 
 
                 Button(
-                    onClick = onRegisterClick,
+                    onClick = {
+                        val nameVal = ValidationUtils.validateName(fullname)
+                        val phoneVal = ValidationUtils.validatePhone(phone)
+                        val emailVal = ValidationUtils.validateEmail(email)
+                        val passwordVal = ValidationUtils.validatePassword(password)
+                        
+                        nameError = nameVal.errorMessage
+                        phoneError = phoneVal.errorMessage
+                        emailError = emailVal.errorMessage
+                        passwordError = passwordVal.errorMessage
+                        
+                        if (nameVal.isValid && phoneVal.isValid && emailVal.isValid && passwordVal.isValid) {
+                            onRegisterClick()
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
                         .shadow(elevation = 1.dp, shape = RoundedCornerShape(50.dp)),
                     shape = RoundedCornerShape(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00754A)),
-                    enabled = uiState !is AuthUiState.Loading
+                    enabled = isButtonEnabled
                 ) {
                     if (uiState is AuthUiState.Loading) {
                         CircularProgressIndicator(

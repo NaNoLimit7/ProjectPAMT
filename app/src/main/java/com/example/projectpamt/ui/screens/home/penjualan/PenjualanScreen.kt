@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.screens.home
+package com.example.projectpamt.ui.screens.home.penjualan
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -21,24 +20,22 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -52,24 +49,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import coil.compose.SubcomposeAsyncImage
 import com.example.projectpamt.R
 import com.example.projectpamt.data.model.Pelanggan
 import com.example.projectpamt.data.model.Produk
+import com.example.projectpamt.ui.components.AppNavigationBar
 import com.example.projectpamt.ui.components.ProductCard
 import com.example.projectpamt.ui.navigation.ProsesPembayaran
 import com.example.projectpamt.ui.navigation.TambahPelanggan
-import com.example.projectpamt.ui.theme.BackgroundSlate
-import com.example.projectpamt.ui.theme.DynamicStatusBar
 import com.example.projectpamt.ui.theme.GreenPrimary
-import com.example.projectpamt.ui.theme.GreenSecondary
-import com.example.projectpamt.ui.theme.formatRupiah
+import com.example.projectpamt.ui.theme.ProjectPAMTTheme
+import com.example.projectpamt.ui.utils.formatRupiah
 import com.example.projectpamt.viewmodel.penjualan.CartItem
 import com.example.projectpamt.viewmodel.penjualan.PenjualanDataUiState
 import com.example.projectpamt.viewmodel.penjualan.PenjualanViewModel
@@ -82,14 +82,14 @@ fun PenjualanScreen(
     viewModel: PenjualanViewModel = viewModel(),
     navController: NavController,
 ) {
-    val dataState by viewModel.dataState.collectAsStateWithLifecycle()
+    val uiState by viewModel.dataState.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val cartItems by viewModel.cartItems.collectAsStateWithLifecycle()
     val selectedPelanggan by viewModel.selectedPelanggan.collectAsStateWithLifecycle()
 
     PenjualanContent(
         modifier = modifier,
-        dataState = dataState,
+        dataState = uiState,
         searchQuery = searchQuery,
         cartItems = cartItems,
         selectedPelanggan = selectedPelanggan,
@@ -123,21 +123,19 @@ private fun PenjualanContent(
     onProcessPaymentClick: () -> Unit,
 ) {
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(BackgroundSlate)
+        modifier = Modifier.fillMaxSize()
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(
-                bottom = if (cartItems.isNotEmpty()) 140.dp else 16.dp
-            )
         ) {
             // ── HEADER ────────────────────────────────────────────────────
             item {
                 PenjualanHeader(
-                    totalTransaksi = if (dataState is PenjualanDataUiState.Success)
-                        dataState.totalTransaksi else 0,
+                    modifier = modifier,
+                    totalTransaksi =
+                        if (dataState is PenjualanDataUiState.Success)
+                            dataState.totalTransaksi
+                        else 0,
                     cartItemCount = cartItems.sumOf { it.quantity }
                 )
             }
@@ -278,7 +276,7 @@ private fun PenjualanContent(
                 when (dataState) {
                     is PenjualanDataUiState.Loading -> {
                         Box(
-                            modifier = Modifier
+                            modifier = modifier
                                 .fillMaxWidth()
                                 .height(200.dp),
                             contentAlignment = Alignment.Center
@@ -286,9 +284,10 @@ private fun PenjualanContent(
                             Text("Memuat produk...", color = Color.Gray)
                         }
                     }
+
                     is PenjualanDataUiState.Error -> {
                         Box(
-                            modifier = Modifier
+                            modifier = modifier
                                 .fillMaxWidth()
                                 .height(200.dp),
                             contentAlignment = Alignment.Center
@@ -296,6 +295,7 @@ private fun PenjualanContent(
                             Text(dataState.message, color = Color.Red, fontSize = 14.sp)
                         }
                     }
+
                     is PenjualanDataUiState.Success -> {
                         val filtered = dataState.produkList.filter {
                             it.nama.contains(searchQuery, ignoreCase = true)
@@ -305,7 +305,7 @@ private fun PenjualanContent(
                         // jadi kita render grid secara manual dalam rows
                         val rows = filtered.chunked(2)
                         Column(
-                            modifier = Modifier
+                            modifier = modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp)
                                 .padding(top = 12.dp),
@@ -332,6 +332,7 @@ private fun PenjualanContent(
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
+
                     else -> {}
                 }
             }
@@ -356,6 +357,7 @@ private fun PenjualanContent(
 
 @Composable
 private fun PenjualanHeader(
+    modifier: Modifier = Modifier,
     totalTransaksi: Int,
     cartItemCount: Int
 ) {
@@ -528,10 +530,10 @@ private fun CartItemRow(
                     .background(Color(0xFFF1F5F9)),
                 contentAlignment = Alignment.Center
             ) {
-                coil.compose.SubcomposeAsyncImage(
+                SubcomposeAsyncImage(
                     model = item.produk.imageUrl,
                     contentDescription = item.produk.nama,
-                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(RoundedCornerShape(12.dp))
@@ -570,7 +572,12 @@ private fun CartItemRow(
                             .clickable { onDecrement() },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("−", fontSize = 14.sp, color = Color(0xFF64748B), fontWeight = FontWeight.Bold)
+                        Text(
+                            "−",
+                            fontSize = 14.sp,
+                            color = Color(0xFF64748B),
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                     Text(
                         text = "${item.quantity}",
@@ -584,7 +591,12 @@ private fun CartItemRow(
                             .clickable { onIncrement() },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("+", fontSize = 14.sp, color = Color(0xFF64748B), fontWeight = FontWeight.Bold)
+                        Text(
+                            "+",
+                            fontSize = 14.sp,
+                            color = Color(0xFF64748B),
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
@@ -610,56 +622,125 @@ private fun CartBottomBar(
     onProcessClick: () -> Unit
 ) {
     val totalHarga = cartItems.sumOf { it.totalHarga }
+    val totalItems = cartItems.sumOf { it.quantity }
 
-    Card(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            .padding(16.dp)
+            .clickable { onProcessClick() },
+        shape = RoundedCornerShape(12.dp),
+        color = GreenPrimary,
+        shadowElevation = 6.dp
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Total row
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(
-                    text = "Total",
-                    fontSize = 18.sp,
-                    color = Color(0xFF1E293B)
-                )
-                Text(
-                    text = formatRupiah(totalHarga),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = GreenPrimary
-                )
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.2f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = "Keranjang",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                Column {
+                    Text(
+                        text = "$totalItems Item",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = formatRupiah(totalHarga),
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
 
-            // Process button
-            Button(
-                onClick = onProcessClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
-                shape = RoundedCornerShape(12.dp)
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "Proses Pembayaran",
-                    fontSize = 16.sp,
+                    text = "Proses",
+                    color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    fontSize = 16.sp
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(
+                    imageVector = Icons.Default.ArrowForward,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
                 )
             }
+        }
+    }
+}
+
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+private fun PenjualanScreenPreview() {
+    // Sample data for preview
+    val sampleProduk = Produk.dummyList
+    val samplePelanggan = listOf(
+        Pelanggan(idPelanggan = "p1", nama = "Budi", telepon = "08123456789"),
+        Pelanggan(idPelanggan = "p2", nama = "Siti", telepon = "08234567890")
+    )
+
+    val sampleCart = listOf(
+        CartItem(sampleProduk[0], quantity = 2),
+        CartItem(sampleProduk[2], quantity = 1)
+    )
+
+    val total = sampleCart.sumOf { it.totalHarga }.toInt()
+    val dataStatePreview = PenjualanDataUiState.Success(
+        totalTransaksi = total,
+        pelangganList = samplePelanggan,
+        produkList = sampleProduk
+    )
+
+    ProjectPAMTTheme(dynamicColor = false) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            contentWindowInsets = WindowInsets(0), // ← tambahkan ini
+            bottomBar = {
+                AppNavigationBar(
+                    navController = rememberNavController(),
+                    currentDestination = null
+                )
+            }
+        ) { innerPadding ->
+            PenjualanContent(
+                modifier = Modifier.padding(innerPadding),
+                dataState = dataStatePreview,
+                searchQuery = "",
+                cartItems = sampleCart,
+                selectedPelanggan = samplePelanggan.firstOrNull(),
+                onSearchQueryChange = {},
+                onSelectPelanggan = {},
+                onAddToCart = {},
+                onRemoveFromCart = {},
+                onUpdateQuantity = { _, _ -> },
+                onClearCart = {},
+                onAddPelangganClick = {},
+                onProcessPaymentClick = {}
+            )
         }
     }
 }

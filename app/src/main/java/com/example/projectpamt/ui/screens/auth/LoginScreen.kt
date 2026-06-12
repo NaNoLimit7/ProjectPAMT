@@ -1,7 +1,6 @@
 package com.example.projectpamt.ui.screens.auth
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,12 +21,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,7 +39,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
@@ -49,7 +48,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.projectpamt.R
-import com.example.projectpamt.ui.components.AuthForm
+import com.example.projectpamt.ui.components.AppTextField
+import com.example.projectpamt.ui.utils.ValidationUtils
 import com.example.projectpamt.ui.navigation.Register
 import com.example.projectpamt.ui.theme.ProjectPAMTTheme
 import com.example.projectpamt.viewmodel.auth.AuthUiState
@@ -92,6 +92,10 @@ private fun LoginContent(
     onLoginClick: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+    val isButtonEnabled = email.isNotBlank() && password.isNotBlank() && emailError == null && passwordError == null && uiState !is AuthUiState.Loading
+
     Box(
         modifier = modifier.fillMaxSize()
     ) {
@@ -127,10 +131,15 @@ private fun LoginContent(
                 modifier = Modifier.padding(top = 8.dp, bottom = 48.dp),
                 letterSpacing = (-0.16).sp
             )
-            AuthForm(
+            AppTextField(
                 label = "Email",
                 value = email,
-                onValueChange = onEmailChange,
+                onValueChange = {
+                    onEmailChange(it)
+                    emailError = ValidationUtils.validateEmail(it).errorMessage
+                },
+                isError = emailError != null,
+                errorMessage = emailError,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
@@ -139,17 +148,30 @@ private fun LoginContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            AuthForm(
+            AppTextField(
                 label = "Kata Sandi",
                 value = password,
-                onValueChange = onPasswordChange,
+                onValueChange = {
+                    onPasswordChange(it)
+                    passwordError = ValidationUtils.validatePassword(it).errorMessage
+                },
+                isError = passwordError != null,
+                errorMessage = passwordError,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
-                    onDone = { onLoginClick() }
+                    onDone = {
+                        val emailVal = ValidationUtils.validateEmail(email)
+                        val passwordVal = ValidationUtils.validatePassword(password)
+                        emailError = emailVal.errorMessage
+                        passwordError = passwordVal.errorMessage
+                        if (emailVal.isValid && passwordVal.isValid) {
+                            onLoginClick()
+                        }
+                    }
                 )
             )
 
@@ -171,13 +193,21 @@ private fun LoginContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = onLoginClick,
+                onClick = {
+                    val emailVal = ValidationUtils.validateEmail(email)
+                    val passwordVal = ValidationUtils.validatePassword(password)
+                    emailError = emailVal.errorMessage
+                    passwordError = passwordVal.errorMessage
+                    if (emailVal.isValid && passwordVal.isValid) {
+                        onLoginClick()
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
                 shape = RoundedCornerShape(9999.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00754A)),
-                enabled = uiState !is AuthUiState.Loading
+                enabled = isButtonEnabled
             ) {
                 if (uiState is AuthUiState.Loading) {
                     CircularProgressIndicator(

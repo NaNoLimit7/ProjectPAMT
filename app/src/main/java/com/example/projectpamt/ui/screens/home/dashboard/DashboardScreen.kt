@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.screens.home
+package com.example.projectpamt.ui.screens.home.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +22,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -52,10 +51,10 @@ import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.GreenSecondary
 import com.example.projectpamt.ui.theme.ProjectPAMTTheme
-import com.example.projectpamt.ui.theme.formatNumber
-import com.example.projectpamt.ui.theme.formatRupiah
-import com.example.projectpamt.ui.theme.getInitials
-import com.example.projectpamt.ui.theme.toIndonesianFormattedDate
+import com.example.projectpamt.ui.utils.formatNumber
+import com.example.projectpamt.ui.utils.formatRupiah
+import com.example.projectpamt.ui.utils.getInitials
+import com.example.projectpamt.ui.utils.toIndonesianFormattedDate
 import com.example.projectpamt.viewmodel.auth.AuthViewModel
 import java.util.Date
 
@@ -244,7 +243,7 @@ fun DashboardContent(
 
         // ── MAIN CONTENT AREA ────────────────────────────────────────────
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(32.dp)
@@ -262,7 +261,7 @@ fun DashboardContent(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     QuickActionButton(
-                        icon = Icons.Default.Receipt,
+                        icon = ImageVector.vectorResource(R.drawable.penjualan),
                         label = "Penjualan\nBaru",
                         accentColor = ActionBlue,
                         onClick = onNavigateTambahPenjualan,

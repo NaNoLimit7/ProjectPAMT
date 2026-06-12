@@ -25,7 +25,8 @@ class ProdukViewModel(
         viewModelScope.launch {
             _uiState.value = ProdukUiState.Loading
             try {
-                val result = repository.getProdukAktif()
+                // Menggunakan data dummy offline untuk UI sementara waktu
+                val result = Produk.dummyList
                 _uiState.value = ProdukUiState.Success(result)
             } catch (e: Exception) {
                 _uiState.value = ProdukUiState.Error(e.message ?: "Gagal menampilkan produk")

@@ -1,0 +1,78 @@
+package com.example.projectpamt.ui.utils
+
+data class ValidationResult(
+    val isValid: Boolean,
+    val errorMessage: String? = null
+)
+
+object ValidationUtils {
+    private val emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
+    private val phoneRegex = "^\\+?[0-9]{9,15}$".toRegex()
+    private val nameRegex = "^[A-Za-z\\s']{3,}$".toRegex()
+
+    fun validateEmail(email: String): ValidationResult {
+        if (email.isBlank()) {
+            return ValidationResult(false, "Email tidak boleh kosong.")
+        }
+        if (!emailRegex.matches(email)) {
+            return ValidationResult(false, "Format email tidak valid.")
+        }
+        return ValidationResult(true)
+    }
+
+    fun validatePassword(password: String): ValidationResult {
+        if (password.isBlank()) {
+            return ValidationResult(false, "Kata sandi tidak boleh kosong.")
+        }
+        if (password.length < 6) {
+            return ValidationResult(false, "Kata sandi minimal harus 6 karakter.")
+        }
+        return ValidationResult(true)
+    }
+
+    fun validateName(name: String): ValidationResult {
+        if (name.isBlank()) {
+            return ValidationResult(false, "Nama tidak boleh kosong.")
+        }
+        if (name.trim().length < 3) {
+            return ValidationResult(false, "Nama harus minimal 3 karakter.")
+        }
+        if (!nameRegex.matches(name)) {
+            return ValidationResult(false, "Nama hanya boleh mengandung huruf.")
+        }
+        return ValidationResult(true)
+    }
+
+    fun validatePhone(phone: String): ValidationResult {
+        // Hapus karakter pemisah seperti strip sebelum memvalidasi
+        val cleanPhone = phone.replace("-", "").replace(" ", "")
+        if (cleanPhone.isBlank()) {
+            return ValidationResult(false, "Nomor telepon tidak boleh kosong.")
+        }
+        if (!phoneRegex.matches(cleanPhone)) {
+            return ValidationResult(false, "Nomor telepon harus terdiri dari 9-15 digit angka.")
+        }
+        return ValidationResult(true)
+    }
+
+    fun validateKasName(name: String): ValidationResult {
+        if (name.isBlank()) {
+            return ValidationResult(false, "Nama kas tidak boleh kosong.")
+        }
+        if (name.trim().length < 3) {
+            return ValidationResult(false, "Nama kas harus minimal 3 karakter.")
+        }
+        return ValidationResult(true)
+    }
+
+    fun validateKasSaldo(saldo: String): ValidationResult {
+        if (saldo.isBlank()) {
+            return ValidationResult(false, "Saldo tidak boleh kosong.")
+        }
+        val doubleValue = saldo.toDoubleOrNull()
+        if (doubleValue == null || doubleValue < 0.0) {
+            return ValidationResult(false, "Saldo harus berupa angka non-negatif.")
+        }
+        return ValidationResult(true)
+    }
+}
