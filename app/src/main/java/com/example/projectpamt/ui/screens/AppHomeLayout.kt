@@ -25,6 +25,7 @@ import com.example.projectpamt.ui.navigation.ProsesPembayaran
 import com.example.projectpamt.ui.navigation.RiwayatPenjualan
 import com.example.projectpamt.ui.navigation.LogInventoryList
 import com.example.projectpamt.ui.navigation.LogTotalKas
+import com.example.projectpamt.ui.navigation.LogKas
 import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.utils.DynamicStatusBar
 import com.example.projectpamt.ui.theme.GreenPrimary
@@ -46,7 +47,8 @@ fun AppHomeLayout(
         currentDestination?.hasRoute(ProsesPembayaran::class) == true ||
         currentDestination?.hasRoute(RiwayatPenjualan::class) == true ||
         currentDestination?.hasRoute(LogInventoryList::class) == true ||
-        currentDestination?.hasRoute(LogTotalKas::class) == true -> GreenPrimary
+        currentDestination?.hasRoute(LogTotalKas::class) == true ||
+        currentDestination?.hasRoute(LogKas::class) == true -> GreenPrimary
         else -> BackgroundSlate // default untuk screen lain
     }
 

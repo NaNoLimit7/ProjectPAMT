@@ -246,9 +246,7 @@ fun KasScreen(
             showInfoDialog = true
         },
         onLihatLogClick = { kas ->
-            infoDialogTitle = "Log Transaksi"
-            infoDialogMessage = "Menampilkan riwayat log transaksi untuk akun kas: ${kas.nama}."
-            showInfoDialog = true
+            navController.navigate(com.example.projectpamt.ui.navigation.LogKas(kas))
         },
         onEditClick = { kas ->
             editKasNama = kas.nama

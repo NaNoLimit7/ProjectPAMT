@@ -24,6 +24,9 @@ import com.example.projectpamt.ui.screens.home.produk.LogInventoryScreen
 import com.example.projectpamt.ui.navigation.LogInventoryList
 import com.example.projectpamt.ui.screens.home.kas.LogTotalKasScreen
 import com.example.projectpamt.ui.navigation.LogTotalKas
+import com.example.projectpamt.ui.navigation.LogKas
+import com.example.projectpamt.ui.screens.home.kas.LogKasScreen
+import com.example.projectpamt.data.model.Kas
 import com.example.projectpamt.ui.screens.home.produk.DetailProdukScreen
 import com.example.projectpamt.ui.screens.home.produk.EditProdukScreen
 import com.example.projectpamt.ui.screens.home.produk.ProdukScreen
@@ -213,6 +216,17 @@ fun AppNavHost(
         composable<LogTotalKas> {
             LogTotalKasScreen(
                 modifier = modifier,
+                navController = navController
+            )
+        }
+
+        composable<LogKas>(
+            typeMap = mapOf(typeOf<Kas>() to Kas.KasNavType)
+        ) { backStackEntry ->
+            val route = backStackEntry.toRoute<LogKas>()
+            LogKasScreen(
+                modifier = modifier,
+                kas = route.kas,
                 navController = navController
             )
         }

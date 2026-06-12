@@ -1,5 +1,6 @@
 package com.example.projectpamt.ui.navigation
 
+import com.example.projectpamt.data.model.Kas
 import com.example.projectpamt.data.model.Pelanggan
 import com.example.projectpamt.data.model.Produk
 import kotlinx.serialization.Serializable
@@ -74,3 +75,6 @@ object LogInventoryList
 
 @Serializable
 object LogTotalKas
+
+@Serializable
+data class LogKas(val kas: Kas)
