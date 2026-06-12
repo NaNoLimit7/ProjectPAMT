@@ -70,6 +70,7 @@ import com.example.projectpamt.ui.components.AppNavigationBar
 import com.example.projectpamt.ui.components.ProductCard
 import com.example.projectpamt.ui.navigation.ProsesPembayaran
 import com.example.projectpamt.ui.navigation.TambahPelanggan
+import com.example.projectpamt.ui.navigation.RiwayatPenjualan
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.ProjectPAMTTheme
 import com.example.projectpamt.ui.utils.formatRupiah
@@ -135,7 +136,8 @@ fun PenjualanScreen(
             } else {
                 Toast.makeText(context, "Silakan pilih pelanggan terlebih dahulu", Toast.LENGTH_SHORT).show()
             }
-        }
+        },
+        onHistoryClick = { navController.navigate(RiwayatPenjualan) }
     )
 }
 
@@ -156,6 +158,7 @@ private fun PenjualanContent(
     onClearCart: () -> Unit,
     onAddPelangganClick: () -> Unit,
     onProcessPaymentClick: () -> Unit,
+    onHistoryClick: () -> Unit,
 ) {
     Box(
         modifier = modifier.fillMaxSize()
@@ -168,7 +171,8 @@ private fun PenjualanContent(
             item {
                 PenjualanHeader(
                     totalTransaksi = cartItems.sumOf { it.totalHarga }.toInt(),
-                    cartItemCount = cartItems.sumOf { it.quantity }
+                    cartItemCount = cartItems.sumOf { it.quantity },
+                    onHistoryClick = onHistoryClick
                 )
             }
 
@@ -396,7 +400,8 @@ private fun PenjualanContent(
 @Composable
 private fun PenjualanHeader(
     totalTransaksi: Int,
-    cartItemCount: Int
+    cartItemCount: Int,
+    onHistoryClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -432,12 +437,13 @@ private fun PenjualanHeader(
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape)
-                    .background(Color(0x8A7CE2BD)),
+                    .background(Color(0x8A7CE2BD))
+                    .clickable { onHistoryClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.history),
-                    contentDescription = "Refresh",
+                    contentDescription = "Riwayat Penjualan",
                     tint = Color.White,
                     modifier = Modifier.size(18.dp)
                 )
@@ -781,7 +787,8 @@ private fun PenjualanScreenPreview() {
                 onUpdateQuantity = { _, _ -> },
                 onClearCart = {},
                 onAddPelangganClick = {},
-                onProcessPaymentClick = {}
+                onProcessPaymentClick = {},
+                onHistoryClick = {}
             )
         }
     }

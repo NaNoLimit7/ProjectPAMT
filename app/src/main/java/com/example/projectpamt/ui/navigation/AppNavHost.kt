@@ -19,6 +19,11 @@ import com.example.projectpamt.ui.screens.home.pelanggan.TambahPelangganScreen
 import com.example.projectpamt.ui.screens.home.penjualan.PenjualanScreen
 import com.example.projectpamt.ui.screens.home.penjualan.ProsesPembayaranScreen
 import com.example.projectpamt.ui.screens.home.penjualan.PembayaranBerhasilScreen
+import com.example.projectpamt.ui.screens.home.penjualan.RiwayatPenjualanScreen
+import com.example.projectpamt.ui.screens.home.produk.LogInventoryScreen
+import com.example.projectpamt.ui.navigation.LogInventoryList
+import com.example.projectpamt.ui.screens.home.kas.LogTotalKasScreen
+import com.example.projectpamt.ui.navigation.LogTotalKas
 import com.example.projectpamt.ui.screens.home.produk.DetailProdukScreen
 import com.example.projectpamt.ui.screens.home.produk.EditProdukScreen
 import com.example.projectpamt.ui.screens.home.produk.ProdukScreen
@@ -187,6 +192,27 @@ fun AppNavHost(
                 totalPembayaran = route.totalPembayaran,
                 kembalian = route.kembalian,
                 tanggalWaktu = route.tanggalWaktu,
+                navController = navController
+            )
+        }
+
+        composable<RiwayatPenjualan> {
+            RiwayatPenjualanScreen(
+                modifier = modifier,
+                navController = navController
+            )
+        }
+
+        composable<LogInventoryList> {
+            LogInventoryScreen(
+                modifier = modifier,
+                navController = navController
+            )
+        }
+
+        composable<LogTotalKas> {
+            LogTotalKasScreen(
+                modifier = modifier,
                 navController = navController
             )
         }

@@ -52,6 +52,7 @@ import com.example.projectpamt.ui.theme.TextDark
 import com.example.projectpamt.ui.navigation.DetailProduk
 import com.example.projectpamt.ui.navigation.EditProduk
 import com.example.projectpamt.ui.navigation.TambahProduk
+import com.example.projectpamt.ui.navigation.LogInventoryList
 import com.example.projectpamt.viewmodel.produk.ProdukUiState
 import com.example.projectpamt.viewmodel.produk.ProdukViewModel
 
@@ -76,7 +77,8 @@ fun ProdukScreen(
         onSearchQueryChange = { searchQuery = it },
         onAddProductClick = { navController.navigate(TambahProduk) },
         onDetailClick = { produk -> navController.navigate(DetailProduk(produk)) },
-        onEditClick = { produk -> navController.navigate(EditProduk(produk)) }
+        onEditClick = { produk -> navController.navigate(EditProduk(produk)) },
+        onHistoryClick = { navController.navigate(LogInventoryList) }
     )
 }
 
@@ -88,7 +90,8 @@ private fun ProdukContent(
     onSearchQueryChange: (String) -> Unit,
     onAddProductClick: () -> Unit,
     onDetailClick: (Produk) -> Unit,
-    onEditClick: (Produk) -> Unit
+    onEditClick: (Produk) -> Unit,
+    onHistoryClick: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -136,7 +139,7 @@ private fun ProdukContent(
                             .size(40.dp)
                             .clip(CircleShape)
                             .border(BorderStroke(2.dp, Color.White.copy(alpha = 0.3f)), CircleShape)
-                            .clickable { /* TODO: MASUK KE LOG INVENTORY SCREEN */ },
+                            .clickable { onHistoryClick() },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(

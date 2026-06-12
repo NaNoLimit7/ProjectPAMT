@@ -65,3 +65,12 @@ data class InfoPembayaranBerhasil(
     val kembalian: Double,
     val tanggalWaktu: String
 )
+
+@Serializable
+object RiwayatPenjualan
+
+@Serializable
+object LogInventoryList
+
+@Serializable
+object LogTotalKas

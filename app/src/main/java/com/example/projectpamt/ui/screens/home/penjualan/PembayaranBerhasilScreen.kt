@@ -11,8 +11,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.text.style.TextOverflow
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -136,18 +146,48 @@ fun PembayaranBerhasilScreen(
                         )
                     }
 
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "ID Transaksi",
                             fontSize = 12.sp,
                             color = TextMuted
                         )
-                        Text(
-                            text = idTransaksi,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextDark
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = idTransaksi,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextDark,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false)
+                            )
+                            val clipboardManager = LocalClipboardManager.current
+                            var copied by remember { mutableStateOf(false) }
+                            
+                            LaunchedEffect(copied) {
+                                if (copied) {
+                                    delay(2000)
+                                    copied = false
+                                }
+                            }
+
+                            Icon(
+                                imageVector = if (copied) Icons.Default.Check else Icons.Default.ContentCopy,
+                                contentDescription = "Salin ID Transaksi",
+                                tint = if (copied) Color(0xFF2E7D32) else TextMuted,
+                                modifier = Modifier
+                                    .size(18.dp)
+                                    .clickable {
+                                        clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(idTransaksi))
+                                        copied = true
+                                    }
+                            )
+                        }
                     }
                 }
 

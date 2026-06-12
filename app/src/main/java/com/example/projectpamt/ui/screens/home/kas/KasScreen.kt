@@ -255,9 +255,7 @@ fun KasScreen(
             editingKas = kas
         },
         onLogTotalClick = {
-            infoDialogTitle = "Log Total Kas"
-            infoDialogMessage = "Menampilkan riwayat log penggabungan total seluruh saldo kas aktif."
-            showInfoDialog = true
+            navController.navigate(com.example.projectpamt.ui.navigation.LogTotalKas)
         }
     )
 }
