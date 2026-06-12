@@ -61,12 +61,14 @@ fun QuickActionButton(
             modifier = Modifier
                 .size(56.dp)
                 .shadow(
-                    elevation = 1.dp,
-                    shape = RoundedCornerShape(16.dp),
-                    ambientColor = Color.Black.copy(alpha = 0.05f),
-                    spotColor = Color.Black.copy(alpha = 0.05f)
+                    elevation = 2.dp,
+                    spotColor = Color(0x0D000000),
+                    ambientColor = Color(0x0D000000)
                 )
-                .background(Color.White, RoundedCornerShape(16.dp))
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(16.dp)
+                )
                 .padding(8.dp),
             contentAlignment = Alignment.Center
         ) {

@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -35,6 +36,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -123,19 +125,16 @@ private fun PenjualanContent(
     onProcessPaymentClick: () -> Unit,
 ) {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = if (cartItems.isNotEmpty()) 88.dp else 24.dp)
         ) {
             // ── HEADER ────────────────────────────────────────────────────
             item {
                 PenjualanHeader(
-                    modifier = modifier,
-                    totalTransaksi =
-                        if (dataState is PenjualanDataUiState.Success)
-                            dataState.totalTransaksi
-                        else 0,
+                    totalTransaksi = cartItems.sumOf { it.totalHarga }.toInt(),
                     cartItemCount = cartItems.sumOf { it.quantity }
                 )
             }
@@ -276,7 +275,7 @@ private fun PenjualanContent(
                 when (dataState) {
                     is PenjualanDataUiState.Loading -> {
                         Box(
-                            modifier = modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
                                 .height(200.dp),
                             contentAlignment = Alignment.Center
@@ -287,7 +286,7 @@ private fun PenjualanContent(
 
                     is PenjualanDataUiState.Error -> {
                         Box(
-                            modifier = modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
                                 .height(200.dp),
                             contentAlignment = Alignment.Center
@@ -305,7 +304,7 @@ private fun PenjualanContent(
                         // jadi kita render grid secara manual dalam rows
                         val rows = filtered.chunked(2)
                         Column(
-                            modifier = modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp)
                                 .padding(top = 12.dp),
@@ -357,7 +356,6 @@ private fun PenjualanContent(
 
 @Composable
 private fun PenjualanHeader(
-    modifier: Modifier = Modifier,
     totalTransaksi: Int,
     cartItemCount: Int
 ) {
@@ -602,9 +600,12 @@ private fun CartItemRow(
             }
 
             // Delete icon
-            IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+            IconButton(
+                onClick = onDelete,
+                modifier = Modifier.size(32.dp)
+            ) {
                 Icon(
-                    imageVector = Icons.Default.Delete,
+                    imageVector = ImageVector.vectorResource(R.drawable.delete),
                     contentDescription = "Hapus",
                     tint = Color(0xFFEF4444),
                     modifier = Modifier.size(18.dp)
@@ -624,22 +625,21 @@ private fun CartBottomBar(
     val totalHarga = cartItems.sumOf { it.totalHarga }
     val totalItems = cartItems.sumOf { it.quantity }
 
-    Surface(
+    Snackbar(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
             .clickable { onProcessClick() },
         shape = RoundedCornerShape(12.dp),
-        color = GreenPrimary,
-        shadowElevation = 6.dp
+        containerColor = GreenPrimary,
+        contentColor = Color.White,
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            // Bagian Kiri (Ikon Keranjang dan Total)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -674,7 +674,10 @@ private fun CartBottomBar(
                 }
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            // Bagian Kanan (Tombol Proses)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = "Proses",
                     color = Color.White,

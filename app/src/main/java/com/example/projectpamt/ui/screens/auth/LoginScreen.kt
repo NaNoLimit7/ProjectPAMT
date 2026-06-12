@@ -94,17 +94,19 @@ private fun LoginContent(
 ) {
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
-    val isButtonEnabled = email.isNotBlank() && password.isNotBlank() && emailError == null && passwordError == null && uiState !is AuthUiState.Loading
+    val isButtonEnabled =
+        email.isNotBlank() && password.isNotBlank() && emailError == null && passwordError == null && uiState !is AuthUiState.Loading
 
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
     ) {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(horizontal = 32.dp)
-                .verticalScroll(rememberScrollState())
-                .imePadding(),
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
