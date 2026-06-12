@@ -37,6 +37,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.projectpamt.ui.components.AppTextField
+import com.example.projectpamt.ui.utils.ValidationUtils
 
 @Composable
 fun HargaStokSection(
@@ -51,9 +52,17 @@ fun HargaStokSection(
     stokError: String?,
     satuan: String,
     onSatuanChange: (String) -> Unit,
+    stokLabel: String = "Stok Awal",
     modifier: Modifier = Modifier
 ) {
     var showSatuanDropdown by remember { mutableStateOf(false) }
+
+    val modalDouble = ValidationUtils.parseThousandSeparator(hargaModal)
+    val jualDouble = ValidationUtils.parseThousandSeparator(hargaJual)
+    val marginPercent = if (jualDouble > 0) {
+        val diff = jualDouble - modalDouble
+        ((diff / jualDouble) * 100).toInt()
+    } else 0
 
     Card(
         modifier = modifier
@@ -117,7 +126,7 @@ fun HargaStokSection(
                         AppTextField(
                             value = hargaJual,
                             onValueChange = onHargaJualChange,
-                            externalLabel = "Harga Jual",
+                            externalLabel = "Harga Jual *",
                             placeholder = "0",
                             leadingIcon = null,
                             trailingIcon = {
@@ -136,6 +145,17 @@ fun HargaStokSection(
                             isError = hargaJualError != null,
                             errorMessage = hargaJualError
                         )
+                        if (hargaJualError == null && jualDouble > 0) {
+                            Text(
+                                text = "Margin: ~$marginPercent%",
+                                color = Color(0xFF005F34),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Normal,
+                                modifier = Modifier
+                                    .align(Alignment.End)
+                                    .padding(top = 4.dp, end = 4.dp)
+                            )
+                        }
                     }
                 }
 
@@ -143,12 +163,12 @@ fun HargaStokSection(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Stok Awal Input
+                    // Stok Input
                     Column(modifier = Modifier.weight(1f)) {
                         AppTextField(
                             value = stok,
                             onValueChange = onStokChange,
-                            externalLabel = "Stok Awal",
+                            externalLabel = stokLabel,
                             placeholder = "0",
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,

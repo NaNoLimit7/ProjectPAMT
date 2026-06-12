@@ -37,6 +37,9 @@ object KategoriList
 data class EditProduk(val produk: Produk)
 
 @Serializable
+data class DetailProduk(val produk: Produk)
+
+@Serializable
 data class EditPelanggan(val pelanggan: Pelanggan)
 
 @Serializable

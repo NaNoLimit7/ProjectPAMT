@@ -21,12 +21,15 @@ import com.example.projectpamt.ui.screens.home.pelanggan.EditPelangganScreen
 import com.example.projectpamt.ui.screens.home.pelanggan.PelangganScreen
 import com.example.projectpamt.ui.screens.home.pelanggan.TambahPelangganScreen
 import com.example.projectpamt.ui.screens.home.penjualan.PenjualanScreen
+import com.example.projectpamt.ui.screens.home.produk.DetailProdukScreen
+import com.example.projectpamt.ui.screens.home.produk.EditProdukScreen
 import com.example.projectpamt.ui.screens.home.produk.ProdukScreen
 import com.example.projectpamt.ui.screens.home.produk.TambahProdukScreen
 import com.example.projectpamt.viewmodel.auth.AuthViewModel
 import com.example.projectpamt.viewmodel.kategori.KategoriViewModel
 import com.example.projectpamt.viewmodel.pelanggan.PelangganViewModel
 import com.example.projectpamt.viewmodel.produk.ProdukViewModel
+import com.example.projectpamt.data.model.Produk
 import kotlin.reflect.typeOf
 
 @Composable
@@ -109,6 +112,31 @@ fun AppNavHost(
         composable<TambahProduk> {
             TambahProdukScreen(
                 modifier = modifier,
+                produkViewModel = produkViewModel,
+                kategoriViewModel = kategoriViewModel,
+                navController = navController
+            )
+        }
+
+        composable<DetailProduk>(
+            typeMap = mapOf(typeOf<Produk>() to Produk.ProdukNavType)
+        ) { backStackEntry ->
+            val route = backStackEntry.toRoute<DetailProduk>()
+            DetailProdukScreen(
+                modifier = modifier,
+                produk = route.produk,
+                viewModel = produkViewModel,
+                navController = navController
+            )
+        }
+
+        composable<EditProduk>(
+            typeMap = mapOf(typeOf<Produk>() to Produk.ProdukNavType)
+        ) { backStackEntry ->
+            val route = backStackEntry.toRoute<EditProduk>()
+            EditProdukScreen(
+                modifier = modifier,
+                produk = route.produk,
                 produkViewModel = produkViewModel,
                 kategoriViewModel = kategoriViewModel,
                 navController = navController

@@ -87,6 +87,41 @@ class ProdukViewModel(
         }
     }
 
+    fun updateProduk(
+        id: String,
+        nama: String,
+        harga: Double,
+        stok: Double,
+        namaSatuan: String,
+        detailProduk: JsonElement?,
+        onSuccess: () -> Unit = {}
+    ) {
+        viewModelScope.launch {
+            _uiState.value = ProdukUiState.Loading
+            try {
+                // Simulasikan delay network agar loading terlihat nyata
+                delay(500.milliseconds)
+                _produkList.value = _produkList.value.map { produk ->
+                    if (produk.idProduk == id) {
+                        produk.copy(
+                            nama = nama,
+                            harga = harga,
+                            stok = stok,
+                            namaSatuan = namaSatuan,
+                            detailProduk = detailProduk
+                        )
+                    } else {
+                        produk
+                    }
+                }
+                fetchProdukAktif()
+                onSuccess()
+            } catch (e: Exception) {
+                _uiState.value = ProdukUiState.Error(e.message ?: "Gagal memperbarui produk")
+            }
+        }
+    }
+
     fun updateStok(id: String, stok: Double, onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
             _uiState.value = ProdukUiState.Loading
