@@ -21,6 +21,7 @@ import com.example.projectpamt.ui.navigation.PenjualanList
 import com.example.projectpamt.ui.navigation.ProdukList
 import com.example.projectpamt.ui.navigation.PelangganList
 import com.example.projectpamt.ui.navigation.KasList
+import com.example.projectpamt.ui.navigation.ProsesPembayaran
 import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.utils.DynamicStatusBar
 import com.example.projectpamt.ui.theme.GreenPrimary
@@ -38,7 +39,8 @@ fun AppHomeLayout(
     val statusBarColor = when {
         currentDestination?.hasRoute(Dashboard::class) == true ||
         currentDestination?.hasRoute(PenjualanList::class) == true ||
-        currentDestination?.hasRoute(KasList::class) == true -> GreenPrimary
+        currentDestination?.hasRoute(KasList::class) == true ||
+        currentDestination?.hasRoute(ProsesPembayaran::class) == true -> GreenPrimary
         else -> BackgroundSlate // default untuk screen lain
     }
 

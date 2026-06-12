@@ -21,6 +21,7 @@ import com.example.projectpamt.ui.screens.home.pelanggan.EditPelangganScreen
 import com.example.projectpamt.ui.screens.home.pelanggan.PelangganScreen
 import com.example.projectpamt.ui.screens.home.pelanggan.TambahPelangganScreen
 import com.example.projectpamt.ui.screens.home.penjualan.PenjualanScreen
+import com.example.projectpamt.ui.screens.home.penjualan.ProsesPembayaranScreen
 import com.example.projectpamt.ui.screens.home.produk.DetailProdukScreen
 import com.example.projectpamt.ui.screens.home.produk.EditProdukScreen
 import com.example.projectpamt.ui.screens.home.produk.ProdukScreen
@@ -166,13 +167,19 @@ fun AppNavHost(
             )
         }
 
-        composable<ProsesPembayaran> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Halaman Proses Pembayaran")
-            }
+        composable<ProsesPembayaran>(
+            typeMap = mapOf(
+                typeOf<Pelanggan>() to Pelanggan.PelangganNavType
+            )
+        ) { backStackEntry ->
+            val route = backStackEntry.toRoute<ProsesPembayaran>()
+            ProsesPembayaranScreen(
+                modifier = modifier,
+                pelanggan = route.pelanggan,
+                cartItemsJson = route.cartItemsJson,
+                totalHarga = route.totalHarga,
+                navController = navController
+            )
         }
     }
 }

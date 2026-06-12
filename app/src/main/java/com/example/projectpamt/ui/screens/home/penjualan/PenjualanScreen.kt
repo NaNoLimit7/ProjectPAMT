@@ -1,5 +1,6 @@
 package com.example.projectpamt.ui.screens.home.penjualan
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -76,6 +77,10 @@ import com.example.projectpamt.viewmodel.penjualan.CartItem
 import com.example.projectpamt.viewmodel.penjualan.PenjualanDataUiState
 import com.example.projectpamt.viewmodel.penjualan.PenjualanViewModel
 
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
 // ─── Screen (stateful) ──────────────────────────────────────────────────────
 
 @Composable
@@ -88,6 +93,20 @@ fun PenjualanScreen(
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val cartItems by viewModel.cartItems.collectAsStateWithLifecycle()
     val selectedPelanggan by viewModel.selectedPelanggan.collectAsStateWithLifecycle()
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    val clearCart by navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow<Boolean?>("clear_cart", null)
+        ?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(null) }
+
+    LaunchedEffect(clearCart) {
+        if (clearCart == true) {
+            viewModel.clearCart()
+            navController.currentBackStackEntry?.savedStateHandle?.remove<Boolean>("clear_cart")
+        }
+    }
 
     PenjualanContent(
         modifier = modifier,
@@ -102,7 +121,21 @@ fun PenjualanScreen(
         onUpdateQuantity = viewModel::updateCartQuantity,
         onClearCart = viewModel::clearCart,
         onAddPelangganClick = { navController.navigate(TambahPelanggan) },
-        onProcessPaymentClick = { navController.navigate(ProsesPembayaran) }
+        onProcessPaymentClick = { 
+            if (selectedPelanggan != null) {
+                val cartItemsJson = Json.encodeToString(cartItems)
+                val totalHarga = cartItems.sumOf { it.totalHarga }
+                navController.navigate(
+                    ProsesPembayaran(
+                        pelanggan = selectedPelanggan!!,
+                        cartItemsJson = cartItemsJson,
+                        totalHarga = totalHarga
+                    )
+                )
+            } else {
+                Toast.makeText(context, "Silakan pilih pelanggan terlebih dahulu", Toast.LENGTH_SHORT).show()
+            }
+        }
     )
 }
 
@@ -172,8 +205,14 @@ private fun PenjualanContent(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.add_with_circle),
+                            contentDescription = null,
+                            tint = GreenPrimary,
+                            modifier = Modifier.size(12.dp)
+                        )
                         Text(
-                            text = "+ Tambah pelanggan cepat",
+                            text = "Tambah pelanggan cepat",
                             fontSize = 12.sp,
                             color = GreenPrimary
                         )

@@ -52,4 +52,8 @@ object TambahPelanggan
 object TambahProduk
 
 @Serializable
-object ProsesPembayaran
+data class ProsesPembayaran(
+    val pelanggan: Pelanggan,
+    val cartItemsJson: String,
+    val totalHarga: Double
+)
