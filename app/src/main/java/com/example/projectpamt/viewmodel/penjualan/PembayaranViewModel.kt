@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class PembayaranViewModel : ViewModel() {
-    private val _kasList = MutableStateFlow<List<Kas>>(Kas.dummyList.filter { it.aktif })
+    private val _kasList = MutableStateFlow<List<Kas>>(emptyList())
     val kasList: StateFlow<List<Kas>> = _kasList.asStateFlow()
 
     private val _selectedKas = MutableStateFlow<Kas?>(null)

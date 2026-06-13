@@ -42,6 +42,8 @@ import com.example.projectpamt.viewmodel.pelanggan.PelangganViewModel
 import com.example.projectpamt.viewmodel.produk.ProdukViewModel
 import com.example.projectpamt.data.model.Produk
 import com.example.projectpamt.ui.screens.home.profil.ProfilScreen
+import com.example.projectpamt.ui.navigation.TransaksiKas
+import com.example.projectpamt.ui.screens.home.kas.TransaksiKasScreen
 import kotlin.reflect.typeOf
 
 @Composable
@@ -290,6 +292,16 @@ fun AppNavHost(
             ProfilScreen(
                 modifier = modifier,
                 authViewModel = authViewModel,
+                navController = navController
+            )
+        }
+
+        composable<TransaksiKas>(
+            typeMap = mapOf(typeOf<Kas>() to Kas.KasNavType)
+        ) { backStackEntry ->
+            val route = backStackEntry.toRoute<TransaksiKas>()
+            TransaksiKasScreen(
+                kas = route.kas,
                 navController = navController
             )
         }

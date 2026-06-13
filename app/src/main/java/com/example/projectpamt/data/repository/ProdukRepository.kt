@@ -41,10 +41,24 @@ class ProdukRepository {
         )
     }
 
+    suspend fun setStok(idProduk: String, stokBaru: Double) {
+        supabase.postgrest["produk"].update({
+            set("stok", stokBaru)
+        }) {
+            filter { eq("id_produk", idProduk) }
+        }
+    }
+
     suspend fun nonaktifkanProduk(idProduk: String) {
         supabase.postgrest["produk"].update({
             set("aktif", false)
         }) {
+            filter { eq("id_produk", idProduk) }
+        }
+    }
+
+    suspend fun updateProduk(idProduk: String, produkBaru: Produk) {
+        supabase.postgrest["produk"].update(produkBaru) {
             filter { eq("id_produk", idProduk) }
         }
     }

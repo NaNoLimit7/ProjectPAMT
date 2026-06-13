@@ -49,6 +49,7 @@ import com.example.projectpamt.ui.navigation.EditKas
 import com.example.projectpamt.ui.navigation.LogKas
 import com.example.projectpamt.ui.navigation.LogTotalKas
 import com.example.projectpamt.ui.navigation.TambahKas
+import com.example.projectpamt.ui.navigation.TransaksiKas
 import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.theme.GreenMintActive
 import com.example.projectpamt.ui.theme.GreenPrimary
@@ -100,6 +101,9 @@ fun KasScreen(
         onLihatLogClick = { kas ->
             navController.navigate(LogKas(kas))
         },
+        onTransaksiClick = { kas ->
+            navController.navigate(TransaksiKas(kas))
+        },
         onEditClick = { kas ->
             navController.navigate(EditKas(kas))
         },
@@ -117,6 +121,7 @@ private fun KasContent(
     uiState: KasUiState,
     onAddKasClick: () -> Unit,
     onLihatLogClick: (Kas) -> Unit,
+    onTransaksiClick: (Kas) -> Unit,
     onEditClick: (Kas) -> Unit,
     onLogTotalClick: () -> Unit
 ) {
@@ -332,6 +337,7 @@ private fun KasContent(
                                 KasCard(
                                     kas = kas,
                                     onLihatLogClick = { onLihatLogClick(kas) },
+                                    onTransaksiClick = { onTransaksiClick(kas) },
                                     onEditClick = { onEditClick(kas) }
                                 )
                             }

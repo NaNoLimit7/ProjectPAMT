@@ -1,48 +1,43 @@
 package com.example.projectpamt.data.repository
 
+import com.example.projectpamt.data.SupabaseClientProvider
+import com.example.projectpamt.data.model.Kas
+import com.example.projectpamt.data.model.LogKas
 import com.example.projectpamt.data.model.KasBalanceSnapshot
 import com.example.projectpamt.data.model.LogTotalKasDay
 import com.example.projectpamt.data.model.LogTotalKasSummary
-import kotlinx.coroutines.delay
+import io.github.jan.supabase.postgrest.postgrest
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 class LogTotalKasRepository {
+    private val supabase = SupabaseClientProvider.client
 
     suspend fun getLogTotalKasSummary(): LogTotalKasSummary {
-        // Simulate network delay
-        delay(500)
+        val allKas = supabase.postgrest["kas"].select().decodeList<Kas>()
+        val allLogs = supabase.postgrest["log_kas"].select().decodeList<LogKas>()
+
+        val currentTotalSaldo = allKas.sumOf { it.saldo }
         
+        // Buat satu snapshot untuk hari ini berdasarkan data kas saat ini
+        val todayStr = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+        val todaySnapshot = LogTotalKasDay(
+            idLogTotal = "current",
+            tanggal = todayStr,
+            totalSaldo = currentTotalSaldo,
+            breakdown = allKas.map { 
+                KasBalanceSnapshot(kasId = it.idKas ?: "", kasNama = it.nama, saldo = it.saldo) 
+            }
+        )
+
+        // Hitung trend secara sederhana (sementara 0 jika tidak ada cukup data masa lalu untuk dihitung secara akurat)
+        val weeklyTrendPercent = 0.0
+
         return LogTotalKasSummary(
-            totalSaldo = 128450000.0,
-            weeklyTrendPercent = 12.4,
-            dailyLogs = listOf(
-                LogTotalKasDay(
-                    idLogTotal = "d9fbc382-7e3f-42cb-b1bb-8db7d78a83ee",
-                    tanggal = "2026-05-24T00:00:00Z",
-                    totalSaldo = 45890.25,
-                    breakdown = listOf(
-                        KasBalanceSnapshot(kasId = "1", kasNama = "Kas Utama", saldo = 30000.25),
-                        KasBalanceSnapshot(kasId = "2", kasNama = "Kas Laci 1", saldo = 15890.00)
-                    )
-                ),
-                LogTotalKasDay(
-                    idLogTotal = "2f9b3c4d-8e5f-46a1-b2c3-4d5e6f7a8b9c",
-                    tanggal = "2026-05-23T00:00:00Z",
-                    totalSaldo = 42120.50,
-                    breakdown = listOf(
-                        KasBalanceSnapshot(kasId = "1", kasNama = "Kas Utama", saldo = 28500.50),
-                        KasBalanceSnapshot(kasId = "2", kasNama = "Kas Laci 1", saldo = 13620.00)
-                    )
-                ),
-                LogTotalKasDay(
-                    idLogTotal = "a1b2c3d4-e5f6-47a8-b9c0-d1e2f3a4b5c6",
-                    tanggal = "2026-05-22T00:00:00Z",
-                    totalSaldo = 39450.00,
-                    breakdown = listOf(
-                        KasBalanceSnapshot(kasId = "1", kasNama = "Kas Utama", saldo = 26400.00),
-                        KasBalanceSnapshot(kasId = "2", kasNama = "Kas Laci 1", saldo = 13050.00)
-                    )
-                )
-            )
+            totalSaldo = currentTotalSaldo,
+            weeklyTrendPercent = weeklyTrendPercent,
+            dailyLogs = listOf(todaySnapshot)
         )
     }
 }

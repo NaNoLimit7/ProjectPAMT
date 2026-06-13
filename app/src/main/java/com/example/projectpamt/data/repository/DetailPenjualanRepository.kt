@@ -13,6 +13,6 @@ class DetailPenjualanRepository {
     }
 
     suspend fun insertDetailPenjualan(detailPenjualan: DetailPenjualan) {
-        supabase.postgrest["detail_penjualan"].insert(DetailPenjualan)
+        supabase.postgrest["detail_penjualan"].insert(detailPenjualan)
     }
 }

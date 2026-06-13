@@ -16,7 +16,6 @@ class ProdukViewModel(
     private val repository: ProdukRepository = ProdukRepository()
 ) : ViewModel() {
 
-    private val _produkList = MutableStateFlow(Produk.dummyList)
     private val _uiState = MutableStateFlow<ProdukUiState>(ProdukUiState.Idle)
     val uiState: StateFlow<ProdukUiState> = _uiState.asStateFlow()
 
@@ -28,8 +27,8 @@ class ProdukViewModel(
         viewModelScope.launch {
             _uiState.value = ProdukUiState.Loading
             try {
-                // Menggunakan data dummy offline in-memory untuk UI sementara waktu
-                _uiState.value = ProdukUiState.Success(_produkList.value)
+                val list = repository.getProdukAktif()
+                _uiState.value = ProdukUiState.Success(list)
             } catch (e: Exception) {
                 _uiState.value = ProdukUiState.Error(e.message ?: "Gagal menampilkan produk")
             }
@@ -47,11 +46,7 @@ class ProdukViewModel(
         viewModelScope.launch {
             _uiState.value = ProdukUiState.Loading
             try {
-                // Simulasikan delay network agar loading terlihat nyata
-                delay(500.milliseconds)
-                val newId = (_produkList.value.mapNotNull { it.idProduk?.toIntOrNull() }.maxOrNull() ?: 0) + 1
                 val produkBaru = Produk(
-                    idProduk = newId.toString(),
                     nama = nama,
                     harga = harga,
                     stok = stok,
@@ -59,7 +54,7 @@ class ProdukViewModel(
                     detailProduk = detailProduk,
                     aktif = true
                 )
-                _produkList.value += produkBaru
+                repository.tambahProduk(produkBaru)
                 fetchProdukAktif()
                 onSuccess()
             } catch (e: Exception) {
@@ -72,13 +67,7 @@ class ProdukViewModel(
         viewModelScope.launch {
             _uiState.value = ProdukUiState.Loading
             try {
-                _produkList.value = _produkList.value.map { produk ->
-                    if (produk.idProduk == id) {
-                        produk.copy(nama = nama, harga = harga)
-                    } else {
-                        produk
-                    }
-                }
+                repository.updateInfoProduk(id, nama, harga)
                 fetchProdukAktif()
                 onSuccess()
             } catch (e: Exception) {
@@ -99,21 +88,16 @@ class ProdukViewModel(
         viewModelScope.launch {
             _uiState.value = ProdukUiState.Loading
             try {
-                // Simulasikan delay network agar loading terlihat nyata
-                delay(500.milliseconds)
-                _produkList.value = _produkList.value.map { produk ->
-                    if (produk.idProduk == id) {
-                        produk.copy(
-                            nama = nama,
-                            harga = harga,
-                            stok = stok,
-                            namaSatuan = namaSatuan,
-                            detailProduk = detailProduk
-                        )
-                    } else {
-                        produk
-                    }
-                }
+                val produkBaru = Produk(
+                    idProduk = id,
+                    nama = nama,
+                    harga = harga,
+                    stok = stok,
+                    namaSatuan = namaSatuan,
+                    detailProduk = detailProduk,
+                    aktif = true
+                )
+                repository.updateProduk(id, produkBaru)
                 fetchProdukAktif()
                 onSuccess()
             } catch (e: Exception) {
@@ -126,13 +110,7 @@ class ProdukViewModel(
         viewModelScope.launch {
             _uiState.value = ProdukUiState.Loading
             try {
-                _produkList.value = _produkList.value.map { produk ->
-                    if (produk.idProduk == id) {
-                        produk.copy(stok = stok)
-                    } else {
-                        produk
-                    }
-                }
+                repository.setStok(id, stok)
                 fetchProdukAktif()
                 onSuccess()
             } catch (e: Exception) {
@@ -145,13 +123,7 @@ class ProdukViewModel(
         viewModelScope.launch {
             _uiState.value = ProdukUiState.Loading
             try {
-                _produkList.value = _produkList.value.map { produk ->
-                    if (produk.idProduk == id) {
-                        produk.copy(aktif = false)
-                    } else {
-                        produk
-                    }
-                }
+                repository.nonaktifkanProduk(id)
                 fetchProdukAktif()
                 onSuccess()
             } catch (e: Exception) {

@@ -29,17 +29,17 @@ class RiwayatPenjualanViewModel : ViewModel() {
         _uiState.value = RiwayatPenjualanUiState.Loading
         
         // Define some dummy products from Produk.dummyList
-        val mouse = Produk.dummyList.find { it.idProduk == "1" } ?: Produk("1", "HP Mouse", 110000.0, 10.0, "pcs")
-        val cable = Produk.dummyList.find { it.idProduk == "2" } ?: Produk("2", "Kabel Type-C", 45000.0, 20.0, "pcs")
+        val mouse = Produk("1", "HP Mouse", 110000.0, 10.0, "pcs")
+        val cable = Produk("2", "Kabel Type-C", 45000.0, 20.0, "pcs")
         
         // Define dummy pelanggan from Pelanggan.dummyList
-        val sarah = Pelanggan.dummyList.find { it.idPelanggan == "1" }
-        val michael = Pelanggan.dummyList.find { it.idPelanggan == "2" }
-        val emily = Pelanggan.dummyList.find { it.idPelanggan == "3" }
+        val sarah = Pelanggan("1", "Sarah", "081234567890", true)
+        val michael = Pelanggan("2", "Michael", "082345678901", true)
+        val emily = Pelanggan("3", "Emily", "083456789012", true)
         
         // Define dummy kas from Kas.dummyList
-        val kasUtama = Kas.dummyList.find { it.idKas == "1" }
-        val kasLaci = Kas.dummyList.find { it.idKas == "2" }
+        val kasUtama = Kas("1", "Kas Utama", 100000.0, true)
+        val kasLaci = Kas("2", "Kas Laci", 50000.0, true)
         
         // Get date instances for today, yesterday, and older
         val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID"))

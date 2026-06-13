@@ -41,6 +41,7 @@ fun KasCard(
     kas: Kas,
     modifier: Modifier = Modifier,
     onLihatLogClick: () -> Unit = {},
+    onTransaksiClick: () -> Unit = {},
     onEditClick: () -> Unit = {}
 ) {
     // Status Badge colors
@@ -190,6 +191,35 @@ fun KasCard(
                                     fontWeight = FontWeight.Bold
                                 )
                             }
+                        }
+                    }
+
+                    // Tombol Transaksi
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(41.dp)
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                            .background(GreenPrimary)
+                            .clickable { onTransaksiClick() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.transaksi),
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Text(
+                                text = "Transaksi",
+                                fontSize = 13.sp,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }

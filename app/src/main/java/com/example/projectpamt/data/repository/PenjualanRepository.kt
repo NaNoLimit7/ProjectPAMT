@@ -2,6 +2,7 @@ package com.example.projectpamt.data.repository
 
 import com.example.projectpamt.data.SupabaseClientProvider
 import com.example.projectpamt.data.model.DetailPenjualan
+import com.example.projectpamt.data.model.Penjualan
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -48,5 +49,13 @@ class PenjualanRepository {
         return supabase.postgrest["penjualan"]
             .select { count(Count.EXACT) }
             .countOrNull()?.toInt() ?: 0
+    }
+
+    suspend fun getPenjualanByPelanggan(idPelanggan: String): List<Penjualan> {
+        return supabase.postgrest["penjualan"].select {
+            filter {
+                eq("id_pelanggan", idPelanggan)
+            }
+        }.decodeList<Penjualan>()
     }
 }

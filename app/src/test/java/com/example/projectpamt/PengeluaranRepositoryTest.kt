@@ -1,6 +1,5 @@
 package com.example.projectpamt
 
-import com.example.projectpamt.data.model.Kas
 import com.example.projectpamt.data.model.Pengeluaran
 import com.example.projectpamt.data.repository.PengeluaranRepository
 import kotlinx.coroutines.runBlocking

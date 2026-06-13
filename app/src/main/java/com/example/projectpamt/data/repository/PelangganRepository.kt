@@ -21,8 +21,10 @@ class PelangganRepository {
         }
     }
 
-    suspend fun deletePelanggan(id: String) {
-        supabase.postgrest["pelanggan"].delete {
+    suspend fun softDeletePelanggan(id: String) {
+        supabase.postgrest["pelanggan"].update({
+            set("aktif", false)
+        }) {
             filter { eq("id_pelanggan", id) }
         }
     }

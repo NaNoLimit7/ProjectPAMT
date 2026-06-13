@@ -94,3 +94,6 @@ data class EditPengeluaran(val pengeluaran: Pengeluaran)
 
 @Serializable
 object Profil
+
+@Serializable
+data class TransaksiKas(val kas: Kas)
