@@ -16,6 +16,7 @@ class ProdukRepository {
                 filter {
                     eq("aktif", true)
                 }
+                order("created_at", order = io.github.jan.supabase.postgrest.query.Order.DESCENDING)
             }
             .decodeList<Produk>()
     }

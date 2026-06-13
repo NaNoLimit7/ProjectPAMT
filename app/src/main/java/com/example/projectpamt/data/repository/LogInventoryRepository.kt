@@ -8,6 +8,8 @@ class LogInventoryRepository {
     private val supabase = SupabaseClientProvider.client
 
     suspend fun getAllLogInventory(): List<LogInventory> {
-        return supabase.postgrest["log_inventory"].select().decodeList<LogInventory>()
+        return supabase.postgrest["log_inventory"].select {
+            order("updated_at", order = io.github.jan.supabase.postgrest.query.Order.DESCENDING)
+        }.decodeList<LogInventory>()
     }
 }

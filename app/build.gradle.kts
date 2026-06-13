@@ -75,6 +75,9 @@ dependencies {
     // Coil Compose
     implementation(libs.coil.compose)
 
+    // Splash Screen
+    implementation(libs.androidx.core.splashscreen)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

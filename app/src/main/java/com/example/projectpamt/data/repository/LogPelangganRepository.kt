@@ -8,6 +8,8 @@ class LogPelangganRepository {
     private val supabase = SupabaseClientProvider.client
 
     suspend fun getAllLogPelanggan(): List<LogPelanggan> {
-        return supabase.postgrest["log_pelanggan"].select().decodeList<LogPelanggan>()
+        return supabase.postgrest["log_pelanggan"].select {
+            order("updated_at", order = io.github.jan.supabase.postgrest.query.Order.DESCENDING)
+        }.decodeList<LogPelanggan>()
     }
 }

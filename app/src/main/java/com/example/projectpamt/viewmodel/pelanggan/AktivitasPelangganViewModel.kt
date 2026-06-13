@@ -36,7 +36,7 @@ class AktivitasPelangganViewModel(
     private var currentFilter: AktivitasFilter = AktivitasFilter.SEMUA_WAKTU
 
     private val indonesianLocale = Locale.Builder().setLanguage("in").setRegion("ID").build()
-    private val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy • HH:mm", indonesianLocale)
+    private val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", indonesianLocale)
 
     var isRefreshing by mutableStateOf(false)
         private set

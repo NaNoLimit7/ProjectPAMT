@@ -8,7 +8,9 @@ class KategoriRepository {
     private val supabase = SupabaseClientProvider.client
 
     suspend fun getAllKategori(): List<Kategori> {
-        return supabase.postgrest["kategori"].select().decodeList<Kategori>()
+        return supabase.postgrest["kategori"].select {
+            order("created_at", order = io.github.jan.supabase.postgrest.query.Order.DESCENDING)
+        }.decodeList<Kategori>()
     }
 
     suspend fun insertKategori(kategori: Kategori) {

@@ -177,21 +177,6 @@ private fun LoginContent(
                 )
             )
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Text(
-                    text = "Lupa kata sandi?",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF00754A),
-                    modifier = Modifier.clickable { /* Link to Forgot Password */ }
-                )
-            }
-
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(

@@ -10,11 +10,18 @@ object DateTimeUtils {
 
     fun parseIso(dateStr: String?): Date? {
         if (dateStr == null) return null
+        
+        // Supabase often returns fractional seconds (e.g., .748365) and different TZ formats (Z, +00, +00:00).
+        // To safely parse with SimpleDateFormat, we strip the fractional part and TZ, then append 'Z'.
+        val normalized = dateStr.substringBefore(".").substringBefore("+").substringBefore("Z") + "Z"
+
         return try {
-            SimpleDateFormat(ISO_FORMAT, Locale("id", "ID")).parse(dateStr)
+            val format = SimpleDateFormat(ISO_FORMAT, Locale.US)
+            format.timeZone = java.util.TimeZone.getTimeZone("UTC")
+            format.parse(normalized)
         } catch (e: Exception) {
             try {
-                SimpleDateFormat(ISO_WITHOUT_Z_FORMAT, Locale.US).parse(dateStr)
+                SimpleDateFormat(ISO_WITHOUT_Z_FORMAT, Locale.US).parse(normalized.replace("Z", ""))
             } catch (ex: Exception) {
                 null
             }

@@ -104,14 +104,14 @@ fun EditProdukScreen(
         onBackClick = { navController.popBackStack() },
         onDeleteClick = { showDeleteDialog = true },
         onSaveClick = { nama, sku, kategori, deskripsi, hargaModal, hargaJual, stok, satuan, imageUri ->
-            // Bangun detail JSON tanpa image_url (ditangani ViewModel)
+
             val detailBase = buildJsonObject {
                 put("sku", sku)
                 put("kategori", kategori)
                 put("deskripsi", deskripsi)
                 put("harga_modal", hargaModal)
             }
-            // Compress gambar (resize dan ubah ke ByteArray JPEG) jika user mengganti gambar
+
             val imageBytes = imageUri?.let { uri ->
                 compressImageFromUri(context, uri)
             }
@@ -129,7 +129,7 @@ fun EditProdukScreen(
                     detailProdukBase = detailBase,
                     imageBytes = imageBytes,
                     imageMimeType = mimeType,
-                    existingImageUrl = produk.imageUrl, // pertahankan URL lama jika tidak diganti
+                    existingImageUrl = produk.imageUrl,
                     onSuccess = {
                         navController.previousBackStackEntry?.savedStateHandle?.set(
                             "need_refresh",
@@ -240,8 +240,8 @@ private fun EditProdukContent(
     var hargaJual by remember { mutableStateOf(initialHargaJual) }
     var stok by remember { mutableStateOf(initialStok) }
     var satuan by remember { mutableStateOf(initialSatuan) }
-    // selectedImageUri: HANYA berisi URI lokal gambar BARU yang dipilih user.
-    // Gambar lama ditampilkan via existingImageUrl di FotoProdukSection.
+
+
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     var namaError by remember { mutableStateOf<String?>(null) }
@@ -292,7 +292,7 @@ private fun EditProdukContent(
             .background(BackgroundSlate)
             .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
-        // HEADER SECTION (Fixed)
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -340,7 +340,7 @@ private fun EditProdukContent(
             }
         }
 
-        // SCROLLABLE FORM
+
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -350,14 +350,14 @@ private fun EditProdukContent(
                 .padding(horizontal = 20.dp, vertical = 24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // 1. FOTO PRODUK SECTION
+
             FotoProdukSection(
                 selectedImageUri = selectedImageUri,
-                existingImageUrl = initialImageUrl, // gambar lama dari Supabase
+                existingImageUrl = initialImageUrl,
                 onImageSelected = { selectedImageUri = it }
             )
 
-            // 2. INFORMASI PRODUK SECTION
+
             InformasiProdukSection(
                 nama = nama,
                 onNamaChange = {
@@ -379,7 +379,7 @@ private fun EditProdukContent(
                 onDeskripsiChange = { deskripsi = it }
             )
 
-            // 3. HARGA & STOK SECTION (stokLabel set to "Stok Saat Ini *")
+
             HargaStokSection(
                 hargaModal = hargaModal,
                 onHargaModalChange = { input ->
@@ -420,7 +420,7 @@ private fun EditProdukContent(
             )
         }
 
-        // FIXED FOOTER ACTION BAR
+
         Box(
             modifier = modifier
                 .fillMaxWidth()
@@ -438,7 +438,7 @@ private fun EditProdukContent(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Delete Button (Hapus)
+
                 Button(
                     onClick = onDeleteClick,
                     modifier = Modifier.height(48.dp),
@@ -468,7 +468,7 @@ private fun EditProdukContent(
                     }
                 }
 
-                // Save Button (Simpan Perubahan)
+
                 Button(
                     onClick = {
                         val nVal = ValidationUtils.validateProductName(nama)
@@ -537,7 +537,7 @@ private fun EditProdukContent(
         }
     }
 
-    // CUSTOM CATEGORY ADDITION BOTTOM SHEET
+
     if (showBottomSheet) {
         TambahKategoriBottomSheet(
             categories = categories,

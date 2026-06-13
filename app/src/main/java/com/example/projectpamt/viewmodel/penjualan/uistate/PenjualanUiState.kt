@@ -30,6 +30,7 @@ sealed class PenjualanDataUiState {
     }
     data class Success(
         val totalTransaksi: Int,
+        val totalPendapatan: Double,
         val pelangganList: List<Pelanggan>,
         val produkList: List<Produk>
     ) : PenjualanDataUiState() {

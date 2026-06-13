@@ -9,7 +9,9 @@ class LogKasRepository {
     private val supabase = SupabaseClientProvider.client
 
     suspend fun getAllLogKas(): List<LogKas> {
-        return supabase.postgrest["log_kas"].select().decodeList<LogKas>()
+        return supabase.postgrest["log_kas"].select {
+            order("updated_at", order = io.github.jan.supabase.postgrest.query.Order.DESCENDING)
+        }.decodeList<LogKas>()
     }
 
     suspend fun getLogKas(idKas: String): List<LogKasItem> {

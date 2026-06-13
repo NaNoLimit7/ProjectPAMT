@@ -47,17 +47,7 @@ fun TransactionDetailSheetContent(
 ) {
     val dateStr = txn.penjualan.createdAt ?: ""
     val formattedTime = remember(dateStr) {
-        try {
-            val date =
-                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
-            if (date != null) {
-                SimpleDateFormat("d MMMM yyyy HH:mm", Locale("id", "ID")).format(date)
-            } else {
-                dateStr
-            }
-        } catch (e: Exception) {
-            dateStr
-        }
+        com.example.projectpamt.ui.utils.DateTimeUtils.formatIso(dateStr, "d MMMM yyyy, HH:mm")
     }
 
     Column(

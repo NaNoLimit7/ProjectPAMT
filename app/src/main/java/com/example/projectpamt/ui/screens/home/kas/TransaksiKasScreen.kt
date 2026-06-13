@@ -163,16 +163,8 @@ private fun TransaksiKasContent(
     // Group transactions by date
     val groupedTransactions = remember(transactions) {
         transactions.groupBy { logItem ->
-            try {
-                val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(logItem.updatedAt)
-                if (date != null) {
-                    SimpleDateFormat("d MMMM yyyy", Locale("id", "ID")).format(date)
-                } else {
-                    "Lainnya"
-                }
-            } catch (_: Exception) {
-                "Lainnya"
-            }
+            val formatted = com.example.projectpamt.ui.utils.DateTimeUtils.formatIso(logItem.updatedAt, "d MMMM yyyy")
+            formatted.ifEmpty { "Lainnya" }
         }
     }
 
@@ -391,16 +383,7 @@ private fun TransactionRowCard(
 ) {
     val dateStr = logItem.updatedAt
     val formattedTime = remember(dateStr) {
-        try {
-            val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
-            if (date != null) {
-                SimpleDateFormat("HH:mm", Locale("id", "ID")).format(date)
-            } else {
-                ""
-            }
-        } catch (_: Exception) {
-            ""
-        }
+        com.example.projectpamt.ui.utils.DateTimeUtils.formatIso(dateStr, "HH:mm")
     }
 
     val changeAmount = logItem.saldoAkhir - logItem.saldoAwal
@@ -463,26 +446,6 @@ private fun TransactionRowCard(
                     color = Color(0xFF3E4940),
                     lineHeight = 20.sp
                 )
-
-                // Footer: Performer and Time in a single line with bullet separator
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier.padding(top = 4.dp)
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.profil),
-                        contentDescription = null,
-                        tint = Color(0xFF6E7A70),
-                        modifier = Modifier.size(12.dp)
-                    )
-                    Text(
-                        text = "Oleh: ${logItem.pelaku} • $formattedTime",
-                        fontSize = 13.sp,
-                        color = Color(0xFF6E7A70),
-                        fontWeight = FontWeight.Normal
-                    )
-                }
             }
 
             // Right Side: Amount

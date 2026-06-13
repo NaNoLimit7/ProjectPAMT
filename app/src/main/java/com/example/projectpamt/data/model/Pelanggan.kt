@@ -14,7 +14,7 @@ data class Pelanggan(
     @SerialName("id_pelanggan") val idPelanggan: String? = null,
     val nama: String,
     val telepon: String,
-    val aktif: Boolean = true,
+    val aktif: Boolean,
     @SerialName("created_at") val createdAt: String? = null
 ) {
     companion object {

@@ -1,5 +1,6 @@
 package com.example.projectpamt.viewmodel.pelanggan
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -35,6 +36,7 @@ class PelangganViewModel(
                 val list = repository.getAllPelanggan()
                 _uiState.value = PelangganUiState.Success(list)
             } catch (e: Exception) {
+                Log.d("PELANGGAN", e.message.toString())
                 _uiState.value = PelangganUiState.Error(e.toAppError().toUserMessage())
             }
         }
@@ -47,6 +49,7 @@ class PelangganViewModel(
                 val list = repository.getAllPelanggan()
                 _uiState.value = PelangganUiState.Success(list)
             } catch (e: Exception) {
+                Log.d("PELANGGAN", e.message.toString())
                 _uiState.value = PelangganUiState.Error(e.toAppError().toUserMessage())
             } finally {
                 isRefreshing = false
@@ -67,6 +70,7 @@ class PelangganViewModel(
                 fetchPelanggan()
                 onSuccess()
             } catch (e: Exception) {
+                Log.d("PELANGGAN", e.message.toString())
                 _uiState.value = PelangganUiState.Error(e.toAppError().toUserMessage())
             }
         }
@@ -92,6 +96,7 @@ class PelangganViewModel(
                 fetchPelanggan()
                 onSuccess()
             } catch (e: Exception) {
+                Log.d("PELANGGAN", e.message.toString())
                 _uiState.value = PelangganUiState.Error(e.toAppError().toUserMessage())
             }
         }
@@ -105,6 +110,8 @@ class PelangganViewModel(
                 fetchPelanggan()
                 onSuccess()
             } catch (e: Exception) {
+                Log.d("PELANGGAN", e.message.toString())
+
                 _uiState.value = PelangganUiState.Error(e.toAppError().toUserMessage())
             }
         }

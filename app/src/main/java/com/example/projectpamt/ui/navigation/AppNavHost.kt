@@ -32,6 +32,7 @@ import com.example.projectpamt.viewmodel.pengeluaran.PengeluaranViewModel
 import com.example.projectpamt.data.model.Pengeluaran
 import com.example.projectpamt.viewmodel.kas.KasViewModel
 import com.example.projectpamt.data.model.Kas
+import com.example.projectpamt.ui.screens.home.labarugi.LabaRugiScreen
 import com.example.projectpamt.ui.screens.home.produk.DetailProdukScreen
 import com.example.projectpamt.ui.screens.home.produk.EditProdukScreen
 import com.example.projectpamt.ui.screens.home.produk.ProdukScreen
@@ -312,6 +313,13 @@ fun AppNavHost(
             TransaksiKasScreen(
                 kas = route.kas,
                 navController = navController
+            )
+        }
+
+        composable<LabaRugi> {
+            LabaRugiScreen(
+                navController = navController,
+                snackbarHostState = snackbarHostState
             )
         }
     }

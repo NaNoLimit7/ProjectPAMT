@@ -51,15 +51,6 @@ fun CustomerCard(
     val badgeText = if (pelanggan.aktif) InfoBlueText else Color(0xFF4B5563)
     val badgeLabel = if (pelanggan.aktif) "Aktif" else "Non-Aktif"
 
-    // Mock total belanja berdasarkan spesifikasi Figma
-    val totalBelanjaVal = when (pelanggan.nama) {
-        "Sarah Johnson" -> 240_000.0
-        "Michael Chen" -> 273_948.0
-        "Emily Rodriguez" -> 221_000.0
-        "David Kim" -> 21_000.0
-        else -> 0.0
-    }
-
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -136,25 +127,6 @@ fun CustomerCard(
                             text = pelanggan.telepon,
                             fontSize = 14.sp,
                             color = TextMuted
-                        )
-                    }
-
-                    // Total Belanja
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Total Belanja",
-                            fontSize = 12.sp,
-                            color = Color(0xFF9CA3AF)
-                        )
-                        Text(
-                            text = formatRupiah(totalBelanjaVal),
-                            fontSize = 12.sp,
-                            color = GreenPrimary,
-                            fontWeight = FontWeight.Normal
                         )
                     }
                 }

@@ -11,11 +11,16 @@ class KasRepository {
     private val supabase = SupabaseClientProvider.client
 
     suspend fun getAllKas(): List<Kas> {
-        return supabase.postgrest["kas"].select().decodeList<Kas>()
+        return supabase.postgrest["kas"].select {
+            order("created_at", order = io.github.jan.supabase.postgrest.query.Order.DESCENDING)
+        }.decodeList<Kas>()
     }
 
     suspend fun getKasAktif(): List<Kas> {
-        return supabase.postgrest["kas"].select { filter { eq("aktif", true) } }.decodeList<Kas>()
+        return supabase.postgrest["kas"].select { 
+            filter { eq("aktif", true) } 
+            order("created_at", order = io.github.jan.supabase.postgrest.query.Order.DESCENDING)
+        }.decodeList<Kas>()
     }
 
     suspend fun tambahKas(nama: String, saldo: Double, aktif: Boolean, keteranganUser: String) {

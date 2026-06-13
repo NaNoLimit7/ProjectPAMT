@@ -8,7 +8,9 @@ class PelangganRepository {
     private val supabase = SupabaseClientProvider.client
 
     suspend fun getAllPelanggan(): List<Pelanggan> {
-        return supabase.postgrest["pelanggan"].select().decodeList<Pelanggan>()
+        return supabase.postgrest["pelanggan"].select {
+            order("created_at", order = io.github.jan.supabase.postgrest.query.Order.DESCENDING)
+        }.decodeList<Pelanggan>()
     }
 
     suspend fun insertPelanggan(pelanggan: Pelanggan) {

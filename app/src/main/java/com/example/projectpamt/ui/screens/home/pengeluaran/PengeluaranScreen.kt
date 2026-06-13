@@ -239,23 +239,13 @@ private fun PengeluaranContent(
                     val lastMonth = lastMonthCal.get(Calendar.MONTH)
                     val lastMonthYear = lastMonthCal.get(Calendar.YEAR)
 
-                    val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID"))
-
                     val expensesThisMonthList = remember(rawList) {
                         rawList.filter { exp ->
                             val dateStr = exp.createdAt
                             if (dateStr == null) {
                                 false
                             } else {
-                                val date = try {
-                                    parse(dateStr)?.let { Date.from(it) }
-                                } catch (_: Exception) {
-                                    try {
-                                        df.parse(dateStr)
-                                    } catch (_: Exception) {
-                                        null
-                                    }
-                                }
+                                val date = com.example.projectpamt.ui.utils.DateTimeUtils.parseIso(dateStr)
                                 if (date == null) {
                                     false
                                 } else {
@@ -276,15 +266,7 @@ private fun PengeluaranContent(
                             if (dateStr == null) {
                                 false
                             } else {
-                                val date = try {
-                                    parse(dateStr)?.let { Date.from(it) }
-                                } catch (_: Exception) {
-                                    try {
-                                        df.parse(dateStr)
-                                    } catch (_: Exception) {
-                                        null
-                                    }
-                                }
+                                val date = com.example.projectpamt.ui.utils.DateTimeUtils.parseIso(dateStr)
                                 if (date == null) {
                                     false
                                 } else {

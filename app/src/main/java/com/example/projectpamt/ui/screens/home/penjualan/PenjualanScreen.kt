@@ -253,12 +253,13 @@ private fun PenjualanContent(
                         ) {
                             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Text(
-                                    text = "Transaksi Saat Ini",
+                                    text = "Total Transaksi",
                                     fontSize = 14.sp,
                                     color = Color.White.copy(alpha = 0.8f)
                                 )
+                                val totalVal = if (dataState is PenjualanDataUiState.Success) dataState.totalPendapatan else 0.0
                                 Text(
-                                    text = formatRupiah(cartItems.sumOf { it.totalHarga }),
+                                    text = formatRupiah(totalVal),
                                     fontSize = 32.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White,

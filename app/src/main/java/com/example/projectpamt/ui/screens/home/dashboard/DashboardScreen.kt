@@ -21,6 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.Icon
@@ -61,6 +62,7 @@ import com.example.projectpamt.ui.navigation.RiwayatPenjualan
 import com.example.projectpamt.ui.navigation.TambahPelanggan
 import com.example.projectpamt.ui.navigation.TambahProduk
 import com.example.projectpamt.ui.navigation.Profil
+import com.example.projectpamt.ui.navigation.LabaRugi
 import com.example.projectpamt.ui.theme.ActionBlue
 import com.example.projectpamt.ui.theme.ActionGreen
 import com.example.projectpamt.ui.theme.ActionOrange
@@ -169,7 +171,8 @@ fun DashboardScreen(
                     onNavigateTambahPelanggan = { navController.navigate(TambahPelanggan)},
                     onNavigateTambahPengeluaran = { navController.navigate(PengeluaranList) },
                     onViewAllPenjualan = { navController.navigate(RiwayatPenjualan) },
-                    onNavigateProfil = { navController.navigate(Profil) }
+                    onNavigateProfil = { navController.navigate(Profil) },
+                    onNavigateLabaRugi = { navController.navigate(LabaRugi) }
                 )
             }
         }
@@ -189,6 +192,7 @@ fun DashboardContent(
     onNavigateTambahPengeluaran: () -> Unit,
     onViewAllPenjualan: () -> Unit,
     onNavigateProfil: () -> Unit,
+    onNavigateLabaRugi: () -> Unit,
 ) {
     val formattedDate = Date().toIndonesianFormattedDate()
     val initials = state.namaPengguna.getInitials()
@@ -268,10 +272,8 @@ fun DashboardContent(
                         titleIcon = R.drawable.penjualan_graph,
                         title = "Penjualan Bulan Ini",
                         value = formatRupiah(state.penjualanBulanIni),
-                        statsLabelIcon = Icons.Default.ArrowUpward,
-                        statsLabel = "12.5%",
                         statsLabelColor = Color(0xFF86EFAC),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
                     DashboardCard(
                         titleIcon = R.drawable.kas,
@@ -356,6 +358,17 @@ fun DashboardContent(
                         iconSize = 18.dp
                     )
                 }
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(start = 10.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    QuickActionButton(
+                        icon = ImageVector.vectorResource(R.drawable.labarugi),
+                        label = "Laporan\nLaba/Rugi",
+                        accentColor = Color(0xFFBA1A1A),
+                        onClick = onNavigateLabaRugi,
+                    )
+                }
             }
 
             // ── CHART SECTION
@@ -406,7 +419,8 @@ private fun DashboardContentPreview() {
                 onNavigateTambahPelanggan = {},
                 onNavigateTambahPengeluaran = {},
                 onViewAllPenjualan = {},
-                onNavigateProfil = {}
+                onNavigateProfil = {},
+                onNavigateLabaRugi = {}
             )
         }
     }

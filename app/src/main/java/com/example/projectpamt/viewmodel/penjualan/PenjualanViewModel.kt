@@ -1,5 +1,6 @@
 package com.example.projectpamt.viewmodel.penjualan
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -56,14 +57,17 @@ class PenjualanViewModel(
             _dataState.value = PenjualanDataUiState.Loading
             try {
                 val totalTransaksi = repository.getTotalTransaksi()
+                val totalPendapatan = repository.getTotalNilaiPenjualan()
                 val pelangganList = pelangganRepository.getAllPelanggan().filter { it.aktif }
                 val produkList = produkRepository.getProdukAktif()
                 _dataState.value = PenjualanDataUiState.Success(
                     totalTransaksi = totalTransaksi,
+                    totalPendapatan = totalPendapatan,
                     pelangganList = pelangganList,
                     produkList = produkList
                 )
             } catch (e: Exception) {
+                Log.d("PENJUALAN", e.toString())
                 _dataState.value = PenjualanDataUiState.Error(e.toAppError().toUserMessage())
             }
         }
@@ -74,14 +78,17 @@ class PenjualanViewModel(
             isRefreshing = true
             try {
                 val totalTransaksi = repository.getTotalTransaksi()
+                val totalPendapatan = repository.getTotalNilaiPenjualan()
                 val pelangganList = pelangganRepository.getAllPelanggan().filter { it.aktif }
                 val produkList = produkRepository.getProdukAktif()
                 _dataState.value = PenjualanDataUiState.Success(
                     totalTransaksi = totalTransaksi,
+                    totalPendapatan = totalPendapatan,
                     pelangganList = pelangganList,
                     produkList = produkList
                 )
             } catch (e: Exception) {
+                Log.d("PENJUALAN", e.toString())
                 _dataState.value = PenjualanDataUiState.Error(e.toAppError().toUserMessage())
             } finally {
                 isRefreshing = false

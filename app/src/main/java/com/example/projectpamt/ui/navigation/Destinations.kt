@@ -97,3 +97,6 @@ object Profil
 
 @Serializable
 data class TransaksiKas(val kas: Kas)
+
+@Serializable
+object LabaRugi

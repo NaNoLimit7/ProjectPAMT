@@ -39,17 +39,7 @@ fun DailyLogCard(
 ) {
     val dateStr = logDay.tanggal
     val formattedDate = remember(dateStr) {
-        try {
-            val date =
-                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
-            if (date != null) {
-                SimpleDateFormat("d MMMM yyyy", Locale("id", "ID")).format(date)
-            } else {
-                dateStr
-            }
-        } catch (e: Exception) {
-            dateStr
-        }
+        com.example.projectpamt.ui.utils.DateTimeUtils.formatIso(dateStr, "d MMMM yyyy")
     }
 
     Card(
