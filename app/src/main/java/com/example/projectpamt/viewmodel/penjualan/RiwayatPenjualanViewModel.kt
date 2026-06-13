@@ -1,5 +1,8 @@
 package com.example.projectpamt.viewmodel.penjualan
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.model.Kas
@@ -7,16 +10,17 @@ import com.example.projectpamt.data.model.Pelanggan
 import com.example.projectpamt.data.model.Penjualan
 import com.example.projectpamt.data.model.Produk
 import com.example.projectpamt.data.repository.PenjualanRepository
+import com.example.projectpamt.ui.utils.DateTimeUtils
+import com.example.projectpamt.ui.utils.toAppError
+import com.example.projectpamt.ui.utils.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 
 class RiwayatPenjualanViewModel(
     private val repository: PenjualanRepository = PenjualanRepository()
@@ -27,6 +31,9 @@ class RiwayatPenjualanViewModel(
     private val allTransactions = mutableListOf<PenjualanWithDetails>()
     private var currentFilter = RiwayatFilter.SEMUA_WAKTU
     private var currentSearchQuery = ""
+
+    var isRefreshing by mutableStateOf(false)
+        private set
 
     init {
         fetchRiwayat()
@@ -58,7 +65,40 @@ class RiwayatPenjualanViewModel(
                 allTransactions.addAll(mapped)
                 applyFilterAndSearch()
             } catch (e: Exception) {
-                _uiState.value = RiwayatPenjualanUiState.Error("Gagal memuat riwayat: ${e.message}")
+                _uiState.value = RiwayatPenjualanUiState.Error(e.toAppError().toUserMessage())
+            }
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            isRefreshing = true
+            try {
+                val rawPenjualan = repository.getRiwayatPenjualan()
+                val mapped = rawPenjualan.map { penjualan ->
+                    val items = try {
+                        if (penjualan.detailPenjualan != null) {
+                            Json.decodeFromJsonElement<List<CartItem>>(penjualan.detailPenjualan)
+                        } else {
+                            emptyList()
+                        }
+                    } catch (e: Exception) {
+                        emptyList()
+                    }
+                    PenjualanWithDetails(
+                        penjualan = penjualan,
+                        pelanggan = penjualan.pelanggan,
+                        kas = penjualan.kas,
+                        items = items
+                    )
+                }
+                allTransactions.clear()
+                allTransactions.addAll(mapped)
+                applyFilterAndSearch()
+            } catch (e: Exception) {
+                _uiState.value = RiwayatPenjualanUiState.Error(e.toAppError().toUserMessage())
+            } finally {
+                isRefreshing = false
             }
         }
     }
@@ -93,21 +133,11 @@ class RiwayatPenjualanViewModel(
                 if (dateStr == null) {
                     false
                 } else {
-                    val txnInstant = try {
-                        java.time.Instant.parse(dateStr)
-                    } catch (e: Exception) {
-                        try {
-                            val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID"))
-                            df.parse(dateStr)?.toInstant()
-                        } catch (ex: Exception) {
-                            null
-                        }
-                    }
+                    val txnDate = DateTimeUtils.parseIso(dateStr)
                     
-                    if (txnInstant == null) {
+                    if (txnDate == null) {
                         false
                     } else {
-                        val txnDate = Date.from(txnInstant)
                         val now = Date()
                         when (currentFilter) {
                             RiwayatFilter.HARI_INI -> {

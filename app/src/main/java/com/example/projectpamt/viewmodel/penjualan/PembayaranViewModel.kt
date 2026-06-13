@@ -1,11 +1,16 @@
 package com.example.projectpamt.viewmodel.penjualan
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.model.Kas
 import com.example.projectpamt.data.model.DetailPenjualan
 import com.example.projectpamt.data.repository.KasRepository
 import com.example.projectpamt.data.repository.PenjualanRepository
+import com.example.projectpamt.ui.utils.toAppError
+import com.example.projectpamt.ui.utils.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,6 +34,9 @@ class PembayaranViewModel(
     private val _uiState = MutableStateFlow<PembayaranUiState>(PembayaranUiState.Idle)
     val uiState: StateFlow<PembayaranUiState> = _uiState.asStateFlow()
 
+    var isRefreshing by mutableStateOf(false)
+        private set
+
     init {
         fetchActiveKas()
     }
@@ -43,6 +51,23 @@ class PembayaranViewModel(
                 }
             } catch (e: Exception) {
                 // Ignore or handle
+            }
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            isRefreshing = true
+            try {
+                val list = kasRepository.getKasAktif()
+                _kasList.value = list
+                if (_selectedKas.value == null) {
+                    _selectedKas.value = list.firstOrNull()
+                }
+            } catch (e: Exception) {
+                // Ignore
+            } finally {
+                isRefreshing = false
             }
         }
     }
@@ -100,7 +125,7 @@ class PembayaranViewModel(
                 _uiState.value = PembayaranUiState.Success(txnId)
                 onSuccess()
             } catch (e: Exception) {
-                _uiState.value = PembayaranUiState.Error(e.message ?: "Gagal memproses pembayaran")
+                _uiState.value = PembayaranUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }

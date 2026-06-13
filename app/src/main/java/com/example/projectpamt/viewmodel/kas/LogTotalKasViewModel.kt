@@ -1,8 +1,13 @@
 package com.example.projectpamt.viewmodel.kas
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.repository.LogTotalKasRepository
+import com.example.projectpamt.ui.utils.toAppError
+import com.example.projectpamt.ui.utils.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,6 +20,9 @@ class LogTotalKasViewModel(
     private val _uiState = MutableStateFlow<LogTotalKasUiState>(LogTotalKasUiState.Idle)
     val uiState: StateFlow<LogTotalKasUiState> = _uiState.asStateFlow()
 
+    var isRefreshing by mutableStateOf(false)
+        private set
+
     init {
         fetchLogTotalKas()
     }
@@ -26,9 +34,21 @@ class LogTotalKasViewModel(
                 val summary = repository.getLogTotalKasSummary()
                 _uiState.value = LogTotalKasUiState.Success(summary)
             } catch (e: Exception) {
-                _uiState.value = LogTotalKasUiState.Error(
-                    e.message ?: "Gagal memuat log total kas"
-                )
+                _uiState.value = LogTotalKasUiState.Error(e.toAppError().toUserMessage())
+            }
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            isRefreshing = true
+            try {
+                val summary = repository.getLogTotalKasSummary()
+                _uiState.value = LogTotalKasUiState.Success(summary)
+            } catch (e: Exception) {
+                _uiState.value = LogTotalKasUiState.Error(e.toAppError().toUserMessage())
+            } finally {
+                isRefreshing = false
             }
         }
     }

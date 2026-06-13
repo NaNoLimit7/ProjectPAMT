@@ -3,8 +3,16 @@ package com.example.projectpamt.viewmodel.kas
 import com.example.projectpamt.data.model.LogTotalKasSummary
 
 sealed class LogTotalKasUiState {
-    object Idle : LogTotalKasUiState()
-    object Loading : LogTotalKasUiState()
-    data class Success(val data: LogTotalKasSummary) : LogTotalKasUiState()
-    data class Error(val message: String) : LogTotalKasUiState()
+    abstract val message: String?
+
+    object Idle : LogTotalKasUiState() {
+        override val message: String? = null
+    }
+    object Loading : LogTotalKasUiState() {
+        override val message: String? = null
+    }
+    data class Success(val data: LogTotalKasSummary) : LogTotalKasUiState() {
+        override val message: String? = null
+    }
+    data class Error(override val message: String) : LogTotalKasUiState()
 }

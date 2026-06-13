@@ -28,13 +28,21 @@ data class AktivitasSummary(
     val terakhirAktif: String
 )
 
-sealed interface AktivitasPelangganUiState {
-    object Idle : AktivitasPelangganUiState
-    object Loading : AktivitasPelangganUiState
+sealed class AktivitasPelangganUiState {
+    abstract val message: String?
+
+    object Idle : AktivitasPelangganUiState() {
+        override val message: String? = null
+    }
+    object Loading : AktivitasPelangganUiState() {
+        override val message: String? = null
+    }
     data class Success(
         val summary: AktivitasSummary,
         val listAktivitas: List<PelangganAktivitas>,
         val selectedFilter: AktivitasFilter
-    ) : AktivitasPelangganUiState
-    data class Error(val message: String) : AktivitasPelangganUiState
+    ) : AktivitasPelangganUiState() {
+        override val message: String? = null
+    }
+    data class Error(override val message: String) : AktivitasPelangganUiState()
 }

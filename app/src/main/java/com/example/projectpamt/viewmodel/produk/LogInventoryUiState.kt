@@ -10,12 +10,20 @@ enum class LogInventoryFilter {
 }
 
 sealed class LogInventoryUiState {
-    object Idle : LogInventoryUiState()
-    object Loading : LogInventoryUiState()
+    abstract val message: String?
+
+    object Idle : LogInventoryUiState() {
+        override val message: String? = null
+    }
+    object Loading : LogInventoryUiState() {
+        override val message: String? = null
+    }
     data class Success(
         val listLogs: List<LogInventory>,
         val searchQuery: String,
         val selectedFilter: LogInventoryFilter
-    ) : LogInventoryUiState()
-    data class Error(val message: String) : LogInventoryUiState()
+    ) : LogInventoryUiState() {
+        override val message: String? = null
+    }
+    data class Error(override val message: String) : LogInventoryUiState()
 }

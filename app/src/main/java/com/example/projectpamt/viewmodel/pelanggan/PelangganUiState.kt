@@ -3,8 +3,16 @@ package com.example.projectpamt.viewmodel.pelanggan
 import com.example.projectpamt.data.model.Pelanggan
 
 sealed class PelangganUiState {
-    object Idle : PelangganUiState()
-    object Loading : PelangganUiState()
-    data class Success(val data: List<Pelanggan>) : PelangganUiState()
-    data class Error(val message: String) : PelangganUiState()
+    abstract val message: String?
+
+    object Idle : PelangganUiState() {
+        override val message: String? = null
+    }
+    object Loading : PelangganUiState() {
+        override val message: String? = null
+    }
+    data class Success(val data: List<Pelanggan>) : PelangganUiState() {
+        override val message: String? = null
+    }
+    data class Error(override val message: String) : PelangganUiState()
 }

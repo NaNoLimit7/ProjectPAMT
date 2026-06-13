@@ -1,9 +1,14 @@
 package com.example.projectpamt.viewmodel.kategori
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.model.Kategori
 import com.example.projectpamt.data.repository.KategoriRepository
+import com.example.projectpamt.ui.utils.toAppError
+import com.example.projectpamt.ui.utils.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,6 +19,9 @@ class KategoriViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<KategoriUiState>(KategoriUiState.Idle)
     val uiState: StateFlow<KategoriUiState> = _uiState.asStateFlow()
+
+    var isRefreshing by mutableStateOf(false)
+        private set
 
     init {
         fetchKategori()
@@ -26,7 +34,21 @@ class KategoriViewModel(
                 val list = repository.getAllKategori()
                 _uiState.value = KategoriUiState.Success(list)
             } catch (e: Exception) {
-                _uiState.value = KategoriUiState.Error("Gagal memuat data kategori ${e.message}")
+                _uiState.value = KategoriUiState.Error(e.toAppError().toUserMessage())
+            }
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            isRefreshing = true
+            try {
+                val list = repository.getAllKategori()
+                _uiState.value = KategoriUiState.Success(list)
+            } catch (e: Exception) {
+                _uiState.value = KategoriUiState.Error(e.toAppError().toUserMessage())
+            } finally {
+                isRefreshing = false
             }
         }
     }
@@ -40,7 +62,7 @@ class KategoriViewModel(
                 repository.insertKategori(kategoriBaru)
                 fetchKategori()
             } catch (e: Exception) {
-                _uiState.value = KategoriUiState.Error("Gagal menambahkan kategori ${e.message}")
+                _uiState.value = KategoriUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }
@@ -53,7 +75,7 @@ class KategoriViewModel(
                 repository.updateKategori(id, kategoriUpdate)
                 fetchKategori()
             } catch (e: Exception) {
-                _uiState.value = KategoriUiState.Error("Gagal memperbarui kategori ${e.message}")
+                _uiState.value = KategoriUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }
@@ -65,7 +87,7 @@ class KategoriViewModel(
                 repository.deleteKategori(id)
                 fetchKategori()
             } catch (e: Exception) {
-                _uiState.value = KategoriUiState.Error("Gagal menghapus kategori ${e.message}")
+                _uiState.value = KategoriUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }

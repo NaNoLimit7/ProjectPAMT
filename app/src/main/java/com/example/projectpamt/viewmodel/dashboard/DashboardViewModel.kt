@@ -12,16 +12,26 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import com.example.projectpamt.ui.utils.toAppError
+import com.example.projectpamt.ui.utils.toUserMessage
+import com.example.projectpamt.ui.utils.DateTimeUtils
 
 sealed class DashboardUiState {
-    object Idle : DashboardUiState()
-    object Loading : DashboardUiState()
-    data class Success(val state: DashboardState) : DashboardUiState()
-    data class Error(val message: String) : DashboardUiState()
+    abstract val message: String?
+
+    object Idle : DashboardUiState() {
+        override val message: String? = null
+    }
+    object Loading : DashboardUiState() {
+        override val message: String? = null
+    }
+    data class Success(val state: DashboardState) : DashboardUiState() {
+        override val message: String? = null
+    }
+    data class Error(override val message: String) : DashboardUiState()
 }
 
 class DashboardViewModel(
@@ -60,22 +70,12 @@ class DashboardViewModel(
                 val currentMonth = now.get(Calendar.MONTH)
                 val currentYear = now.get(Calendar.YEAR)
 
-                val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID"))
-
                 val penjualanBulanIni = riwayatPenjualan.filter { penjualan ->
                     val dateStr = penjualan.createdAt
                     if (dateStr == null) {
                         false
                     } else {
-                        val date = try {
-                            java.time.Instant.parse(dateStr)?.let { Date.from(it) }
-                        } catch (e: Exception) {
-                            try {
-                                df.parse(dateStr)
-                            } catch (ex: Exception) {
-                                null
-                            }
-                        }
+                        val date = DateTimeUtils.parseIso(dateStr)
                         if (date == null) {
                             false
                         } else {
@@ -106,15 +106,7 @@ class DashboardViewModel(
                 riwayatPenjualan.forEach { penjualan ->
                     val dateStr = penjualan.createdAt
                     if (dateStr != null) {
-                        val date = try {
-                            java.time.Instant.parse(dateStr)?.let { Date.from(it) }
-                        } catch (e: Exception) {
-                            try {
-                                df.parse(dateStr)
-                            } catch (ex: Exception) {
-                                null
-                            }
-                        }
+                        val date = DateTimeUtils.parseIso(dateStr)
                         if (date != null && date.after(sevenDaysAgo)) {
                             val cal = Calendar.getInstance().apply { time = date }
                             val dayName = dayNames[cal.get(Calendar.DAY_OF_WEEK) - 1]
@@ -141,7 +133,7 @@ class DashboardViewModel(
                     )
                 )
             } catch (e: Exception) {
-                _uiState.value = DashboardUiState.Error("Gagal memuat dashboard: ${e.message}")
+                _uiState.value = DashboardUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }

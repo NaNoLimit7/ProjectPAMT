@@ -5,21 +5,37 @@ import com.example.projectpamt.data.model.Produk
 import kotlinx.serialization.Serializable
 
 sealed class PenjualanUiState {
-    object Idle : PenjualanUiState()
-    object Loading : PenjualanUiState()
-    data class Success(val idPenjualan: String) : PenjualanUiState()
-    data class Error(val message: String) : PenjualanUiState()
+    abstract val message: String?
+
+    object Idle : PenjualanUiState() {
+        override val message: String? = null
+    }
+    object Loading : PenjualanUiState() {
+        override val message: String? = null
+    }
+    data class Success(val idPenjualan: String) : PenjualanUiState() {
+        override val message: String? = null
+    }
+    data class Error(override val message: String) : PenjualanUiState()
 }
 
 sealed class PenjualanDataUiState {
-    object Idle : PenjualanDataUiState()
-    object Loading : PenjualanDataUiState()
+    abstract val message: String?
+
+    object Idle : PenjualanDataUiState() {
+        override val message: String? = null
+    }
+    object Loading : PenjualanDataUiState() {
+        override val message: String? = null
+    }
     data class Success(
         val totalTransaksi: Int,
         val pelangganList: List<Pelanggan>,
         val produkList: List<Produk>
-    ) : PenjualanDataUiState()
-    data class Error(val message: String) : PenjualanDataUiState()
+    ) : PenjualanDataUiState() {
+        override val message: String? = null
+    }
+    data class Error(override val message: String) : PenjualanDataUiState()
 }
 
 @Serializable

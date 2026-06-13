@@ -1,16 +1,19 @@
 package com.example.projectpamt.viewmodel.produk
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.model.Produk
 import com.example.projectpamt.data.repository.ProdukRepository
-import kotlinx.coroutines.delay
+import com.example.projectpamt.ui.utils.toAppError
+import com.example.projectpamt.ui.utils.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
-import kotlin.time.Duration.Companion.milliseconds
 
 class ProdukViewModel(
     private val repository: ProdukRepository = ProdukRepository()
@@ -18,6 +21,9 @@ class ProdukViewModel(
 
     private val _uiState = MutableStateFlow<ProdukUiState>(ProdukUiState.Idle)
     val uiState: StateFlow<ProdukUiState> = _uiState.asStateFlow()
+
+    var isRefreshing by mutableStateOf(false)
+        private set
 
     init {
         fetchProdukAktif()
@@ -30,7 +36,21 @@ class ProdukViewModel(
                 val list = repository.getProdukAktif()
                 _uiState.value = ProdukUiState.Success(list)
             } catch (e: Exception) {
-                _uiState.value = ProdukUiState.Error(e.message ?: "Gagal menampilkan produk")
+                _uiState.value = ProdukUiState.Error(e.toAppError().toUserMessage())
+            }
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            isRefreshing = true
+            try {
+                val list = repository.getProdukAktif()
+                _uiState.value = ProdukUiState.Success(list)
+            } catch (e: Exception) {
+                _uiState.value = ProdukUiState.Error(e.toAppError().toUserMessage())
+            } finally {
+                isRefreshing = false
             }
         }
     }
@@ -58,7 +78,7 @@ class ProdukViewModel(
                 fetchProdukAktif()
                 onSuccess()
             } catch (e: Exception) {
-                _uiState.value = ProdukUiState.Error(e.message ?: "Gagal menambahkan produk")
+                _uiState.value = ProdukUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }
@@ -71,7 +91,7 @@ class ProdukViewModel(
                 fetchProdukAktif()
                 onSuccess()
             } catch (e: Exception) {
-                _uiState.value = ProdukUiState.Error(e.message ?: "Gagal mengubah info Produk")
+                _uiState.value = ProdukUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }
@@ -101,7 +121,7 @@ class ProdukViewModel(
                 fetchProdukAktif()
                 onSuccess()
             } catch (e: Exception) {
-                _uiState.value = ProdukUiState.Error(e.message ?: "Gagal memperbarui produk")
+                _uiState.value = ProdukUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }
@@ -114,7 +134,7 @@ class ProdukViewModel(
                 fetchProdukAktif()
                 onSuccess()
             } catch (e: Exception) {
-                _uiState.value = ProdukUiState.Error(e.message ?: "Gagal memperbarui stok")
+                _uiState.value = ProdukUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }
@@ -127,7 +147,7 @@ class ProdukViewModel(
                 fetchProdukAktif()
                 onSuccess()
             } catch (e: Exception) {
-                _uiState.value = ProdukUiState.Error(e.message ?: "Gagal menonaktifkan produk")
+                _uiState.value = ProdukUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }

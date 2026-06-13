@@ -1,5 +1,8 @@
 package com.example.projectpamt.viewmodel.penjualan
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.model.DetailPenjualan
@@ -8,6 +11,8 @@ import com.example.projectpamt.data.model.Produk
 import com.example.projectpamt.data.repository.PelangganRepository
 import com.example.projectpamt.data.repository.PenjualanRepository
 import com.example.projectpamt.data.repository.ProdukRepository
+import com.example.projectpamt.ui.utils.toAppError
+import com.example.projectpamt.ui.utils.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,6 +43,9 @@ class PenjualanViewModel(
     private val _selectedPelanggan = MutableStateFlow<Pelanggan?>(null)
     val selectedPelanggan: StateFlow<Pelanggan?> = _selectedPelanggan.asStateFlow()
 
+    var isRefreshing by mutableStateOf(false)
+        private set
+
     init {
         fetchPenjualanData()
     }
@@ -55,7 +63,27 @@ class PenjualanViewModel(
                     produkList = produkList
                 )
             } catch (e: Exception) {
-                _dataState.value = PenjualanDataUiState.Error("Gagal memuat data: ${e.message}")
+                _dataState.value = PenjualanDataUiState.Error(e.toAppError().toUserMessage())
+            }
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            isRefreshing = true
+            try {
+                val totalTransaksi = repository.getTotalTransaksi()
+                val pelangganList = pelangganRepository.getAllPelanggan().filter { it.aktif }
+                val produkList = produkRepository.getProdukAktif()
+                _dataState.value = PenjualanDataUiState.Success(
+                    totalTransaksi = totalTransaksi,
+                    pelangganList = pelangganList,
+                    produkList = produkList
+                )
+            } catch (e: Exception) {
+                _dataState.value = PenjualanDataUiState.Error(e.toAppError().toUserMessage())
+            } finally {
+                isRefreshing = false
             }
         }
     }
@@ -125,7 +153,7 @@ class PenjualanViewModel(
                 _uiState.value = PenjualanUiState.Success(idBaru)
                 clearCart() // optional: clear cart after success
             } catch (e: Exception) {
-                _uiState.value = PenjualanUiState.Error("Gagal memproses penjualan ${e.message}")
+                _uiState.value = PenjualanUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }

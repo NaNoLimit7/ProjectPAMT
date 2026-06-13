@@ -1,11 +1,16 @@
 package com.example.projectpamt.viewmodel.pengeluaran
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.model.Kas
 import com.example.projectpamt.data.model.Kategori
 import com.example.projectpamt.data.model.Pengeluaran
 import com.example.projectpamt.data.repository.PengeluaranRepository
+import com.example.projectpamt.ui.utils.toAppError
+import com.example.projectpamt.ui.utils.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +22,9 @@ class PengeluaranViewModel(
 
     private val _uiState = MutableStateFlow<PengeluaranUiState>(PengeluaranUiState.Idle)
     val uiState: StateFlow<PengeluaranUiState> = _uiState.asStateFlow()
+
+    var isRefreshing by mutableStateOf(false)
+        private set
 
     init {
         fetchPengeluaran()
@@ -30,7 +38,22 @@ class PengeluaranViewModel(
                 _uiState.value = PengeluaranUiState.Success(result)
             } catch (e: Exception) {
                 _uiState.value =
-                    PengeluaranUiState.Error("Gagal memuat data pengeluaran: ${e.message}")
+                    PengeluaranUiState.Error(e.toAppError().toUserMessage())
+            }
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            isRefreshing = true
+            try {
+                val result = repository.getAllPengeluaran()
+                _uiState.value = PengeluaranUiState.Success(result)
+            } catch (e: Exception) {
+                _uiState.value =
+                    PengeluaranUiState.Error(e.toAppError().toUserMessage())
+            } finally {
+                isRefreshing = false
             }
         }
     }
@@ -60,7 +83,7 @@ class PengeluaranViewModel(
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value =
-                    PengeluaranUiState.Error("Gagal mencatat pengeluaran: ${e.message}")
+                    PengeluaranUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }
@@ -91,7 +114,7 @@ class PengeluaranViewModel(
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value =
-                    PengeluaranUiState.Error("Gagal memperbarui pengeluaran: ${e.message}")
+                    PengeluaranUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }
@@ -105,7 +128,7 @@ class PengeluaranViewModel(
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value =
-                    PengeluaranUiState.Error("Gagal menghapus pengeluaran: ${e.message}")
+                    PengeluaranUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }

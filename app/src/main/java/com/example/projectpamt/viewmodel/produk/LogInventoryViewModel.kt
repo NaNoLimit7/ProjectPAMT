@@ -1,17 +1,21 @@
 package com.example.projectpamt.viewmodel.produk
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.model.LogInventory
 import com.example.projectpamt.data.repository.LogInventoryRepository
+import com.example.projectpamt.ui.utils.DateTimeUtils
+import com.example.projectpamt.ui.utils.toAppError
+import com.example.projectpamt.ui.utils.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 
 class LogInventoryViewModel(
     private val repository: LogInventoryRepository = LogInventoryRepository()
@@ -22,6 +26,9 @@ class LogInventoryViewModel(
     private val allLogs = mutableListOf<LogInventory>()
     private var currentFilter = LogInventoryFilter.SEMUA_WAKTU
     private var currentSearchQuery = ""
+
+    var isRefreshing by mutableStateOf(false)
+        private set
 
     init {
         fetchLogs()
@@ -36,7 +43,23 @@ class LogInventoryViewModel(
                 allLogs.addAll(logs)
                 applyFilterAndSearch()
             } catch (e: Exception) {
-                _uiState.value = LogInventoryUiState.Error("Gagal memuat log inventori: ${e.message}")
+                _uiState.value = LogInventoryUiState.Error(e.toAppError().toUserMessage())
+            }
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            isRefreshing = true
+            try {
+                val logs = repository.getAllLogInventory()
+                allLogs.clear()
+                allLogs.addAll(logs)
+                applyFilterAndSearch()
+            } catch (e: Exception) {
+                _uiState.value = LogInventoryUiState.Error(e.toAppError().toUserMessage())
+            } finally {
+                isRefreshing = false
             }
         }
     }
@@ -52,7 +75,6 @@ class LogInventoryViewModel(
     }
 
     private fun applyFilterAndSearch() {
-        val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID"))
         val now = Date()
 
         val filtered = allLogs.filter { item ->
@@ -71,7 +93,7 @@ class LogInventoryViewModel(
                 if (dateStr == null) {
                     false
                 } else {
-                    val logDate = try { df.parse(dateStr) } catch (e: Exception) { null }
+                    val logDate = DateTimeUtils.parseIso(dateStr)
                     if (logDate == null) {
                         false
                     } else {

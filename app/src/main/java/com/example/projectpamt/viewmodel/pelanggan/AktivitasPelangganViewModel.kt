@@ -1,9 +1,13 @@
 package com.example.projectpamt.viewmodel.pelanggan
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.repository.PenjualanRepository
-import kotlinx.coroutines.delay
+import com.example.projectpamt.ui.utils.toAppError
+import com.example.projectpamt.ui.utils.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +18,6 @@ import kotlinx.serialization.json.doubleOrNull
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import kotlin.time.Duration.Companion.milliseconds
 
 class AktivitasPelangganViewModel(
     private val penjualanRepository: PenjualanRepository = PenjualanRepository()
@@ -28,6 +31,9 @@ class AktivitasPelangganViewModel(
     private val indonesianLocale = java.util.Locale.Builder().setLanguage("in").setRegion("ID").build()
     private val dateFormatter = java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy • HH:mm", indonesianLocale)
 
+    var isRefreshing by mutableStateOf(false)
+        private set
+
     fun loadAktivitas(customerId: String) {
         currentCustomerId = customerId
         fetchAktivitas()
@@ -39,8 +45,23 @@ class AktivitasPelangganViewModel(
     }
 
     private fun fetchAktivitas() {
+        fetchAktivitasInternal(showLoading = true)
+    }
+
+    fun refresh() {
+        if (currentCustomerId.isNotEmpty()) {
+            fetchAktivitasInternal(showLoading = false, isRefresh = true)
+        }
+    }
+
+    private fun fetchAktivitasInternal(showLoading: Boolean, isRefresh: Boolean = false) {
         viewModelScope.launch {
-            _uiState.value = AktivitasPelangganUiState.Loading
+            if (showLoading) {
+                _uiState.value = AktivitasPelangganUiState.Loading
+            }
+            if (isRefresh) {
+                isRefreshing = true
+            }
             try {
                 // Fetch real transactions for the customer
                 val transactions = penjualanRepository.getPenjualanByPelanggan(currentCustomerId)
@@ -129,7 +150,11 @@ class AktivitasPelangganViewModel(
                     selectedFilter = currentFilter
                 )
             } catch (e: Exception) {
-                _uiState.value = AktivitasPelangganUiState.Error("Gagal memuat aktivitas: ${e.message}")
+                _uiState.value = AktivitasPelangganUiState.Error(e.toAppError().toUserMessage())
+            } finally {
+                if (isRefresh) {
+                    isRefreshing = false
+                }
             }
         }
     }

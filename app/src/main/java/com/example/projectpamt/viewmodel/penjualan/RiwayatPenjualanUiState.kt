@@ -19,14 +19,22 @@ enum class RiwayatFilter {
 }
 
 sealed class RiwayatPenjualanUiState {
-    object Idle : RiwayatPenjualanUiState()
-    object Loading : RiwayatPenjualanUiState()
+    abstract val message: String?
+
+    object Idle : RiwayatPenjualanUiState() {
+        override val message: String? = null
+    }
+    object Loading : RiwayatPenjualanUiState() {
+        override val message: String? = null
+    }
     data class Success(
         val listPenjualan: List<PenjualanWithDetails>,
         val totalPendapatan: Double,
         val totalTransaksi: Int,
         val searchQuery: String,
         val selectedFilter: RiwayatFilter
-    ) : RiwayatPenjualanUiState()
-    data class Error(val message: String) : RiwayatPenjualanUiState()
+    ) : RiwayatPenjualanUiState() {
+        override val message: String? = null
+    }
+    data class Error(override val message: String) : RiwayatPenjualanUiState()
 }

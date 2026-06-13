@@ -1,9 +1,14 @@
 package com.example.projectpamt.viewmodel.kas
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.model.Kas
 import com.example.projectpamt.data.repository.KasRepository
+import com.example.projectpamt.ui.utils.toAppError
+import com.example.projectpamt.ui.utils.toUserMessage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +21,9 @@ class KasViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<KasUiState>(KasUiState.Idle)
     val uiState: StateFlow<KasUiState> = _uiState.asStateFlow()
 
+    var isRefreshing by mutableStateOf(false)
+        private set
+
     init {
         fetchAllActiveKas()
     }
@@ -24,11 +32,24 @@ class KasViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = KasUiState.Loading
             try {
-                // Menampilkan seluruh kas (aktif maupun non-aktif) untuk keperluan UI
                 _kasList.value = repository.getAllKas()
                 _uiState.value = KasUiState.Success(_kasList.value)
             } catch (e: Exception) {
-                _uiState.value = KasUiState.Error(e.message ?: "Gagal menampilkan data kas")
+                _uiState.value = KasUiState.Error(e.toAppError().toUserMessage())
+            }
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            isRefreshing = true
+            try {
+                _kasList.value = repository.getAllKas()
+                _uiState.value = KasUiState.Success(_kasList.value)
+            } catch (e: Exception) {
+                _uiState.value = KasUiState.Error(e.toAppError().toUserMessage())
+            } finally {
+                isRefreshing = false
             }
         }
     }
@@ -41,7 +62,7 @@ class KasViewModel : ViewModel() {
                 fetchAllActiveKas()
                 onSuccess()
             } catch (e: Exception) {
-                _uiState.value = KasUiState.Error(e.message ?: "Gagal menambahkan kas baru")
+                _uiState.value = KasUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }
@@ -58,7 +79,7 @@ class KasViewModel : ViewModel() {
                     _uiState.value = KasUiState.Error("Kas tidak ditemukan")
                 }
             } catch (e: Exception) {
-                _uiState.value = KasUiState.Error(e.message ?: "Gagal mengubah nama kas")
+                _uiState.value = KasUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }
@@ -70,7 +91,7 @@ class KasViewModel : ViewModel() {
                 repository.updateSaldo(id, saldo, keterangan)
                 fetchAllActiveKas()
             } catch (e: Exception) {
-                _uiState.value = KasUiState.Error(e.message ?: "Gagal merubah saldo kas")
+                _uiState.value = KasUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }
@@ -82,7 +103,7 @@ class KasViewModel : ViewModel() {
                 repository.nonaktifkanKas(id)
                 fetchAllActiveKas()
             } catch (e: Exception) {
-                _uiState.value = KasUiState.Error(e.message ?: "Gagal menonaktifkan kas")
+                _uiState.value = KasUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }
@@ -95,7 +116,7 @@ class KasViewModel : ViewModel() {
                 fetchAllActiveKas()
                 onSuccess()
             } catch (e: Exception) {
-                _uiState.value = KasUiState.Error(e.message ?: "Gagal mengubah kas")
+                _uiState.value = KasUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }
@@ -106,7 +127,6 @@ class KasViewModel : ViewModel() {
             try {
                 val existing = _kasList.value.find { it.idKas == id }
                 if (existing != null) {
-                    // Update aktif = false dan catat log
                     repository.updateKasDanCatatLog(id, existing.nama, false, keteranganUser)
                     fetchAllActiveKas()
                     onSuccess()
@@ -114,7 +134,7 @@ class KasViewModel : ViewModel() {
                     _uiState.value = KasUiState.Error("Kas tidak ditemukan")
                 }
             } catch (e: Exception) {
-                _uiState.value = KasUiState.Error(e.message ?: "Gagal menonaktifkan kas")
+                _uiState.value = KasUiState.Error(e.toAppError().toUserMessage())
             }
         }
     }
