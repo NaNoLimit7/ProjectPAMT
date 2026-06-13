@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.components
+package com.example.projectpamt.ui.screens.home.pelanggan.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -113,7 +113,7 @@ fun CustomerCard(
 
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
+                                .clip(androidx.compose.foundation.shape.RoundedCornerShape(4.dp))
                                 .background(badgeBg)
                                 .padding(horizontal = 8.dp, vertical = 2.dp)
                         ) {
@@ -179,7 +179,7 @@ fun CustomerCard(
                     modifier = Modifier
                         .weight(1f)
                         .height(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
                         .background(GreenMintActive)
                         .clickable { onActivityClick() },
                     contentAlignment = Alignment.Center
@@ -208,7 +208,7 @@ fun CustomerCard(
                     modifier = Modifier
                         .weight(1f)
                         .height(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
                         .background(GreenPrimary)
                         .clickable { onEditClick() },
                     contentAlignment = Alignment.Center

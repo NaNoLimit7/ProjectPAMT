@@ -26,6 +26,7 @@ import com.example.projectpamt.ui.navigation.RiwayatPenjualan
 import com.example.projectpamt.ui.navigation.LogInventoryList
 import com.example.projectpamt.ui.navigation.LogTotalKas
 import com.example.projectpamt.ui.navigation.LogKas
+import com.example.projectpamt.ui.navigation.Profil
 import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.utils.DynamicStatusBar
 import com.example.projectpamt.ui.theme.GreenPrimary
@@ -39,20 +40,7 @@ fun AppHomeLayout(
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStack?.destination
 
-    // Mapping route → warna background
-    val statusBarColor = when {
-        currentDestination?.hasRoute(Dashboard::class) == true ||
-        currentDestination?.hasRoute(PenjualanList::class) == true ||
-        currentDestination?.hasRoute(KasList::class) == true ||
-        currentDestination?.hasRoute(ProsesPembayaran::class) == true ||
-        currentDestination?.hasRoute(RiwayatPenjualan::class) == true ||
-        currentDestination?.hasRoute(LogInventoryList::class) == true ||
-        currentDestination?.hasRoute(LogTotalKas::class) == true ||
-        currentDestination?.hasRoute(LogKas::class) == true -> GreenPrimary
-        else -> BackgroundSlate // default untuk screen lain
-    }
-
-    DynamicStatusBar(backgroundColor = statusBarColor)
+    DynamicStatusBar(backgroundColor = GreenPrimary)
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),

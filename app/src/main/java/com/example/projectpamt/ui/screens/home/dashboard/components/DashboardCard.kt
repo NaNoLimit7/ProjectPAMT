@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.components
+package com.example.projectpamt.ui.screens.home.dashboard.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

@@ -66,7 +66,6 @@ import com.example.projectpamt.viewmodel.kas.KasViewModel
 
 @Composable
 fun TambahKasScreen(
-    modifier: Modifier = Modifier,
     viewModel: KasViewModel,
     navController: NavController
 ) {
@@ -74,7 +73,6 @@ fun TambahKasScreen(
     val isLoading = uiState is KasUiState.Loading
 
     TambahKasContent(
-        modifier = modifier,
         isLoading = isLoading,
         onBackClick = { navController.popBackStack() },
         onSaveClick = { nama, saldo, keterangan, aktif ->
@@ -87,7 +85,6 @@ fun TambahKasScreen(
 
 @Composable
 private fun TambahKasContent(
-    modifier: Modifier = Modifier,
     isLoading: Boolean,
     onBackClick: () -> Unit,
     onSaveClick: (String, Double, String, Boolean) -> Unit

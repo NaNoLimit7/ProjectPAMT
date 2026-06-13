@@ -2,6 +2,8 @@ package com.example.projectpamt.viewmodel.pengeluaran
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.projectpamt.data.model.Kas
+import com.example.projectpamt.data.model.Kategori
 import com.example.projectpamt.data.model.Pengeluaran
 import com.example.projectpamt.data.repository.PengeluaranRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +35,15 @@ class PengeluaranViewModel(
         }
     }
 
-    fun addPengeluaran(idKategori: String, idKas: String, deskripsi: String, total: Double) {
+    fun addPengeluaran(
+        idKategori: String,
+        idKas: String,
+        deskripsi: String,
+        total: Double,
+        kategori: Kategori?,
+        kas: Kas?,
+        onSuccess: () -> Unit
+    ) {
         viewModelScope.launch {
             _uiState.value = PengeluaranUiState.Loading
             try {
@@ -41,10 +51,13 @@ class PengeluaranViewModel(
                     idKategori = idKategori,
                     idKas = idKas,
                     deskripsi = deskripsi,
-                    total = total
+                    total = total,
+                    kategori = kategori,
+                    kas = kas
                 )
                 repository.insertPengeluaran(pengeluaranBaru)
                 fetchPengeluaran()
+                onSuccess()
             } catch (e: Exception) {
                 _uiState.value =
                     PengeluaranUiState.Error("Gagal mencatat pengeluaran: ${e.message}")
@@ -57,7 +70,10 @@ class PengeluaranViewModel(
         idKategori: String,
         idKas: String,
         deskripsi: String,
-        total: Double
+        total: Double,
+        kategori: Kategori?,
+        kas: Kas?,
+        onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
             _uiState.value = PengeluaranUiState.Loading
@@ -66,10 +82,13 @@ class PengeluaranViewModel(
                     idKategori = idKategori,
                     idKas = idKas,
                     deskripsi = deskripsi,
-                    total = total
+                    total = total,
+                    kategori = kategori,
+                    kas = kas
                 )
                 repository.updatePengeluaran(idPengeluaran, pengeluaranUpdate)
                 fetchPengeluaran()
+                onSuccess()
             } catch (e: Exception) {
                 _uiState.value =
                     PengeluaranUiState.Error("Gagal memperbarui pengeluaran: ${e.message}")
@@ -77,15 +96,16 @@ class PengeluaranViewModel(
         }
     }
 
-    fun deletePengeluaran(idPengeluaran: String) {
+    fun deletePengeluaran(idPengeluaran: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
             _uiState.value = PengeluaranUiState.Loading
             try {
                 repository.deletePengeluaran(idPengeluaran)
                 fetchPengeluaran()
+                onSuccess()
             } catch (e: Exception) {
                 _uiState.value =
-                    PengeluaranUiState.Error("Gagal menghapus pengeluaran ${e.message}")
+                    PengeluaranUiState.Error("Gagal menghapus pengeluaran: ${e.message}")
             }
         }
     }

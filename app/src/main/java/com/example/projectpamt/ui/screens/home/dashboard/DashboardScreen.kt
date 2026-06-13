@@ -1,6 +1,7 @@
 package com.example.projectpamt.ui.screens.home.dashboard
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,15 +40,17 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.projectpamt.R
-import com.example.projectpamt.ui.components.CircleContainer
-import com.example.projectpamt.ui.components.DashboardCard
-import com.example.projectpamt.ui.components.QuickActionButton
-import com.example.projectpamt.ui.components.WeeklyBarChart
+import com.example.projectpamt.ui.screens.home.dashboard.components.CircleContainer
+import com.example.projectpamt.ui.screens.home.dashboard.components.DashboardCard
+import com.example.projectpamt.ui.screens.home.dashboard.components.QuickActionButton
+import com.example.projectpamt.ui.screens.home.dashboard.components.WeeklyBarChart
 import com.example.projectpamt.ui.navigation.Dashboard
+import com.example.projectpamt.ui.navigation.PengeluaranList
 import com.example.projectpamt.ui.navigation.PenjualanList
 import com.example.projectpamt.ui.navigation.RiwayatPenjualan
 import com.example.projectpamt.ui.navigation.TambahPelanggan
 import com.example.projectpamt.ui.navigation.TambahProduk
+import com.example.projectpamt.ui.navigation.Profil
 import com.example.projectpamt.ui.theme.ActionBlue
 import com.example.projectpamt.ui.theme.ActionGreen
 import com.example.projectpamt.ui.theme.ActionOrange
@@ -63,7 +66,7 @@ import com.example.projectpamt.ui.utils.toIndonesianFormattedDate
 import com.example.projectpamt.viewmodel.auth.AuthViewModel
 import java.util.Date
 
-// ─── Data model untuk state Dashboard ───────────────────────────────────────
+// Data model untuk state Dashboard
 
 data class DashboardState(
     val penjualanBulanIni: Double = 0.0,
@@ -76,7 +79,7 @@ data class DashboardState(
     val namaPengguna: String = ""
 )
 
-// ─── Screen (stateful) ──────────────────────────────────────────────────────
+//  Screen (stateful)
 
 @Composable
 fun DashboardScreen(
@@ -120,12 +123,13 @@ fun DashboardScreen(
         },
         onNavigateTambahProduk = { navController.navigate(TambahProduk) },
         onNavigateTambahPelanggan = { navController.navigate(TambahPelanggan)},
-        onNavigateTambahPengeluaran = { /* TODO: NAVIGASI TAMBAH PENGELUARAN */},
-        onViewAllPenjualan = { navController.navigate(RiwayatPenjualan) }
+        onNavigateTambahPengeluaran = { navController.navigate(PengeluaranList) },
+        onViewAllPenjualan = { navController.navigate(RiwayatPenjualan) },
+        onNavigateProfil = { navController.navigate(Profil) }
     )
 }
 
-// ─── Content (stateless, testable) ──────────────────────────────────────────
+//  Content (stateless, testable)
 
 @Composable
 fun DashboardContent(
@@ -136,6 +140,7 @@ fun DashboardContent(
     onNavigateTambahPelanggan: () -> Unit,
     onNavigateTambahPengeluaran: () -> Unit,
     onViewAllPenjualan: () -> Unit,
+    onNavigateProfil: () -> Unit,
 ) {
     val formattedDate = Date().toIndonesianFormattedDate()
     val initials = state.namaPengguna.getInitials()
@@ -146,7 +151,7 @@ fun DashboardContent(
             .background(BackgroundSlate)
             .verticalScroll(rememberScrollState())
     ) {
-        // ── HEADER SECTION (green background) ───────────────────────────
+        // ── HEADER SECTION (green background)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -193,7 +198,8 @@ fun DashboardContent(
                 // Avatar / Foto Profil
                 CircleContainer(
                     size = 48.dp,
-                    backgroundColor = GreenSecondary
+                    backgroundColor = GreenSecondary,
+                    modifier = Modifier.clickable { onNavigateProfil() }
                 ) {
                     Text(
                         text = initials,
@@ -204,7 +210,7 @@ fun DashboardContent(
                 }
             }
 
-            // ── SUMMARY CARDS GRID ───────────────────────────────────────
+            // ── SUMMARY CARDS GRID
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Row(
                     modifier = Modifier.height(IntrinsicSize.Max),
@@ -252,14 +258,14 @@ fun DashboardContent(
             }
         }
 
-        // ── MAIN CONTENT AREA ────────────────────────────────────────────
+        // ── MAIN CONTENT AREA
         Column(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            // ── QUICK ACTIONS ─────────────────────────────────────────────
+            // ── QUICK ACTIONS
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(
                     text = "Aksi Cepat",
@@ -304,7 +310,7 @@ fun DashboardContent(
                 }
             }
 
-            // ── CHART SECTION ─────────────────────────────────────────────
+            // ── CHART SECTION
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -321,7 +327,7 @@ fun DashboardContent(
     }
 }
 
-// ─── Preview ──────────────────────────────────────────────────────────────
+//  Preview
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 private fun DashboardContentPreview() {
@@ -351,7 +357,8 @@ private fun DashboardContentPreview() {
                 onNavigateTambahProduk = {},
                 onNavigateTambahPelanggan = {},
                 onNavigateTambahPengeluaran = {},
-                onViewAllPenjualan = {}
+                onViewAllPenjualan = {},
+                onNavigateProfil = {}
             )
         }
     }

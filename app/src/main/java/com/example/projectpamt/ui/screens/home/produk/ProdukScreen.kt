@@ -45,7 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.projectpamt.R
 import com.example.projectpamt.data.model.Produk
-import com.example.projectpamt.ui.components.InventoryProductCard
+import com.example.projectpamt.ui.screens.home.produk.components.InventoryProductCard
 import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.TextDark

@@ -25,6 +25,11 @@ import com.example.projectpamt.ui.screens.home.kas.LogTotalKasScreen
 import com.example.projectpamt.ui.screens.home.kas.LogKasScreen
 import com.example.projectpamt.ui.screens.home.kas.EditKasScreen
 import com.example.projectpamt.ui.screens.home.kas.TambahKasScreen
+import com.example.projectpamt.ui.screens.home.pengeluaran.PengeluaranScreen
+import com.example.projectpamt.ui.screens.home.pengeluaran.TambahPengeluaranScreen
+import com.example.projectpamt.ui.screens.home.pengeluaran.EditPengeluaranScreen
+import com.example.projectpamt.viewmodel.pengeluaran.PengeluaranViewModel
+import com.example.projectpamt.data.model.Pengeluaran
 import com.example.projectpamt.viewmodel.kas.KasViewModel
 import com.example.projectpamt.data.model.Kas
 import com.example.projectpamt.ui.screens.home.produk.DetailProdukScreen
@@ -36,6 +41,7 @@ import com.example.projectpamt.viewmodel.kategori.KategoriViewModel
 import com.example.projectpamt.viewmodel.pelanggan.PelangganViewModel
 import com.example.projectpamt.viewmodel.produk.ProdukViewModel
 import com.example.projectpamt.data.model.Produk
+import com.example.projectpamt.ui.screens.home.profil.ProfilScreen
 import kotlin.reflect.typeOf
 
 @Composable
@@ -48,6 +54,8 @@ fun AppNavHost(
     val pelangganViewModel: PelangganViewModel = viewModel()
     val produkViewModel: ProdukViewModel = viewModel()
     val kategoriViewModel: KategoriViewModel = viewModel()
+    val kasViewModel: KasViewModel = viewModel()
+    val pengeluaranViewModel: PengeluaranViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -103,6 +111,7 @@ fun AppNavHost(
         composable<KasList> {
             KasScreen(
                 modifier = modifier,
+                viewModel = kasViewModel,
                 navController = navController
             )
         }
@@ -213,7 +222,6 @@ fun AppNavHost(
 
         composable<LogTotalKas> {
             LogTotalKasScreen(
-                modifier = modifier,
                 navController = navController
             )
         }
@@ -223,7 +231,6 @@ fun AppNavHost(
         ) { backStackEntry ->
             val route = backStackEntry.toRoute<LogKas>()
             LogKasScreen(
-                modifier = modifier,
                 kas = route.kas,
                 navController = navController
             )
@@ -235,15 +242,54 @@ fun AppNavHost(
             val route = backStackEntry.toRoute<EditKas>()
             EditKasScreen(
                 kas = route.kas,
-                viewModel = viewModel(modelClass = KasViewModel::class.java),
+                viewModel = kasViewModel,
                 navController = navController
             )
         }
 
         composable<TambahKas> {
             TambahKasScreen(
+                viewModel = kasViewModel,
+                navController = navController
+            )
+        }
+
+        composable<PengeluaranList> {
+            PengeluaranScreen(
                 modifier = modifier,
-                viewModel = viewModel(modelClass = KasViewModel::class.java),
+                viewModel = pengeluaranViewModel,
+                navController = navController
+            )
+        }
+
+        composable<TambahPengeluaran> {
+            TambahPengeluaranScreen(
+                modifier = modifier,
+                pengeluaranViewModel = pengeluaranViewModel,
+                kategoriViewModel = kategoriViewModel,
+                kasViewModel = kasViewModel,
+                navController = navController
+            )
+        }
+
+        composable<EditPengeluaran>(
+            typeMap = mapOf(typeOf<Pengeluaran>() to Pengeluaran.PengeluaranNavType)
+        ) { backStackEntry ->
+            val route = backStackEntry.toRoute<EditPengeluaran>()
+            EditPengeluaranScreen(
+                modifier = modifier,
+                pengeluaran = route.pengeluaran,
+                pengeluaranViewModel = pengeluaranViewModel,
+                kategoriViewModel = kategoriViewModel,
+                kasViewModel = kasViewModel,
+                navController = navController
+            )
+        }
+
+        composable<Profil> {
+            ProfilScreen(
+                modifier = modifier,
+                authViewModel = authViewModel,
                 navController = navController
             )
         }

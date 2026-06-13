@@ -45,7 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.projectpamt.R
 import com.example.projectpamt.data.model.Pelanggan
-import com.example.projectpamt.ui.components.CustomerCard
+import com.example.projectpamt.ui.screens.home.pelanggan.components.CustomerCard
 import com.example.projectpamt.ui.navigation.AktivitasPelanggan
 import com.example.projectpamt.ui.navigation.EditPelanggan
 import com.example.projectpamt.ui.navigation.TambahPelanggan

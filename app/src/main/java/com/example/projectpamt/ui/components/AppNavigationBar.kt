@@ -1,8 +1,5 @@
 package com.example.projectpamt.ui.components
 
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,10 +21,10 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.example.projectpamt.R
 import com.example.projectpamt.ui.navigation.Dashboard
+import com.example.projectpamt.ui.navigation.KasList
+import com.example.projectpamt.ui.navigation.PelangganList
 import com.example.projectpamt.ui.navigation.PenjualanList
 import com.example.projectpamt.ui.navigation.ProdukList
-import com.example.projectpamt.ui.navigation.PelangganList
-import com.example.projectpamt.ui.navigation.KasList
 import com.example.projectpamt.ui.theme.GreenMintActive
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.TextPlaceholder

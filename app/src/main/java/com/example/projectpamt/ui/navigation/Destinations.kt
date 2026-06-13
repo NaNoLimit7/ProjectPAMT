@@ -3,6 +3,7 @@ package com.example.projectpamt.ui.navigation
 import com.example.projectpamt.data.model.Kas
 import com.example.projectpamt.data.model.Pelanggan
 import com.example.projectpamt.data.model.Produk
+import com.example.projectpamt.data.model.Pengeluaran
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -84,3 +85,12 @@ data class EditKas(val kas: Kas)
 
 @Serializable
 object TambahKas
+
+@Serializable
+object TambahPengeluaran
+
+@Serializable
+data class EditPengeluaran(val pengeluaran: Pengeluaran)
+
+@Serializable
+object Profil

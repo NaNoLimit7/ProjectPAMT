@@ -36,8 +36,8 @@ class KategoriViewModel(
             _uiState.value = KategoriUiState.Loading
             try {
                 kotlinx.coroutines.delay(300)
-                val newId = (_kategoriList.value.mapNotNull { it.idKategori?.toIntOrNull() }.maxOrNull() ?: 0) + 1
-                val kategoriBaru = Kategori(idKategori = newId.toString(), name = name)
+                val newId = java.util.UUID.randomUUID().toString()
+                val kategoriBaru = Kategori(idKategori = newId, name = name)
                 _kategoriList.value += kategoriBaru
                 fetchKategori()
             } catch (e: Exception) {
@@ -85,11 +85,11 @@ class KategoriViewModel(
 
     companion object {
         val defaultCategories = listOf(
-            Kategori(idKategori = "1", name = "Makanan"),
-            Kategori(idKategori = "2", name = "Minuman"),
-            Kategori(idKategori = "3", name = "Aksesoris"),
-            Kategori(idKategori = "4", name = "Elektronik"),
-            Kategori(idKategori = "5", name = "Jasa")
+            Kategori(idKategori = "4bfa0525-455b-419b-8d16-6512eb2d4ee7", name = "Makanan"),
+            Kategori(idKategori = "9d3d3ef1-5a5c-4d51-a982-f5492d3b24f5", name = "Minuman"),
+            Kategori(idKategori = "8c68ebfa-ec5c-4a37-b4d2-b6ab0c99f9de", name = "Aksesoris"),
+            Kategori(idKategori = "3b08e5e8-132d-45df-bb2f-6825ec3a2417", name = "Elektronik"),
+            Kategori(idKategori = "5602b255-f3d1-4339-86ff-3da58c0437be", name = "Jasa")
         )
     }
 }

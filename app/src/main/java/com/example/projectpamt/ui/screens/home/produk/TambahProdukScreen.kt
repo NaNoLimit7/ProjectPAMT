@@ -163,7 +163,7 @@ private fun TambahProdukContent(
             .background(BackgroundSlate)
             .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
-        // HEADER SECTION (Fixed)
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -211,7 +211,7 @@ private fun TambahProdukContent(
             }
         }
 
-        // SCROLLABLE FORM
+
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -221,13 +221,13 @@ private fun TambahProdukContent(
                 .padding(horizontal = 20.dp, vertical = 24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // 1. FOTO PRODUK SECTION
+
             FotoProdukSection(
                 selectedImageUri = selectedImageUri,
                 onImageSelected = { selectedImageUri = it }
             )
 
-            // 2. INFORMASI PRODUK SECTION
+
             InformasiProdukSection(
                 nama = nama,
                 onNamaChange = {
@@ -249,7 +249,7 @@ private fun TambahProdukContent(
                 onDeskripsiChange = { deskripsi = it }
             )
 
-            // 3. HARGA & STOK SECTION
+
             HargaStokSection(
                 hargaModal = hargaModal,
                 onHargaModalChange = { input ->
@@ -289,7 +289,7 @@ private fun TambahProdukContent(
             )
         }
 
-        // FIXED FOOTER ACTION SECTION
+
         Box(
             modifier = modifier
                 .fillMaxWidth()
@@ -354,7 +354,7 @@ private fun TambahProdukContent(
         }
     }
 
-    // CUSTOM CATEGORY ADDITION BOTTOM SHEET
+
     if (showBottomSheet) {
         TambahKategoriBottomSheet(
             categories = categories,

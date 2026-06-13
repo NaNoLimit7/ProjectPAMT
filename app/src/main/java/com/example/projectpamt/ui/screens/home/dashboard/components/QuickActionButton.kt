@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.components
+package com.example.projectpamt.ui.screens.home.dashboard.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -76,7 +76,7 @@ fun QuickActionButton(
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(RoundedCornerShape(9999.dp))
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(9999.dp))
                     .background(accentColor),
                 contentAlignment = Alignment.Center
             ) {

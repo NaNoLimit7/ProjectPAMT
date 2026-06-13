@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.components
+package com.example.projectpamt.ui.screens.home.produk.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -78,7 +78,7 @@ fun InventoryProductCard(
                 Box(
                     modifier = Modifier
                         .size(64.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
                         .background(GreenMintActive),
                     contentAlignment = Alignment.Center
                 ) {
@@ -157,7 +157,7 @@ fun InventoryProductCard(
 
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(9999.dp))
+                                .clip(androidx.compose.foundation.shape.RoundedCornerShape(9999.dp))
                                 .background(badgeBg)
                                 .padding(horizontal = 11.dp, vertical = 2.dp)
                         ) {
@@ -192,7 +192,7 @@ fun InventoryProductCard(
                     modifier = Modifier
                         .weight(1f)
                         .height(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
                         .background(GreenMintActive)
                         .clickable { onDetailClick() },
                     contentAlignment = Alignment.Center
@@ -221,7 +221,7 @@ fun InventoryProductCard(
                     modifier = Modifier
                         .weight(1f)
                         .height(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
                         .background(GreenPrimary)
                         .clickable { onEditClick() },
                     contentAlignment = Alignment.Center

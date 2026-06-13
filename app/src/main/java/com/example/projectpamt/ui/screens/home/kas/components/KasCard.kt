@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.components
+package com.example.projectpamt.ui.screens.home.kas.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -40,7 +40,6 @@ import com.example.projectpamt.ui.utils.formatRupiah
 fun KasCard(
     kas: Kas,
     modifier: Modifier = Modifier,
-    onTransaksiClick: () -> Unit = {},
     onLihatLogClick: () -> Unit = {},
     onEditClick: () -> Unit = {}
 ) {
@@ -81,7 +80,7 @@ fun KasCard(
 
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(9999.dp))
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(9999.dp))
                             .background(badgeBg)
                             .padding(horizontal = 10.dp, vertical = 2.dp)
                     ) {
@@ -156,41 +155,12 @@ fun KasCard(
                         .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(18.dp)
                 ) {
-                    // Tombol Transaksi
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(41.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(GreenPrimary)
-                            .clickable { onTransaksiClick() },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(R.drawable.transaksi),
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Text(
-                                text = "Transaksi",
-                                fontSize = 13.sp,
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-
                     // Tombol Lihat Log
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .height(41.dp)
-                            .clip(RoundedCornerShape(12.dp))
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
                             .background(Color(0xFFE5E7EB)) // border outline color
                             .padding(1.dp), // border width
                         contentAlignment = Alignment.Center
@@ -198,7 +168,7 @@ fun KasCard(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .clip(RoundedCornerShape(11.dp))
+                                .clip(androidx.compose.foundation.shape.RoundedCornerShape(11.dp))
                                 .background(Color(0xFFF9FAFB))
                                 .clickable { onLihatLogClick() },
                             contentAlignment = Alignment.Center

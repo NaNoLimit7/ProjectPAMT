@@ -8,6 +8,8 @@ import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 
 class AuthViewModel(
     private val repository: AuthRepository = AuthRepository()
@@ -38,14 +40,35 @@ class AuthViewModel(
         viewModelScope.launch {
             repository.sessionStatus.collect { status ->
                 _authCheckState.value = when (status) {
-                    is SessionStatus.Authenticated -> AuthCheckState.Authenticated
+                    is SessionStatus.Authenticated -> {
+                        val user = repository.getCurrentUser()
+                        val metadata = user?.userMetadata
+                        val fullName = metadata?.get("full_name")?.jsonPrimitive?.contentOrNull
+                            ?: metadata?.get("fullname")?.jsonPrimitive?.contentOrNull
+                            ?: ""
+                        _name.value = fullName
+                        _email.value = user?.email ?: ""
+                        _phone.value = metadata?.get("phone")?.jsonPrimitive?.contentOrNull ?: ""
+
+                        AuthCheckState.Authenticated
+                    }
                     is SessionStatus.NotAuthenticated -> AuthCheckState.NotAuthenticated
                     is SessionStatus.Initializing -> AuthCheckState.Checking
                     is SessionStatus.RefreshFailure -> {
-                        // Jika refresh gagal (misal koneksi internet), tetap cek session yang ada
-                        // atau anggap tidak terautentikasi jika session expired.
-                        if (repository.isLoggedIn()) AuthCheckState.Authenticated
-                        else AuthCheckState.NotAuthenticated
+                        if (repository.isLoggedIn()) {
+                            val user = repository.getCurrentUser()
+                            val metadata = user?.userMetadata
+                            val fullName = metadata?.get("full_name")?.jsonPrimitive?.contentOrNull
+                                ?: metadata?.get("fullname")?.jsonPrimitive?.contentOrNull
+                                ?: ""
+                            _name.value = fullName
+                            _email.value = user?.email ?: ""
+                            _phone.value = metadata?.get("phone")?.jsonPrimitive?.contentOrNull ?: ""
+
+                            AuthCheckState.Authenticated
+                        } else {
+                            AuthCheckState.NotAuthenticated
+                        }
                     }
                 }
             }

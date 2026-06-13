@@ -2,7 +2,6 @@ package com.example.projectpamt.ui.screens.home.kas
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,8 +9,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,13 +18,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,17 +29,14 @@ import androidx.navigation.NavController
 import com.example.projectpamt.R
 import com.example.projectpamt.data.model.Kas
 import com.example.projectpamt.data.model.LogKasItem
+import com.example.projectpamt.ui.screens.home.kas.components.LogEntryCard
 import com.example.projectpamt.ui.theme.*
-import com.example.projectpamt.ui.utils.DynamicStatusBar
 import com.example.projectpamt.viewmodel.kas.LogKasUiState
 import com.example.projectpamt.viewmodel.kas.LogKasViewModel
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogKasScreen(
-    modifier: Modifier = Modifier,
     kas: Kas,
     viewModel: LogKasViewModel = viewModel(),
     navController: NavController
@@ -59,9 +49,6 @@ fun LogKasScreen(
             viewModel.fetchLogKas(id)
         }
     }
-
-    // Set dynamic status bar color to GreenPrimary
-    DynamicStatusBar(backgroundColor = GreenPrimary)
 
     Column(
         modifier = Modifier
@@ -150,7 +137,7 @@ fun LogKasScreen(
             }
 
             is LogKasUiState.Success -> {
-                SuccessContent(kas = kas, logs = state.logs)
+                LogTotalKasContent(kas = kas, logs = state.logs)
             }
 
             else -> {}
@@ -160,7 +147,7 @@ fun LogKasScreen(
 
 
 @Composable
-private fun SuccessContent(
+private fun LogTotalKasContent(
     kas: Kas,
     logs: List<LogKasItem>
 ) {
@@ -270,175 +257,6 @@ private fun SuccessContent(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun LogEntryCard(
-    logItem: LogKasItem
-) {
-    val dateStr = logItem.updatedAt
-    val formattedDate = remember(dateStr) {
-        try {
-            val date =
-                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
-            if (date != null) {
-                SimpleDateFormat("d MMMM, HH:mm", Locale("id", "ID")).format(date)
-            } else {
-                dateStr
-            }
-        } catch (e: Exception) {
-            dateStr
-        }
-    }
-
-    // Determine icon details based on log activity type
-    val (icon, iconTint, iconBg) = when (logItem.tipeAktivitas) {
-        "Pembuatan Akun" -> Triple(
-            ImageVector.vectorResource(R.drawable.add),
-            GreenPrimary,
-            Color(0xFF94F7B6)
-        )
-
-        "Saldo disesuaikan oleh Admin" -> Triple(
-            ImageVector.vectorResource(R.drawable.edit),
-            GreenPrimary,
-            Color(0xFF8AF5B3)
-        )
-
-        "Status berubah menjadi Tidak Aktif" -> Triple(
-            Icons.Default.Warning,
-            DangerRed,
-            Color(0xFFFFDAD6)
-        )
-
-        "Status berubah menjadi Aktif" -> Triple(
-            Icons.Default.Check,
-            GreenPrimary,
-            Color(0xFFD1E8DB)
-        )
-
-        else -> Triple(
-            ImageVector.vectorResource(R.drawable.update_time),
-            TextMuted,
-            Color(0xFFE5E7EB)
-        )
-    }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(2.dp, RoundedCornerShape(20.dp)),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, BorderSlate)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.Top
-        ) {
-            // Left Icon Box
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(iconBg),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = iconTint,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-
-            // Right Information Box
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                // Title & Date Header Row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = logItem.tipeAktivitas,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextDark,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = formattedDate,
-                        fontSize = 12.sp,
-                        color = Color(0xFF3E4940),
-                        fontWeight = FontWeight.Normal
-                    )
-                }
-
-                // Description Text with highlighted money amounts
-                Text(
-                    text = buildAnnotatedLogDescription(logItem.detailKeterangan),
-                    fontSize = 14.sp,
-                    color = Color(0xFF3E4940),
-                    lineHeight = 20.sp
-                )
-
-                // Author Footer
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier.padding(top = 4.dp)
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.profil),
-                        contentDescription = null,
-                        tint = Color(0xFF6E7A70),
-                        modifier = Modifier.size(12.dp)
-                    )
-                    Text(
-                        text = "Oleh: ${logItem.pelaku}",
-                        fontSize = 13.sp,
-                        color = Color(0xFF6E7A70),
-                        fontWeight = FontWeight.Normal
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun buildAnnotatedLogDescription(text: String): AnnotatedString {
-    return buildAnnotatedString {
-        // Find currency patterns like Rp 5.000.000 or Rp5.000.000
-        val pattern = Regex("Rp\\s*[0-9\\.,]+")
-        val matches = pattern.findAll(text)
-        var lastIdx = 0
-        for (match in matches) {
-            // Append regular text before match
-            append(text.substring(lastIdx, match.range.first))
-            // Append styled match
-            withStyle(
-                SpanStyle(
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF005F34) // Dark Green
-                )
-            ) {
-                append(match.value)
-            }
-            lastIdx = match.range.last + 1
-        }
-        if (lastIdx < text.length) {
-            append(text.substring(lastIdx))
         }
     }
 }

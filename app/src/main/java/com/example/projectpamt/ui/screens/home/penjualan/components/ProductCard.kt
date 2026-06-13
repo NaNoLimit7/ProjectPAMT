@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.components
+package com.example.projectpamt.ui.screens.home.penjualan.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,7 +35,7 @@ import com.example.projectpamt.ui.utils.formatRupiah
 @Composable
 fun ProductCard(
     produk: Produk,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.Companion,
     onAddClick: () -> Unit
 ) {
     // Tentukan warna badge stok: biru jika stok cukup, oranye jika sisa sedikit
@@ -92,7 +92,7 @@ fun ProductCard(
                 Box(
                     modifier = Modifier
                         .padding(6.dp)
-                        .clip(RoundedCornerShape(6.dp))
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
                         .background(badgeBg)
                         .padding(horizontal = 5.dp, vertical = 3.dp)
                         .align(Alignment.TopStart)
@@ -133,7 +133,7 @@ fun ProductCard(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
                         .background(Color(0xFFEDF6F0))
                         .clickable { onAddClick() }
                         .padding(vertical = 6.dp),

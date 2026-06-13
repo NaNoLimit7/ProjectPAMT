@@ -23,10 +23,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import com.example.projectpamt.ui.components.AppTextField
-import com.example.projectpamt.ui.utils.ValidationUtils
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,7 +44,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.projectpamt.R
 import com.example.projectpamt.data.model.Kas
-import com.example.projectpamt.ui.components.KasCard
+import com.example.projectpamt.ui.screens.home.kas.components.KasCard
+import com.example.projectpamt.ui.navigation.EditKas
+import com.example.projectpamt.ui.navigation.LogKas
+import com.example.projectpamt.ui.navigation.LogTotalKas
+import com.example.projectpamt.ui.navigation.TambahKas
 import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.theme.GreenMintActive
 import com.example.projectpamt.ui.theme.GreenPrimary
@@ -55,8 +56,6 @@ import com.example.projectpamt.ui.theme.TextDark
 import com.example.projectpamt.ui.utils.formatRupiah
 import com.example.projectpamt.viewmodel.kas.KasUiState
 import com.example.projectpamt.viewmodel.kas.KasViewModel
-
-// ─── Screen (stateful) ──────────────────────────────────────────────────────
 
 @Composable
 fun KasScreen(
@@ -66,14 +65,12 @@ fun KasScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Dialog states
+
     var showInfoDialog by remember { mutableStateOf(false) }
     var infoDialogTitle by remember { mutableStateOf("") }
     var infoDialogMessage by remember { mutableStateOf("") }
 
 
-
-    // Info Dialog (mock action status)
     if (showInfoDialog) {
         AlertDialog(
             onDismissRequest = { showInfoDialog = false },
@@ -98,38 +95,32 @@ fun KasScreen(
         modifier = modifier,
         uiState = uiState,
         onAddKasClick = {
-            navController.navigate(com.example.projectpamt.ui.navigation.TambahKas)
-        },
-        onTransaksiClick = { kas ->
-            infoDialogTitle = "Transaksi Kas"
-            infoDialogMessage = "Membuka halaman transaksi untuk ${kas.nama}. Saldo saat ini: ${formatRupiah(kas.saldo)}."
-            showInfoDialog = true
+            navController.navigate(TambahKas)
         },
         onLihatLogClick = { kas ->
-            navController.navigate(com.example.projectpamt.ui.navigation.LogKas(kas))
+            navController.navigate(LogKas(kas))
         },
         onEditClick = { kas ->
-            navController.navigate(com.example.projectpamt.ui.navigation.EditKas(kas))
+            navController.navigate(EditKas(kas))
         },
         onLogTotalClick = {
-            navController.navigate(com.example.projectpamt.ui.navigation.LogTotalKas)
+            navController.navigate(LogTotalKas)
         }
     )
 }
 
-// ─── Content (stateless) ────────────────────────────────────────────────────
+
 
 @Composable
 private fun KasContent(
     modifier: Modifier = Modifier,
     uiState: KasUiState,
     onAddKasClick: () -> Unit,
-    onTransaksiClick: (Kas) -> Unit,
     onLihatLogClick: (Kas) -> Unit,
     onEditClick: (Kas) -> Unit,
     onLogTotalClick: () -> Unit
 ) {
-    // Menghitung total saldo kas secara dinamis dari akun kas yang aktif
+
     val totalSaldo = when (uiState) {
         is KasUiState.Success -> uiState.data.filter { it.aktif }.sumOf { it.saldo }
         else -> 0.0
@@ -140,7 +131,7 @@ private fun KasContent(
             .fillMaxSize()
             .background(BackgroundSlate)
     ) {
-        // ── FIXED HEADER ──────────────────────────────────────────────
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -149,7 +140,7 @@ private fun KasContent(
                 .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 12.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Judul Layar & Ikon
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -169,7 +160,7 @@ private fun KasContent(
                     )
                 }
 
-                // Wallet Icon
+
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.kas),
                     contentDescription = "Kas",
@@ -185,7 +176,7 @@ private fun KasContent(
                 .fillMaxWidth(),
             contentPadding = PaddingValues(bottom = 24.dp)
         ) {
-            // ── BENTO CARD TOTAL SALDO (Green Card Area) ─────────────────────
+
             item {
                 Box(
                     modifier = Modifier
@@ -196,7 +187,7 @@ private fun KasContent(
                         )
                         .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
                 ) {
-                    // Bento Card Total Saldo (Glassmorphism)
+
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -221,7 +212,7 @@ private fun KasContent(
                             )
                         }
 
-                        // Tombol Log Total
+
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -253,7 +244,7 @@ private fun KasContent(
                 }
             }
 
-            // ── 2. SUB-HEADER AREA ("Akun Kas" & "+ Tambah Kas") ────────────────
+
             item {
                 Row(
                     modifier = Modifier
@@ -270,7 +261,7 @@ private fun KasContent(
                         color = TextDark
                     )
 
-                    // Button Tambah Kas (Pill Shape)
+
                     Box(
                         modifier = Modifier
                             .height(36.dp)
@@ -301,7 +292,7 @@ private fun KasContent(
                 }
             }
 
-            // ── 3. LIST OF CASH ACCOUNTS ───────────────────────────────────────
+
             item {
                 when (uiState) {
                     is KasUiState.Loading -> {
@@ -340,7 +331,6 @@ private fun KasContent(
                             uiState.data.forEach { kas ->
                                 KasCard(
                                     kas = kas,
-                                    onTransaksiClick = { onTransaksiClick(kas) },
                                     onLihatLogClick = { onLihatLogClick(kas) },
                                     onEditClick = { onEditClick(kas) }
                                 )

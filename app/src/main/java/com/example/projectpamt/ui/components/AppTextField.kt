@@ -35,6 +35,8 @@ fun AppTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = true,
+    readOnly: Boolean = false,
+    enabled: Boolean = true,
     isError: Boolean = false,
     errorMessage: String? = null,
     shape: RoundedCornerShape = RoundedCornerShape(12.dp)
@@ -54,6 +56,8 @@ fun AppTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth(),
+            readOnly = readOnly,
+            enabled = enabled,
             label = if (!label.isNullOrBlank()) {
                 {
                     Text(

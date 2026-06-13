@@ -9,6 +9,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import com.example.projectpamt.ui.navigation.AppNavHost
 import com.example.projectpamt.ui.navigation.Login
+import com.example.projectpamt.ui.theme.BackgroundSlate
+import com.example.projectpamt.ui.theme.GreenPrimary
+import com.example.projectpamt.ui.utils.DynamicStatusBar
 import com.example.projectpamt.viewmodel.auth.AuthViewModel
 
 @Composable
@@ -16,6 +19,8 @@ fun AppAuthLayout(
     authViewModel: AuthViewModel
 ) {
     val navController = rememberNavController()
+
+    DynamicStatusBar(backgroundColor = BackgroundSlate)
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),

@@ -51,4 +51,6 @@ class AuthRepository {
     suspend fun awaitAuthInitialization() {
         supabase.auth.awaitInitialization()
     }
+
+    fun getCurrentUser() = supabase.auth.currentUserOrNull()
 }

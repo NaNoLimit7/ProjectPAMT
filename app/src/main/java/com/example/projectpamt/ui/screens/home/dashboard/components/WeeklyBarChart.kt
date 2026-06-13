@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.components
+package com.example.projectpamt.ui.screens.home.dashboard.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -131,7 +131,8 @@ fun WeeklyBarChart(
                     verticalAlignment = Alignment.Bottom
                 ) {
                     data.forEach { (day, value) ->
-                        val fraction = if (maxValue > 0) (value / maxValue).coerceIn(0.0, 1.0) else 0.0
+                        val fraction =
+                            if (maxValue > 0) (value / maxValue).coerceIn(0.0, 1.0) else 0.0
                         val barHeight = (chartMaxHeight.value * fraction).dp
 
                         Column(

@@ -2,7 +2,6 @@ package com.example.projectpamt.ui.screens.home.kas
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,27 +27,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.projectpamt.R
-import com.example.projectpamt.data.model.LogTotalKasDay
 import com.example.projectpamt.data.model.LogTotalKasSummary
+import com.example.projectpamt.ui.screens.home.kas.components.DailyLogCard
 import com.example.projectpamt.ui.theme.*
-import com.example.projectpamt.ui.utils.DynamicStatusBar
 import com.example.projectpamt.ui.utils.formatRupiah
 import com.example.projectpamt.viewmodel.kas.LogTotalKasUiState
 import com.example.projectpamt.viewmodel.kas.LogTotalKasViewModel
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogTotalKasScreen(
-    modifier: Modifier = Modifier,
     viewModel: LogTotalKasViewModel = viewModel(),
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    // Set dynamic status bar color to GreenPrimary
-    DynamicStatusBar(backgroundColor = GreenPrimary)
 
     Column(
         modifier = Modifier
@@ -137,7 +129,7 @@ fun LogTotalKasScreen(
             }
 
             is LogTotalKasUiState.Success -> {
-                SuccessContent(summary = state.data)
+                LogTotalKasContent(summary = state.data)
             }
 
             else -> {}
@@ -147,7 +139,7 @@ fun LogTotalKasScreen(
 
 
 @Composable
-private fun SuccessContent(
+private fun LogTotalKasContent(
     summary: LogTotalKasSummary
 ) {
     LazyColumn(
@@ -325,96 +317,3 @@ private fun SuccessContent(
     }
 }
 
-@Composable
-private fun DailyLogCard(
-    logDay: LogTotalKasDay
-) {
-    val dateStr = logDay.tanggal
-    val formattedDate = remember(dateStr) {
-        try {
-            val date =
-                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
-            if (date != null) {
-                SimpleDateFormat("d MMMM yyyy", Locale("id", "ID")).format(date)
-            } else {
-                dateStr
-            }
-        } catch (e: Exception) {
-            dateStr
-        }
-    }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(2.dp, RoundedCornerShape(20.dp)),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, BorderSlate)
-    ) {
-        Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Upper Info: Date & Total
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = formattedDate,
-                    fontSize = 12.sp,
-                    color = TextMuted,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = formatRupiah(logDay.totalSaldo),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF005F34) // Dark Green
-                )
-            }
-
-            HorizontalDivider(color = BorderSlate)
-
-            // Breakdown of accounts
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                logDay.breakdown.forEach { accountSnapshot ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(R.drawable.kas),
-                                contentDescription = null,
-                                tint = TextMuted,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Text(
-                                text = accountSnapshot.kasNama,
-                                fontSize = 14.sp,
-                                color = TextDark,
-                                fontWeight = FontWeight.Normal
-                            )
-                        }
-                        Text(
-                            text = formatRupiah(accountSnapshot.saldo),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextDark
-                        )
-                    }
-                }
-            }
-        }
-    }
-}

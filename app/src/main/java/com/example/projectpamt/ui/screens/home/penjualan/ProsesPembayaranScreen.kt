@@ -73,20 +73,17 @@ fun ProsesPembayaranScreen(
         ValidationUtils.formatThousandSeparator(penerimaanKas)
     }
 
-    // Set dynamic status bar color to GreenPrimary
-    DynamicStatusBar(backgroundColor = GreenPrimary)
 
-    // Handle states
     LaunchedEffect(uiState) {
         if (uiState is PembayaranUiState.Success) {
             val transactionId = (uiState as PembayaranUiState.Success).transactionId
             val formattedDate = SimpleDateFormat("d MMMM yyyy HH:mm", Locale("id", "ID")).format(Date())
             val change = cashReceivedAmount - totalHarga
-            
-            // Set parameter to clear the cart in PenjualanScreen
+
+
             navController.previousBackStackEntry?.savedStateHandle?.set("clear_cart", true)
-            
-            // Navigate to InfoPembayaranBerhasil and pop ProsesPembayaran Screen
+
+
             navController.navigate(
                 InfoPembayaranBerhasil(
                     idTransaksi = transactionId,
@@ -110,7 +107,7 @@ fun ProsesPembayaranScreen(
             .background(BackgroundSlate)
             .imePadding()
     ) {
-        // Scrollable content area that adjusts with keyboard
+
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -118,7 +115,7 @@ fun ProsesPembayaranScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // ── HEADER SECTION ────────────────────────────────────────────────
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -130,7 +127,7 @@ fun ProsesPembayaranScreen(
                     .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                // Back button
+
                 Row(
                     modifier = Modifier
                         .clickable { navController.popBackStack() }
@@ -152,13 +149,13 @@ fun ProsesPembayaranScreen(
                     )
                 }
 
-                // Title and Icon Row
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // IDR Badge Icon
+
                     Box(
                         modifier = Modifier
                             .size(48.dp)
@@ -189,7 +186,7 @@ fun ProsesPembayaranScreen(
                     }
                 }
 
-                // Total Payment Card (Glassmorphic style)
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -214,7 +211,7 @@ fun ProsesPembayaranScreen(
                 }
             }
 
-            // ── ORDER SUMMARY CARD ────────────────────────────────────────────
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -234,7 +231,7 @@ fun ProsesPembayaranScreen(
                         color = TextDark
                     )
 
-                    // Cart items list
+
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         cartItems.forEach { item ->
                             Row(
@@ -260,7 +257,7 @@ fun ProsesPembayaranScreen(
 
                     HorizontalDivider(color = BorderSlate, modifier = Modifier.padding(vertical = 4.dp))
 
-                    // Customer info line
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -280,12 +277,12 @@ fun ProsesPembayaranScreen(
                 }
             }
 
-            // ── PAYMENT DETAILS SECTION ───────────────────────────────────────
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
-                    .padding(bottom = 24.dp), // extra padding to clear keyboard space nicely
+                    .padding(bottom = 24.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 border = BorderStroke(1.dp, BorderSlate)
@@ -294,7 +291,7 @@ fun ProsesPembayaranScreen(
                     modifier = Modifier.padding(22.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    // 1. Dropdown Pilih Akun Kas
+
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -348,7 +345,7 @@ fun ProsesPembayaranScreen(
                         }
                     }
 
-                    // 2. Input Penerimaan Kas
+
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -393,7 +390,7 @@ fun ProsesPembayaranScreen(
                             )
                         )
 
-                        // Live change feedback
+
                         if (penerimaanKas.isNotEmpty()) {
                             if (cashReceivedAmount >= totalHarga) {
                                 val change = cashReceivedAmount - totalHarga
@@ -420,7 +417,7 @@ fun ProsesPembayaranScreen(
             }
         }
 
-        // Fixed Action Buttons at the bottom
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -432,7 +429,7 @@ fun ProsesPembayaranScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Button Batal (Left)
+
                 Button(
                     onClick = { navController.popBackStack() },
                     colors = ButtonDefaults.buttonColors(
@@ -451,7 +448,7 @@ fun ProsesPembayaranScreen(
                     )
                 }
 
-                // Button Proses Pembayaran (Right)
+
                 val isEnabled = uiState !is PembayaranUiState.Loading
                 Button(
                     onClick = {

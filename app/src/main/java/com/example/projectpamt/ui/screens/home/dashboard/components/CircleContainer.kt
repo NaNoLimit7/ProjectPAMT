@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.components
+package com.example.projectpamt.ui.screens.home.dashboard.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,10 +16,11 @@ import androidx.compose.ui.unit.Dp
 fun CircleContainer(
     size: Dp,
     backgroundColor: Color,
+    modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(size)
             .clip(CircleShape)
             .background(color = backgroundColor),
