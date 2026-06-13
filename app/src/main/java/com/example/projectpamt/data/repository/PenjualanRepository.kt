@@ -58,4 +58,12 @@ class PenjualanRepository {
             }
         }.decodeList<Penjualan>()
     }
+
+    suspend fun getRiwayatPenjualan(): List<Penjualan> {
+        return supabase.postgrest["penjualan"].select(
+            columns = io.github.jan.supabase.postgrest.query.Columns.raw("*, pelanggan(*), kas(*)")
+        ) {
+            order("created_at", order = io.github.jan.supabase.postgrest.query.Order.DESCENDING)
+        }.decodeList<Penjualan>()
+    }
 }

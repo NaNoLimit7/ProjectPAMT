@@ -126,8 +126,6 @@ fun TambahPengeluaranScreen(
                 kategori = kategoriObj,
                 kas = kasObj
             ) {
-                // Deduct cash balance
-                kasViewModel.updateSaldo(idKas, -total, "Pengeluaran: $deskripsi")
                 navController.popBackStack()
             }
         }

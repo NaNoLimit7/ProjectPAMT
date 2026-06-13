@@ -13,5 +13,9 @@ data class Penjualan(
     @SerialName("jumlah_bayar") val jumlahBayar: Double,
     @SerialName("total_harga") val totalHarga: Double,
     @SerialName("detail_penjualan") val detailPenjualan: JsonElement? = null,
-    @SerialName("created_at") val createdAt: String? = null
+    @SerialName("created_at") val createdAt: String? = null,
+    
+    // Relationships
+    val pelanggan: Pelanggan? = null,
+    val kas: Kas? = null
 )
