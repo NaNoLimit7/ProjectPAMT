@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.utils
+package com.example.projectpamt.utils
 
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable

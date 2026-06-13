@@ -28,9 +28,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.projectpamt.data.model.Pelanggan
 import com.example.projectpamt.ui.theme.*
-import com.example.projectpamt.ui.utils.DynamicStatusBar
-import com.example.projectpamt.ui.utils.ValidationUtils
-import com.example.projectpamt.ui.utils.formatRupiah
+import com.example.projectpamt.utils.ValidationUtils
+import com.example.projectpamt.utils.formatRupiah
 import com.example.projectpamt.viewmodel.penjualan.CartItem
 import com.example.projectpamt.viewmodel.penjualan.PembayaranUiState
 import com.example.projectpamt.viewmodel.penjualan.PembayaranViewModel

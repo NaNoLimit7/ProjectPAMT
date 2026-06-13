@@ -61,7 +61,7 @@ import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.theme.BorderSlate
 import com.example.projectpamt.ui.theme.TextDark
 import com.example.projectpamt.ui.theme.TextMuted
-import com.example.projectpamt.ui.utils.formatRupiah
+import com.example.projectpamt.utils.formatRupiah
 import kotlinx.coroutines.delay
 
 @Composable

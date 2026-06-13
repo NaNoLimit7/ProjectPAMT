@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import com.example.projectpamt.R
 import com.example.projectpamt.ui.theme.GreenPrimary
-import com.example.projectpamt.ui.utils.formatRupiah
+import com.example.projectpamt.utils.formatRupiah
 import com.example.projectpamt.viewmodel.penjualan.CartItem
 
 @Composable

@@ -41,7 +41,7 @@ import com.example.projectpamt.ui.theme.TextDark
 import com.example.projectpamt.ui.theme.TextMuted
 import com.example.projectpamt.ui.theme.WarningOrangeBg
 import com.example.projectpamt.ui.theme.WarningOrangeText
-import com.example.projectpamt.ui.utils.formatRupiah
+import com.example.projectpamt.utils.formatRupiah
 
 @Composable
 fun InventoryProductCard(

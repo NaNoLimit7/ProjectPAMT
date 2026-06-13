@@ -26,8 +26,15 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.projectpamt.viewmodel.dashboard.DashboardViewModel
+import com.example.projectpamt.viewmodel.dashboard.DashboardUiState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,10 +66,10 @@ import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.GreenSecondary
 import com.example.projectpamt.ui.theme.ProjectPAMTTheme
-import com.example.projectpamt.ui.utils.formatNumber
-import com.example.projectpamt.ui.utils.formatRupiah
-import com.example.projectpamt.ui.utils.getInitials
-import com.example.projectpamt.ui.utils.toIndonesianFormattedDate
+import com.example.projectpamt.utils.formatNumber
+import com.example.projectpamt.utils.formatRupiah
+import com.example.projectpamt.utils.getInitials
+import com.example.projectpamt.utils.toIndonesianFormattedDate
 import com.example.projectpamt.viewmodel.auth.AuthViewModel
 import java.util.Date
 
@@ -85,48 +92,77 @@ data class DashboardState(
 fun DashboardScreen(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
+    dashboardViewModel: DashboardViewModel = viewModel(),
     navController: NavController
 ) {
     val fullname by authViewModel.fullname.collectAsStateWithLifecycle()
+    val uiState by dashboardViewModel.uiState.collectAsStateWithLifecycle()
 
-    // Dummy state — akan diganti dengan data real seiring integrasi bertahap
-    val dummyState = DashboardState(
-        penjualanBulanIni = 500_000.0,
-        totalProduk = 342,
-        saldoKas = 7_000_000.0,
-        jumlahKasAktif = 3,
-        totalPelanggan = 1248,
-        pelangganAktif = 156,
-        penjualanMingguIni = listOf(
-            "Min" to 3600.0,
-            "Sen" to 3200.0,
-            "Sel" to 4400.0,
-            "Rab" to 4000.0,
-            "Kam" to 5200.0,
-            "Jum" to 6800.0,
-            "Sab" to 4800.0,
-        ),
-        namaPengguna = fullname
-    )
+    LaunchedEffect(fullname) {
+        dashboardViewModel.fetchDashboardData(fullname.ifEmpty { "Pengguna" })
+    }
 
-    DashboardContent(
-        modifier = modifier,
-        state = dummyState,
-        onNavigateTambahPenjualan = {
-            navController.navigate(PenjualanList) {
-                popUpTo(Dashboard) {
-                    saveState = true
-                }
-                launchSingleTop = true
-                restoreState = true
+    when (uiState) {
+        is DashboardUiState.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(BackgroundSlate),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = GreenPrimary)
             }
-        },
-        onNavigateTambahProduk = { navController.navigate(TambahProduk) },
-        onNavigateTambahPelanggan = { navController.navigate(TambahPelanggan)},
-        onNavigateTambahPengeluaran = { navController.navigate(PengeluaranList) },
-        onViewAllPenjualan = { navController.navigate(RiwayatPenjualan) },
-        onNavigateProfil = { navController.navigate(Profil) }
-    )
+        }
+        is DashboardUiState.Error -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(BackgroundSlate)
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = (uiState as DashboardUiState.Error).message,
+                        color = Color.Red,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Button(
+                        onClick = { dashboardViewModel.fetchDashboardData(fullname.ifEmpty { "Pengguna" }) },
+                        colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
+                    ) {
+                        Text("Coba Lagi", color = Color.White)
+                    }
+                }
+            }
+        }
+        is DashboardUiState.Success -> {
+            val state = (uiState as DashboardUiState.Success).state
+            DashboardContent(
+                modifier = modifier,
+                state = state,
+                onNavigateTambahPenjualan = {
+                    navController.navigate(PenjualanList) {
+                        popUpTo(Dashboard) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                onNavigateTambahProduk = { navController.navigate(TambahProduk) },
+                onNavigateTambahPelanggan = { navController.navigate(TambahPelanggan)},
+                onNavigateTambahPengeluaran = { navController.navigate(PengeluaranList) },
+                onViewAllPenjualan = { navController.navigate(RiwayatPenjualan) },
+                onNavigateProfil = { navController.navigate(Profil) }
+            )
+        }
+        else -> {}
+    }
 }
 
 //  Content (stateless, testable)

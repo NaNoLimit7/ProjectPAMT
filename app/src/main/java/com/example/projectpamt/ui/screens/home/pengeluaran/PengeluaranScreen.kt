@@ -55,10 +55,12 @@ import com.example.projectpamt.ui.theme.BorderSlate
 import com.example.projectpamt.ui.theme.DangerRed
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.TextMuted
-import com.example.projectpamt.ui.utils.formatRupiah
+import com.example.projectpamt.utils.formatRupiah
 import com.example.projectpamt.viewmodel.pengeluaran.PengeluaranUiState
 import com.example.projectpamt.viewmodel.pengeluaran.PengeluaranViewModel
 import java.text.SimpleDateFormat
+import java.time.Instant.parse
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -185,9 +187,100 @@ private fun PengeluaranContent(
                         }
                     }
 
-                    // Compute dynamic total of expenses (unaffected by search query)
-                    val totalExpenses = remember(rawList) {
-                        rawList.sumOf { it.total }
+                    // Compute dynamic totals based on current date
+                    val now = Calendar.getInstance()
+                    val currentMonth = now.get(Calendar.MONTH)
+                    val currentYear = now.get(Calendar.YEAR)
+                    
+                    val lastMonthCal = Calendar.getInstance().apply {
+                        add(Calendar.MONTH, -1)
+                    }
+                    val lastMonth = lastMonthCal.get(Calendar.MONTH)
+                    val lastMonthYear = lastMonthCal.get(Calendar.YEAR)
+
+                    val df = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID"))
+
+                    val expensesThisMonthList = remember(rawList) {
+                        rawList.filter { exp ->
+                            val dateStr = exp.createdAt
+                            if (dateStr == null) {
+                                false
+                            } else {
+                                val date = try {
+                                    parse(dateStr)?.let { Date.from(it) }
+                                } catch (e: Exception) {
+                                    try { df.parse(dateStr) } catch(ex: Exception) { null }
+                                }
+                                if (date == null) {
+                                    false
+                                } else {
+                                    val cal = Calendar.getInstance().apply { time = date }
+                                    cal.get(Calendar.MONTH) == currentMonth && cal.get(Calendar.YEAR) == currentYear
+                                }
+                            }
+                        }
+                    }
+
+                    val totalExpenses = remember(expensesThisMonthList) {
+                        expensesThisMonthList.sumOf { it.total }
+                    }
+
+                    val totalExpensesLastMonth = remember(rawList) {
+                        rawList.filter { exp ->
+                            val dateStr = exp.createdAt
+                            if (dateStr == null) {
+                                false
+                            } else {
+                                val date = try {
+                                    java.time.Instant.parse(dateStr)?.let { Date.from(it) }
+                                } catch (e: Exception) {
+                                    try { df.parse(dateStr) } catch(ex: Exception) { null }
+                                }
+                                if (date == null) {
+                                    false
+                                } else {
+                                    val cal = Calendar.getInstance().apply { time = date }
+                                    cal.get(Calendar.MONTH) == lastMonth && cal.get(Calendar.YEAR) == lastMonthYear
+                                }
+                            }
+                        }
+                    }.sumOf { it.total }
+
+                    // Compute comparison text & colors
+                    val trendText = remember(totalExpenses, totalExpensesLastMonth) {
+                        if (totalExpensesLastMonth == 0.0) {
+                            if (totalExpenses == 0.0) {
+                                "Stabil vs bulan lalu"
+                            } else {
+                                "Baru bulan ini"
+                            }
+                        } else {
+                            val percent = ((totalExpenses - totalExpensesLastMonth) / totalExpensesLastMonth) * 100
+                            val rounded = kotlin.math.round(percent * 10) / 10
+                            if (rounded > 0) {
+                                "↑ $rounded% vs bulan lalu"
+                            } else if (rounded < 0) {
+                                "↓ ${-rounded}% vs bulan lalu"
+                            } else {
+                                "Stabil vs bulan lalu"
+                            }
+                        }
+                    }
+
+                    val trendBgColor = remember(totalExpenses, totalExpensesLastMonth) {
+                        if (totalExpenses >= totalExpensesLastMonth) {
+                            Color(0xFFFEE2E2) // light red
+                        } else {
+                            Color(0xFFDCFCE7) // light green
+                        }
+                    }
+
+                    val trendTextColor = remember(totalExpenses, totalExpensesLastMonth) {
+                        if (totalExpenses >= totalExpensesLastMonth) {
+                            DangerRed
+                        } else {
+                            GreenPrimary
+                        }
                     }
 
                     LazyColumn(
@@ -236,16 +329,16 @@ private fun PengeluaranContent(
                                         Box(
                                             modifier = Modifier
                                                 .background(
-                                                    color = Color(0xFFFEE2E2),
+                                                    color = trendBgColor,
                                                     shape = RoundedCornerShape(100.dp)
                                                 )
                                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                                         ) {
                                             Text(
-                                                text = "↑ 12% vs bulan lalu",
+                                                text = trendText,
                                                 fontSize = 12.sp,
                                                 fontWeight = FontWeight.Bold,
-                                                color = DangerRed
+                                                color = trendTextColor
                                             )
                                         }
                                     }

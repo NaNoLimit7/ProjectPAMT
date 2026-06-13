@@ -32,6 +32,9 @@ class AuthViewModel(
     private val _phone = MutableStateFlow("")
     val phone: StateFlow<String> = _phone
 
+    private val _role = MutableStateFlow("Store Manager")
+    val role: StateFlow<String> = _role
+
     init {
         observeAuthStatus()
     }
@@ -49,6 +52,7 @@ class AuthViewModel(
                         _name.value = fullName
                         _email.value = user?.email ?: ""
                         _phone.value = metadata?.get("phone")?.jsonPrimitive?.contentOrNull ?: ""
+                        _role.value = metadata?.get("role")?.jsonPrimitive?.contentOrNull ?: "Store Manager"
 
                         AuthCheckState.Authenticated
                     }
@@ -64,6 +68,7 @@ class AuthViewModel(
                             _name.value = fullName
                             _email.value = user?.email ?: ""
                             _phone.value = metadata?.get("phone")?.jsonPrimitive?.contentOrNull ?: ""
+                            _role.value = metadata?.get("role")?.jsonPrimitive?.contentOrNull ?: "Store Manager"
 
                             AuthCheckState.Authenticated
                         } else {

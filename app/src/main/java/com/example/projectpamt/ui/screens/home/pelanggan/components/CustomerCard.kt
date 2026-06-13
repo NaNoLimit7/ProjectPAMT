@@ -35,7 +35,7 @@ import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.InfoBlueBg
 import com.example.projectpamt.ui.theme.InfoBlueText
 import com.example.projectpamt.ui.theme.TextMuted
-import com.example.projectpamt.ui.utils.formatRupiah
+import com.example.projectpamt.utils.formatRupiah
 
 @Composable
 fun CustomerCard(

@@ -37,7 +37,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.projectpamt.ui.components.AppTextField
-import com.example.projectpamt.ui.utils.ValidationUtils
+import com.example.projectpamt.utils.ValidationUtils
 
 @Composable
 fun HargaStokSection(

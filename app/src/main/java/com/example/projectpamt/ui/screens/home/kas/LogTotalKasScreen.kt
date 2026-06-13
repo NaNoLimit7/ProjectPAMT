@@ -30,7 +30,7 @@ import com.example.projectpamt.R
 import com.example.projectpamt.data.model.LogTotalKasSummary
 import com.example.projectpamt.ui.screens.home.kas.components.DailyLogCard
 import com.example.projectpamt.ui.theme.*
-import com.example.projectpamt.ui.utils.formatRupiah
+import com.example.projectpamt.utils.formatRupiah
 import com.example.projectpamt.viewmodel.kas.LogTotalKasUiState
 import com.example.projectpamt.viewmodel.kas.LogTotalKasViewModel
 

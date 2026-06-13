@@ -55,7 +55,7 @@ import com.example.projectpamt.ui.screens.home.produk.components.TambahKategoriB
 import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.TextDark
-import com.example.projectpamt.ui.utils.ValidationUtils
+import com.example.projectpamt.utils.ValidationUtils
 import com.example.projectpamt.viewmodel.kategori.KategoriUiState
 import com.example.projectpamt.viewmodel.kategori.KategoriViewModel
 import com.example.projectpamt.viewmodel.produk.ProdukUiState

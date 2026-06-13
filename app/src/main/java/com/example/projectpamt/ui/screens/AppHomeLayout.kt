@@ -21,14 +21,7 @@ import com.example.projectpamt.ui.navigation.PenjualanList
 import com.example.projectpamt.ui.navigation.ProdukList
 import com.example.projectpamt.ui.navigation.PelangganList
 import com.example.projectpamt.ui.navigation.KasList
-import com.example.projectpamt.ui.navigation.ProsesPembayaran
-import com.example.projectpamt.ui.navigation.RiwayatPenjualan
-import com.example.projectpamt.ui.navigation.LogInventoryList
-import com.example.projectpamt.ui.navigation.LogTotalKas
-import com.example.projectpamt.ui.navigation.LogKas
-import com.example.projectpamt.ui.navigation.Profil
-import com.example.projectpamt.ui.theme.BackgroundSlate
-import com.example.projectpamt.ui.utils.DynamicStatusBar
+import com.example.projectpamt.utils.DynamicStatusBar
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.viewmodel.auth.AuthViewModel
 

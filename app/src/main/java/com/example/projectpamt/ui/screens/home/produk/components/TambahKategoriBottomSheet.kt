@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.projectpamt.ui.components.AppTextField
 import com.example.projectpamt.ui.theme.TextDark
-import com.example.projectpamt.ui.utils.ValidationUtils
+import com.example.projectpamt.utils.ValidationUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

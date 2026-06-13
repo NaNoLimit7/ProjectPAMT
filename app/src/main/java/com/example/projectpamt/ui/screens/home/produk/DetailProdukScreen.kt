@@ -47,7 +47,7 @@ import com.example.projectpamt.ui.screens.home.produk.components.MetricCard
 import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.TextDark
-import com.example.projectpamt.ui.utils.formatRupiah
+import com.example.projectpamt.utils.formatRupiah
 import com.example.projectpamt.viewmodel.produk.ProdukUiState
 import com.example.projectpamt.viewmodel.produk.ProdukViewModel
 import kotlinx.serialization.json.contentOrNull

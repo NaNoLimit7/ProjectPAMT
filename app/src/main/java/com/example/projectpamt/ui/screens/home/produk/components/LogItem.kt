@@ -40,8 +40,8 @@ import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.TextDark
 import com.example.projectpamt.ui.theme.TextMuted
 import com.example.projectpamt.ui.theme.TextPlaceholder
-import com.example.projectpamt.ui.utils.Quadruple
-import com.example.projectpamt.ui.utils.formatRupiah
+import com.example.projectpamt.utils.Quadruple
+import com.example.projectpamt.utils.formatRupiah
 import java.text.SimpleDateFormat
 import java.util.Locale
 

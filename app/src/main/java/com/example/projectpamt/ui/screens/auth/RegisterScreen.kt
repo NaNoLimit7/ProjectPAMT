@@ -38,7 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.projectpamt.R
 import com.example.projectpamt.ui.components.AppTextField
-import com.example.projectpamt.ui.utils.ValidationUtils
+import com.example.projectpamt.utils.ValidationUtils
 import com.example.projectpamt.ui.theme.ProjectPAMTTheme
 import com.example.projectpamt.viewmodel.auth.AuthUiState
 import com.example.projectpamt.viewmodel.auth.AuthViewModel

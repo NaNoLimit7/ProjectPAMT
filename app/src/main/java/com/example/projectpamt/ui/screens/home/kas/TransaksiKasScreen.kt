@@ -32,8 +32,8 @@ import com.example.projectpamt.R
 import com.example.projectpamt.data.model.Kas
 import com.example.projectpamt.data.model.LogKasItem
 import com.example.projectpamt.ui.theme.*
-import com.example.projectpamt.ui.utils.buildAnnotatedLogDescription
-import com.example.projectpamt.ui.utils.formatRupiah
+import com.example.projectpamt.utils.buildAnnotatedLogDescription
+import com.example.projectpamt.utils.formatRupiah
 import com.example.projectpamt.viewmodel.kas.TransaksiKasUiState
 import com.example.projectpamt.viewmodel.kas.TransaksiKasViewModel
 import java.text.SimpleDateFormat

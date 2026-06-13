@@ -57,7 +57,7 @@ import com.example.projectpamt.ui.screens.home.penjualan.components.CartItemRow
 import com.example.projectpamt.ui.screens.home.penjualan.components.CustomerDropdown
 import com.example.projectpamt.ui.screens.home.penjualan.components.ProductCard
 import com.example.projectpamt.ui.theme.GreenPrimary
-import com.example.projectpamt.ui.utils.formatRupiah
+import com.example.projectpamt.utils.formatRupiah
 import com.example.projectpamt.viewmodel.penjualan.CartItem
 import com.example.projectpamt.viewmodel.penjualan.PenjualanDataUiState
 import com.example.projectpamt.viewmodel.penjualan.PenjualanViewModel

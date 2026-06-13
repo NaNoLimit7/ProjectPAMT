@@ -44,7 +44,7 @@ import androidx.navigation.NavController
 import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.GreenSecondary
-import com.example.projectpamt.ui.utils.getInitials
+import com.example.projectpamt.utils.getInitials
 import com.example.projectpamt.viewmodel.auth.AuthViewModel
 
 @Composable
@@ -55,6 +55,7 @@ fun ProfilScreen(
 ) {
     val fullname by authViewModel.fullname.collectAsStateWithLifecycle()
     val email by authViewModel.email.collectAsStateWithLifecycle()
+    val role by authViewModel.role.collectAsStateWithLifecycle()
 
     val initials = fullname.getInitials()
 
@@ -171,7 +172,7 @@ fun ProfilScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Role Badge ("Store Manager" light green pill)
+                    // Role Badge
                     Box(
                         modifier = Modifier
                             .background(
@@ -181,7 +182,7 @@ fun ProfilScreen(
                             .padding(horizontal = 16.dp, vertical = 6.dp)
                     ) {
                         Text(
-                            text = "Store Manager",
+                            text = role,
                             color = Color(0xFF137333),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold

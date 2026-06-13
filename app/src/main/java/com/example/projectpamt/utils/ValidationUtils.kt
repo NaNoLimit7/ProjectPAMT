@@ -1,6 +1,7 @@
-package com.example.projectpamt.ui.utils
+package com.example.projectpamt.utils
 
 import java.text.NumberFormat.getNumberInstance
+import java.util.Locale
 
 data class ValidationResult(
     val isValid: Boolean,
@@ -82,7 +83,7 @@ object ValidationUtils {
         val clean = input.replace(".", "").replace(",", "").filter { it.isDigit() }
         if (clean.isEmpty()) return ""
         val number = clean.toLongOrNull() ?: return ""
-        return getNumberInstance(java.util.Locale.Builder().setLanguage("in").setRegion("ID").build()).format(number)
+        return getNumberInstance(Locale.Builder().setLanguage("in").setRegion("ID").build()).format(number)
     }
 
     fun parseThousandSeparator(input: String): Double {

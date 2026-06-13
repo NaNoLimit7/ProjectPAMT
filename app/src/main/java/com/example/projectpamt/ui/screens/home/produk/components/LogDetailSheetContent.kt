@@ -35,7 +35,7 @@ import com.example.projectpamt.ui.theme.BorderSlate
 import com.example.projectpamt.ui.theme.DangerRed
 import com.example.projectpamt.ui.theme.TextDark
 import com.example.projectpamt.ui.theme.TextMuted
-import com.example.projectpamt.ui.utils.formatRupiah
+import com.example.projectpamt.utils.formatRupiah
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Locale

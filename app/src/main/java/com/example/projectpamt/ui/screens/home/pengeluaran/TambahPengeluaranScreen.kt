@@ -32,7 +32,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,12 +42,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
@@ -68,8 +63,8 @@ import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.theme.BorderSlate
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.TextDark
-import com.example.projectpamt.ui.theme.TextMuted
-import com.example.projectpamt.ui.utils.ValidationUtils
+import com.example.projectpamt.utils.ValidationUtils
+import com.example.projectpamt.utils.formatRupiah
 import com.example.projectpamt.viewmodel.kas.KasUiState
 import com.example.projectpamt.viewmodel.kas.KasViewModel
 import com.example.projectpamt.viewmodel.kategori.KategoriViewModel
@@ -410,7 +405,7 @@ private fun TambahPengeluaranContent(
                             ) {
                                 activeKas.forEach { kas ->
                                     DropdownMenuItem(
-                                        text = { Text("${kas.nama} (Saldo: ${com.example.projectpamt.ui.utils.formatRupiah(kas.saldo)})") },
+                                        text = { Text("${kas.nama} (Saldo: ${formatRupiah(kas.saldo)})") },
                                         onClick = {
                                             selectedKas = kas
                                             expandedKas = false

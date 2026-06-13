@@ -38,7 +38,7 @@ import com.example.projectpamt.ui.theme.DangerRed
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.TextDark
 import com.example.projectpamt.ui.theme.TextMuted
-import com.example.projectpamt.ui.utils.buildAnnotatedLogDescription
+import com.example.projectpamt.utils.buildAnnotatedLogDescription
 import java.text.SimpleDateFormat
 import java.util.Locale
 
