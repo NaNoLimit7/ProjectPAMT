@@ -3,13 +3,20 @@ package com.example.projectpamt.viewmodel.penjualan
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.model.Kas
-import kotlinx.coroutines.delay
+import com.example.projectpamt.data.model.DetailPenjualan
+import com.example.projectpamt.data.repository.KasRepository
+import com.example.projectpamt.data.repository.PenjualanRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 
-class PembayaranViewModel : ViewModel() {
+class PembayaranViewModel(
+    private val kasRepository: KasRepository = KasRepository(),
+    private val penjualanRepository: PenjualanRepository = PenjualanRepository()
+) : ViewModel() {
     private val _kasList = MutableStateFlow<List<Kas>>(emptyList())
     val kasList: StateFlow<List<Kas>> = _kasList.asStateFlow()
 
@@ -23,8 +30,21 @@ class PembayaranViewModel : ViewModel() {
     val uiState: StateFlow<PembayaranUiState> = _uiState.asStateFlow()
 
     init {
-        // Default select the first active Kas (usually Kas Utama)
-        _selectedKas.value = _kasList.value.firstOrNull()
+        fetchActiveKas()
+    }
+
+    fun fetchActiveKas() {
+        viewModelScope.launch {
+            try {
+                val list = kasRepository.getKasAktif()
+                _kasList.value = list
+                if (_selectedKas.value == null) {
+                    _selectedKas.value = list.firstOrNull()
+                }
+            } catch (e: Exception) {
+                // Ignore or handle
+            }
+        }
     }
 
     fun selectKas(kas: Kas) {
@@ -58,14 +78,26 @@ class PembayaranViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = PembayaranUiState.Loading
             try {
-                // Simulate network latency
-                delay(1000)
+                val items = cartItems.map { item ->
+                    DetailPenjualan(
+                        idProduk = item.produk.idProduk!!,
+                        kuantitas = item.quantity.toDouble(),
+                        hargaSatuan = item.produk.harga
+                    )
+                }
+
+                val detailPenjualanJson = Json.encodeToJsonElement(cartItems)
+
+                val txnId = penjualanRepository.prosesPenjualan(
+                    idPelanggan = pelangganId,
+                    idKas = kas.idKas!!,
+                    jumlahBayar = penerimaan,
+                    totalHarga = totalHarga,
+                    items = items,
+                    detailPenjualan = detailPenjualanJson
+                )
                 
-                // Generate a dummy transaction ID TXN-XXXX
-                val dummyTxnId = "TXN-${(1000..9999).random()}"
-                
-                // Keep it in-memory for now per guidelines
-                _uiState.value = PembayaranUiState.Success(dummyTxnId)
+                _uiState.value = PembayaranUiState.Success(txnId)
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = PembayaranUiState.Error(e.message ?: "Gagal memproses pembayaran")

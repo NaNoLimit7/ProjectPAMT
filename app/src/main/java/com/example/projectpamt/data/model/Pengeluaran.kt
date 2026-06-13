@@ -15,6 +15,7 @@ data class Pengeluaran(
     @SerialName("id_kas") val idKas: String,
     val deskripsi: String? = null,
     val total: Double,
+    val status: String = "aktif",
     @SerialName("created_at") val createdAt: String? = null,
     
     // Relationship mappings (for UI and Supabase joins)

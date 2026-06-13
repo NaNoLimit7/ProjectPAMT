@@ -327,19 +327,34 @@ private fun KasContent(
                     }
 
                     is KasUiState.Success -> {
-                        Column(
-                            modifier = modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            uiState.data.forEach { kas ->
-                                KasCard(
-                                    kas = kas,
-                                    onLihatLogClick = { onLihatLogClick(kas) },
-                                    onTransaksiClick = { onTransaksiClick(kas) },
-                                    onEditClick = { onEditClick(kas) }
+                        if (uiState.data.isEmpty()) {
+                            Box(
+                                modifier = modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Tidak ada akun kas",
+                                    color = Color.Gray,
+                                    fontSize = 14.sp
                                 )
+                            }
+                        } else {
+                            Column(
+                                modifier = modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp),
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                uiState.data.forEach { kas ->
+                                    KasCard(
+                                        kas = kas,
+                                        onLihatLogClick = { onLihatLogClick(kas) },
+                                        onTransaksiClick = { onTransaksiClick(kas) },
+                                        onEditClick = { onEditClick(kas) }
+                                    )
+                                }
                             }
                         }
                     }

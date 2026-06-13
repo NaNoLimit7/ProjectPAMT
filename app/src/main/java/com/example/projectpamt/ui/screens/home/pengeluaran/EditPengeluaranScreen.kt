@@ -141,20 +141,6 @@ fun EditPengeluaranScreen(
                     kategori = kategoriObj,
                     kas = kasObj
                 ) {
-                    // Adjust balance of Kas!
-                    if (pengeluaran.idKas == kasId) {
-                        val diff = pengeluaran.total - total
-                        kasViewModel.updateSaldo(kasId, diff, "Koreksi nominal pengeluaran")
-                    } else {
-                        // Restore old kas balance
-                        kasViewModel.updateSaldo(
-                            pengeluaran.idKas,
-                            pengeluaran.total,
-                            "Koreksi kas pengeluaran (kembali)"
-                        )
-                        // Deduct from new kas balance
-                        kasViewModel.updateSaldo(kasId, -total, "Pengeluaran: $deskripsi")
-                    }
                     navController.popBackStack()
                 }
             }
@@ -186,12 +172,6 @@ fun EditPengeluaranScreen(
                         showCancelDialog = false
                         pengeluaran.idPengeluaran?.let { id ->
                             pengeluaranViewModel.deletePengeluaran(id) {
-                                // Revert cash balance
-                                kasViewModel.updateSaldo(
-                                    id = pengeluaran.idKas,
-                                    saldo = pengeluaran.total,
-                                    keterangan = "Pembatalan Pengeluaran: ${pengeluaran.deskripsi}"
-                                )
                                 navController.popBackStack()
                             }
                         }

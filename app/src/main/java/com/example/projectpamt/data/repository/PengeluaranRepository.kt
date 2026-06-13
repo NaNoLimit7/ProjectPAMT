@@ -1,101 +1,118 @@
 package com.example.projectpamt.data.repository
 
-import com.example.projectpamt.data.model.Kategori
-import com.example.projectpamt.data.model.Kas
+import com.example.projectpamt.data.SupabaseClientProvider
 import com.example.projectpamt.data.model.Pengeluaran
+import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.rpc
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class PengeluaranRepository {
-    companion object {
-        private val mockKategoriMakanan = Kategori(idKategori = "4bfa0525-455b-419b-8d16-6512eb2d4ee7", name = "Makanan")
-        private val mockKategoriJasa = Kategori(idKategori = "5602b255-f3d1-4339-86ff-3da58c0437be", name = "Jasa")
-        
-        private val mockKasUtama = Kas(idKas = "1", nama = "Kas Utama", saldo = 15234.50)
-        private val mockKasKecil = Kas(idKas = "2", nama = "Kas Laci 1", saldo = 28450.00)
-
-        private val _mockList = mutableListOf(
-            Pengeluaran(
-                idPengeluaran = "1",
-                idKategori = "5602b255-f3d1-4339-86ff-3da58c0437be",
-                idKas = "1",
-                deskripsi = "Bayar Listrik Toko",
-                total = 450000.0,
-                createdAt = "2026-06-12T10:00:00Z",
-                kategori = mockKategoriJasa,
-                kas = mockKasUtama
-            ),
-            Pengeluaran(
-                idPengeluaran = "2",
-                idKategori = "4bfa0525-455b-419b-8d16-6512eb2d4ee7",
-                idKas = "1",
-                deskripsi = "Restock Beras Premium",
-                total = 1200000.0,
-                createdAt = "2026-06-10T14:30:00Z",
-                kategori = mockKategoriMakanan,
-                kas = mockKasUtama
-            ),
-            Pengeluaran(
-                idPengeluaran = "3",
-                idKategori = "5602b255-f3d1-4339-86ff-3da58c0437be",
-                idKas = "2",
-                deskripsi = "Biaya Kurir Internal",
-                total = 75000.0,
-                createdAt = "2026-06-08T09:15:00Z",
-                kategori = mockKategoriJasa,
-                kas = mockKasKecil
-            ),
-            Pengeluaran(
-                idPengeluaran = "4",
-                idKategori = "5602b255-f3d1-4339-86ff-3da58c0437be",
-                idKas = "1",
-                deskripsi = "Servis AC Kasir",
-                total = 250000.0,
-                createdAt = "2026-06-05T16:00:00Z",
-                kategori = mockKategoriJasa,
-                kas = mockKasUtama
-            ),
-            Pengeluaran(
-                idPengeluaran = "5",
-                idKategori = "4bfa0525-455b-419b-8d16-6512eb2d4ee7",
-                idKas = "2",
-                deskripsi = "Konsumsi Rapat Staff",
-                total = 150000.0,
-                createdAt = "2026-06-02T12:00:00Z",
-                kategori = mockKategoriMakanan,
-                kas = mockKasKecil
-            )
-        )
-    }
+    private val supabase = SupabaseClientProvider.client
 
     suspend fun getAllPengeluaran(): List<Pengeluaran> {
-        return _mockList.toList()
+        return supabase.postgrest["pengeluaran"].select(
+            columns = io.github.jan.supabase.postgrest.query.Columns.raw("*, kategori(*), kas(*)")
+        ) {
+            filter {
+                eq("status", "aktif")
+            }
+        }.decodeList<Pengeluaran>()
     }
 
     suspend fun insertPengeluaran(pengeluaran: Pengeluaran) {
-        val newId = (_mockList.mapNotNull { it.idPengeluaran?.toIntOrNull() }.maxOrNull() ?: 0) + 1
-        val nowStr = java.time.Instant.now().toString()
-        val toInsert = pengeluaran.copy(
-            idPengeluaran = newId.toString(),
-            createdAt = nowStr
-        )
-        _mockList.add(toInsert)
+        val insertData = buildJsonObject {
+            put("id_kategori", pengeluaran.idKategori)
+            put("id_kas", pengeluaran.idKas)
+            put("deskripsi", pengeluaran.deskripsi)
+            put("total", pengeluaran.total)
+            put("status", pengeluaran.status)
+        }
+        supabase.postgrest["pengeluaran"].insert(insertData)
     }
 
     suspend fun updatePengeluaran(id: String, pengeluaran: Pengeluaran) {
-        val idx = _mockList.indexOfFirst { it.idPengeluaran == id }
-        if (idx != -1) {
-            val old = _mockList[idx]
-            _mockList[idx] = old.copy(
-                idKategori = pengeluaran.idKategori,
-                idKas = pengeluaran.idKas,
-                deskripsi = pengeluaran.deskripsi,
-                total = pengeluaran.total,
-                kategori = pengeluaran.kategori ?: old.kategori,
-                kas = pengeluaran.kas ?: old.kas
+        // 1. Fetch old record to calculate balance differences
+        val old = supabase.postgrest["pengeluaran"].select {
+            filter {
+                eq("id_pengeluaran", id)
+            }
+        }.decodeSingle<Pengeluaran>()
+
+        // 2. Perform the update in the database
+        val updateData = buildJsonObject {
+            put("id_kategori", pengeluaran.idKategori)
+            put("id_kas", pengeluaran.idKas)
+            put("deskripsi", pengeluaran.deskripsi)
+            put("total", pengeluaran.total)
+            put("status", pengeluaran.status)
+        }
+        
+        supabase.postgrest["pengeluaran"].update(updateData) {
+            filter {
+                eq("id_pengeluaran", id)
+            }
+        }
+
+        // 3. Update kas balances manually since no UPDATE trigger exists
+        if (old.idKas == pengeluaran.idKas) {
+            val diff = old.total - pengeluaran.total
+            if (diff != 0.0) {
+                // Call update_saldo_kas RPC
+                supabase.postgrest.rpc(
+                    "update_saldo_kas", buildJsonObject {
+                        put("p_id_kas", pengeluaran.idKas)
+                        put("p_perubahan_saldo", diff)
+                        put("p_keterangan", "Koreksi nominal pengeluaran")
+                    }
+                )
+            }
+        } else {
+            // Restore old kas balance
+            supabase.postgrest.rpc(
+                "update_saldo_kas", buildJsonObject {
+                    put("p_id_kas", old.idKas)
+                    put("p_perubahan_saldo", old.total)
+                    put("p_keterangan", "Koreksi kas pengeluaran (kembali)")
+                }
+            )
+            // Deduct from new kas balance
+            supabase.postgrest.rpc(
+                "update_saldo_kas", buildJsonObject {
+                    put("p_id_kas", pengeluaran.idKas)
+                    put("p_perubahan_saldo", -pengeluaran.total)
+                    put("p_keterangan", "Pengeluaran: ${pengeluaran.deskripsi}")
+                }
             )
         }
     }
 
     suspend fun deletePengeluaran(id: String) {
-        _mockList.removeAll { it.idPengeluaran == id }
+        // 1. Fetch old record to know its kas and total
+        val old = supabase.postgrest["pengeluaran"].select {
+            filter {
+                eq("id_pengeluaran", id)
+            }
+        }.decodeSingle<Pengeluaran>()
+
+        if (old.status != "batal") {
+            // 2. Update status to 'batal'
+            supabase.postgrest["pengeluaran"].update(buildJsonObject {
+                put("status", "batal")
+            }) {
+                filter {
+                    eq("id_pengeluaran", id)
+                }
+            }
+
+            // 3. Restore the kas balance
+            supabase.postgrest.rpc(
+                "update_saldo_kas", buildJsonObject {
+                    put("p_id_kas", old.idKas)
+                    put("p_perubahan_saldo", old.total)
+                    put("p_keterangan", "Pembatalan Pengeluaran: ${old.deskripsi ?: ""}")
+                }
+            )
+        }
     }
 }

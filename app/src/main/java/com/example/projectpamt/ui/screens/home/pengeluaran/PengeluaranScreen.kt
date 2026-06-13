@@ -290,11 +290,28 @@ private fun PengeluaranContent(
                         }
 
                         // List Items
-                        items(filteredList, key = { it.idPengeluaran ?: "" }) { expense ->
-                            ExpenseItem(
-                                expense = expense,
-                                onClick = { onItemClick(expense) }
-                            )
+                        if (filteredList.isEmpty()) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 40.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "Tidak ada transaksi pengeluaran",
+                                        color = TextMuted,
+                                        fontSize = 14.sp
+                                    )
+                                }
+                            }
+                        } else {
+                            items(filteredList, key = { it.idPengeluaran ?: "" }) { expense ->
+                                ExpenseItem(
+                                    expense = expense,
+                                    onClick = { onItemClick(expense) }
+                                )
+                            }
                         }
                     }
                 }
