@@ -98,7 +98,10 @@ fun TambahProdukScreen(
                 namaSatuan = satuan,
                 detailProduk = detailJson,
                 onSuccess = {
-                    navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
+                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                        "need_refresh",
+                        true
+                    )
                     navController.popBackStack()
                 }
             )

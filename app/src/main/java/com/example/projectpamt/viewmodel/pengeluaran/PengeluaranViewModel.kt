@@ -133,10 +133,4 @@ class PengeluaranViewModel(
         }
     }
 
-    fun clearUiState() {
-        if (_uiState.value is PengeluaranUiState.Error) {
-            _uiState.value = PengeluaranUiState.Idle
-            fetchPengeluaran()
-        }
-    }
 }

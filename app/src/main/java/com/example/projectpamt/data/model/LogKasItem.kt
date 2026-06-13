@@ -12,7 +12,6 @@ data class LogKasItem(
     val keterangan: String,
     @SerialName("updated_at") val updatedAt: String
 ) {
-    // Derived properties for UI presentation
     val tipeAktivitas: String
         get() {
             return when {
@@ -32,7 +31,7 @@ data class LogKasItem(
 
     val detailKeterangan: String
         get() {
-            // Remove "oleh: ..." suffix or similar if present
+
             return keterangan.replace(Regex(";\\s*oleh:\\s*([^\\n]+)", RegexOption.IGNORE_CASE), "").trim()
         }
 }

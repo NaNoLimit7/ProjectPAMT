@@ -1,4 +1,4 @@
-package com.example.projectpamt.viewmodel.penjualan
+package com.example.projectpamt.viewmodel.penjualan.uistate
 
 sealed class PembayaranUiState {
     abstract val message: String?

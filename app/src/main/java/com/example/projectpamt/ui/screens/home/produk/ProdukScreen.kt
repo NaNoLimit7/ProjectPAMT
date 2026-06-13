@@ -79,7 +79,8 @@ fun ProdukScreen(
 
     // Auto-refresh when returning from add/edit screens
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
-    val needRefresh by savedStateHandle?.getStateFlow("need_refresh", false)?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
+    val needRefresh by savedStateHandle?.getStateFlow("need_refresh", false)
+        ?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
 
     LaunchedEffect(needRefresh) {
         if (needRefresh) {
@@ -270,7 +271,7 @@ private fun ProdukContent(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = uiState.message ?: "Terjadi kesalahan",
+                                    text = uiState.message,
                                     color = Color.Red,
                                     fontSize = 14.sp
                                 )

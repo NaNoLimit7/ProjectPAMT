@@ -31,7 +31,7 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.projectpamt.R
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.utils.formatRupiah
-import com.example.projectpamt.viewmodel.penjualan.CartItem
+import com.example.projectpamt.viewmodel.penjualan.uistate.CartItem
 
 @Composable
 fun CartItemRow(

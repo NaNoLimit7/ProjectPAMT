@@ -61,7 +61,7 @@ import com.example.projectpamt.ui.theme.BorderSlate
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.TextDark
 import com.example.projectpamt.utils.ValidationUtils
-import com.example.projectpamt.viewmodel.kas.KasUiState
+import com.example.projectpamt.viewmodel.kas.uistate.KasUiState
 import com.example.projectpamt.viewmodel.kas.KasViewModel
 
 @Composable

@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -63,6 +64,7 @@ import com.example.projectpamt.ui.theme.TextDark
 import com.example.projectpamt.ui.theme.TextMuted
 import com.example.projectpamt.utils.formatRupiah
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun PembayaranBerhasilScreen(
@@ -191,7 +193,7 @@ fun PembayaranBerhasilScreen(
                             
                             LaunchedEffect(copied) {
                                 if (copied) {
-                                    delay(2000)
+                                    delay(2000.milliseconds)
                                     copied = false
                                 }
                             }
@@ -203,7 +205,7 @@ fun PembayaranBerhasilScreen(
                                 modifier = Modifier
                                     .size(18.dp)
                                     .clickable {
-                                        clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(idTransaksi))
+                                        clipboardManager.setText(AnnotatedString(idTransaksi))
                                         copied = true
                                     }
                             )

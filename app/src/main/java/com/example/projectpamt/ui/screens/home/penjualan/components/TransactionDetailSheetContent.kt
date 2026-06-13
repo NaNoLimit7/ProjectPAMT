@@ -34,7 +34,7 @@ import com.example.projectpamt.ui.theme.BorderSlate
 import com.example.projectpamt.ui.theme.TextDark
 import com.example.projectpamt.ui.theme.TextMuted
 import com.example.projectpamt.utils.formatRupiah
-import com.example.projectpamt.viewmodel.penjualan.PenjualanWithDetails
+import com.example.projectpamt.viewmodel.penjualan.uistate.PenjualanWithDetails
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Locale

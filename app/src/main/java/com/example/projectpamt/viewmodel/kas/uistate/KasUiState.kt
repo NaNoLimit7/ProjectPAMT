@@ -1,4 +1,4 @@
-package com.example.projectpamt.viewmodel.kas
+package com.example.projectpamt.viewmodel.kas.uistate
 
 import com.example.projectpamt.data.model.Kas
 

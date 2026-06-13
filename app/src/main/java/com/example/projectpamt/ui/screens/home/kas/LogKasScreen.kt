@@ -31,7 +31,7 @@ import com.example.projectpamt.data.model.Kas
 import com.example.projectpamt.data.model.LogKasItem
 import com.example.projectpamt.ui.screens.home.kas.components.LogEntryCard
 import com.example.projectpamt.ui.theme.*
-import com.example.projectpamt.viewmodel.kas.LogKasUiState
+import com.example.projectpamt.viewmodel.kas.uistate.LogKasUiState
 import com.example.projectpamt.viewmodel.kas.LogKasViewModel
 
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox

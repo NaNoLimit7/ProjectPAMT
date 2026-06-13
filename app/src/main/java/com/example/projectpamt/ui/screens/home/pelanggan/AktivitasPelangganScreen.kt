@@ -42,15 +42,14 @@ import com.example.projectpamt.ui.screens.home.pelanggan.components.SummarySecti
 import com.example.projectpamt.ui.screens.home.pelanggan.components.TransactionListCard
 import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.theme.GreenPrimary
-import com.example.projectpamt.viewmodel.pelanggan.AktivitasFilter
-import com.example.projectpamt.viewmodel.pelanggan.AktivitasPelangganUiState
+import com.example.projectpamt.viewmodel.pelanggan.uistate.AktivitasFilter
+import com.example.projectpamt.viewmodel.pelanggan.uistate.AktivitasPelangganUiState
 import com.example.projectpamt.viewmodel.pelanggan.AktivitasPelangganViewModel
 
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AktivitasPelangganScreen(
     pelanggan: Pelanggan,
@@ -61,7 +60,7 @@ fun AktivitasPelangganScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Load data aktivitas setiap kali screen dibuka untuk pelanggan ini
+
     LaunchedEffect(pelanggan.idPelanggan) {
         pelanggan.idPelanggan?.let { id ->
             viewModel.loadAktivitas(id)
@@ -85,7 +84,6 @@ fun AktivitasPelangganScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AktivitasPelangganContent(
     pelanggan: Pelanggan,
@@ -102,7 +100,7 @@ private fun AktivitasPelangganContent(
             .background(BackgroundSlate)
             .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
-        // ── 1. HEADER SECTION (Fixed) ────────────────────────────────────────
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -119,7 +117,7 @@ private fun AktivitasPelangganContent(
                 .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Back Button
+
             Row(
                 modifier = Modifier
                     .clickable { onBackClick() }
@@ -141,7 +139,7 @@ private fun AktivitasPelangganContent(
                 )
             }
 
-            // Title Area
+
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
                     text = "Aktivitas Pelanggan",
@@ -158,7 +156,7 @@ private fun AktivitasPelangganContent(
             }
         }
 
-        // ── 2. STATE HANDLING & DYNAMIC BODY (Scrollable) ───────────────────
+
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             onRefresh = onRefresh,
@@ -202,12 +200,12 @@ private fun AktivitasPelangganContent(
                 }
 
                 is AktivitasPelangganUiState.Success -> {
-                    // Summary Cards
+
                     item {
                         SummarySection(summary = uiState.summary)
                     }
 
-                    // Filters Chips Row
+
                     item {
                         FilterChipsRow(
                             selectedFilter = uiState.selectedFilter,
@@ -215,7 +213,7 @@ private fun AktivitasPelangganContent(
                         )
                     }
 
-                    // Transaction List Card
+
                     item {
                         TransactionListCard(
                             listAktivitas = uiState.listAktivitas,

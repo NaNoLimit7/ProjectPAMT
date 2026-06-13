@@ -52,7 +52,7 @@ import com.example.projectpamt.ui.navigation.TambahPelanggan
 import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.TextDark
-import com.example.projectpamt.viewmodel.pelanggan.PelangganUiState
+import com.example.projectpamt.viewmodel.pelanggan.uistate.PelangganUiState
 import com.example.projectpamt.viewmodel.pelanggan.PelangganViewModel
 
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox

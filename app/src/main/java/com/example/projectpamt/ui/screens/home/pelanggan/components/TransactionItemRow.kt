@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.projectpamt.R
 import com.example.projectpamt.utils.formatRupiah
-import com.example.projectpamt.viewmodel.pelanggan.PelangganAktivitas
+import com.example.projectpamt.viewmodel.pelanggan.uistate.PelangganAktivitas
 
 @Composable
 fun TransactionItemRow(

@@ -70,7 +70,6 @@ fun DetailProdukScreen(
     DetailProdukContent(
         modifier = modifier,
         produk = produk,
-        isLoading = isLoading,
         onBackClick = { navController.popBackStack() },
         onDeleteClick = { showDeleteDialog = true },
         onEditClick = { navController.navigate(EditProduk(produk)) }
@@ -116,14 +115,15 @@ fun DetailProdukScreen(
 private fun DetailProdukContent(
     modifier: Modifier = Modifier,
     produk: Produk,
-    isLoading: Boolean,
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onEditClick: () -> Unit
 ) {
-    val hargaModalDouble = produk.detailProduk?.jsonObject?.get("harga_modal")?.jsonPrimitive?.doubleOrNull ?: 0.0
+    val hargaModalDouble =
+        produk.detailProduk?.jsonObject?.get("harga_modal")?.jsonPrimitive?.doubleOrNull ?: 0.0
     val skuText = produk.detailProduk?.jsonObject?.get("sku")?.jsonPrimitive?.contentOrNull ?: "-"
-    val descText = produk.detailProduk?.jsonObject?.get("deskripsi")?.jsonPrimitive?.contentOrNull ?: ""
+    val descText =
+        produk.detailProduk?.jsonObject?.get("deskripsi")?.jsonPrimitive?.contentOrNull ?: ""
 
     // Dynamic Margin Calculation
     val marginPercent = if (produk.harga > 0) {
@@ -133,9 +133,11 @@ private fun DetailProdukContent(
 
     // Description specs parsing
     val lines = descText.split("\n").map { it.trim() }
-    val mainParagraphs = lines.filter { !it.startsWith("-") && !it.startsWith("*") && !it.startsWith("•") }
-    val specBullets = lines.filter { it.startsWith("-") || it.startsWith("*") || it.startsWith("•") }
-        .map { it.removePrefix("-").removePrefix("*").removePrefix("•").trim() }
+    val mainParagraphs =
+        lines.filter { !it.startsWith("-") && !it.startsWith("*") && !it.startsWith("•") }
+    val specBullets =
+        lines.filter { it.startsWith("-") || it.startsWith("*") || it.startsWith("•") }
+            .map { it.removePrefix("-").removePrefix("*").removePrefix("•").trim() }
 
     Column(
         modifier = Modifier

@@ -6,11 +6,14 @@ sealed class AuthUiState {
     object Idle : AuthUiState() {
         override val message: String? = null
     }
+
     object Loading : AuthUiState() {
         override val message: String? = null
     }
+
     object Success : AuthUiState() {
         override val message: String? = null
     }
+
     data class Error(override val message: String) : AuthUiState()
 }

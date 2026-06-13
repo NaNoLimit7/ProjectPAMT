@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.projectpamt.data.model.DetailPenjualan
 import com.example.projectpamt.data.model.Pelanggan
 import com.example.projectpamt.data.model.Produk
 import com.example.projectpamt.data.repository.PelangganRepository
@@ -13,11 +12,13 @@ import com.example.projectpamt.data.repository.PenjualanRepository
 import com.example.projectpamt.data.repository.ProdukRepository
 import com.example.projectpamt.ui.utils.toAppError
 import com.example.projectpamt.ui.utils.toUserMessage
+import com.example.projectpamt.viewmodel.penjualan.uistate.CartItem
+import com.example.projectpamt.viewmodel.penjualan.uistate.PenjualanDataUiState
+import com.example.projectpamt.viewmodel.penjualan.uistate.PenjualanUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.JsonElement
 
 class PenjualanViewModel(
     private val repository: PenjualanRepository = PenjualanRepository(),
@@ -130,35 +131,5 @@ class PenjualanViewModel(
 
     fun clearCart() {
         _cartItems.value = emptyList()
-    }
-
-    fun runProsesPenjualan(
-        idPelanggan: String,
-        idKas: String,
-        jumlahBayar: Double,
-        totalHarga: Double,
-        items: List<DetailPenjualan>,
-        detailPenjualan: JsonElement?) {
-        viewModelScope.launch {
-            _uiState.value = PenjualanUiState.Loading
-            try {
-                val idBaru = repository.prosesPenjualan(
-                    idPelanggan,
-                    idKas,
-                    jumlahBayar,
-                    totalHarga,
-                    items,
-                    detailPenjualan
-                )
-                _uiState.value = PenjualanUiState.Success(idBaru)
-                clearCart() // optional: clear cart after success
-            } catch (e: Exception) {
-                _uiState.value = PenjualanUiState.Error(e.toAppError().toUserMessage())
-            }
-        }
-    }
-
-    fun clearUiState() {
-        _uiState.value = PenjualanUiState.Idle
     }
 }

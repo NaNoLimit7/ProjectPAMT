@@ -30,10 +30,10 @@ import com.example.projectpamt.ui.screens.home.penjualan.components.TransactionD
 import com.example.projectpamt.ui.screens.home.penjualan.components.TransactionItem
 import com.example.projectpamt.ui.theme.*
 import com.example.projectpamt.utils.formatRupiah
-import com.example.projectpamt.viewmodel.penjualan.RiwayatFilter
-import com.example.projectpamt.viewmodel.penjualan.RiwayatPenjualanUiState
+import com.example.projectpamt.viewmodel.penjualan.uistate.RiwayatFilter
+import com.example.projectpamt.viewmodel.penjualan.uistate.RiwayatPenjualanUiState
 import com.example.projectpamt.viewmodel.penjualan.RiwayatPenjualanViewModel
-import com.example.projectpamt.viewmodel.penjualan.PenjualanWithDetails
+import com.example.projectpamt.viewmodel.penjualan.uistate.PenjualanWithDetails
 
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.SnackbarHostState

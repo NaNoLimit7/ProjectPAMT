@@ -64,7 +64,7 @@ fun ProfilScreen(
             .fillMaxSize()
             .background(BackgroundSlate)
     ) {
-        // ── TOP HEADER SECTION (Green background) ───────────────────────────
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -78,7 +78,7 @@ fun ProfilScreen(
                 .windowInsetsPadding(WindowInsets.statusBars)
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 24.dp)
         ) {
-            // Kembali Row
+
             Row(
                 modifier = Modifier
                     .clickable { navController.popBackStack() }
@@ -100,7 +100,7 @@ fun ProfilScreen(
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            // Screen Title
+
             Text(
                 text = "Profile",
                 color = Color.White,
@@ -110,7 +110,7 @@ fun ProfilScreen(
             )
         }
 
-        // ── SCROLLABLE CONTENT AREA ──────────────────────────────────────────
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -119,7 +119,7 @@ fun ProfilScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // ── USER SECTION CARD ────────────────────────────────────────────
+
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -132,7 +132,7 @@ fun ProfilScreen(
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Circular avatar displaying initials with 4dp thick green border
+
                     Box(
                         modifier = Modifier
                             .size(100.dp)
@@ -151,7 +151,7 @@ fun ProfilScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Full Name
+
                     Text(
                         text = fullname.ifEmpty { "Pengguna" },
                         fontSize = 20.sp,
@@ -162,7 +162,7 @@ fun ProfilScreen(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    // Email
+
                     Text(
                         text = email.ifEmpty { "email@example.com" },
                         fontSize = 14.sp,
@@ -172,7 +172,7 @@ fun ProfilScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Role Badge
+
                     Box(
                         modifier = Modifier
                             .background(
@@ -191,7 +191,7 @@ fun ProfilScreen(
                 }
             }
 
-            // ── LOGOUT CARD ──────────────────────────────────────────────────
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -226,7 +226,7 @@ fun ProfilScreen(
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // ── FOOTER TEXT ──────────────────────────────────────────────────
+
             Text(
                 text = "GriyaArta (Build 2026)",
                 color = Color(0xFF94A3B8),

@@ -68,6 +68,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import androidx.core.net.toUri
 import com.example.projectpamt.data.model.Kategori
+import com.example.projectpamt.ui.navigation.ProdukList
 
 @Composable
 fun EditProdukScreen(
@@ -118,7 +119,10 @@ fun EditProdukScreen(
                     namaSatuan = satuan,
                     detailProduk = detailJson,
                     onSuccess = {
-                        navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
+                        navController.previousBackStackEntry?.savedStateHandle?.set(
+                            "need_refresh",
+                            true
+                        )
                         navController.popBackStack()
                     }
                 )
@@ -141,12 +145,16 @@ fun EditProdukScreen(
                         produk.idProduk?.let { id ->
                             produkViewModel.nonaktifkanProduk(id) {
                                 try {
-                                    navController.getBackStackEntry<com.example.projectpamt.ui.navigation.ProdukList>().savedStateHandle.set("need_refresh", true)
-                                } catch (e: Exception) {
-                                    navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
+                                    navController.getBackStackEntry<ProdukList>().savedStateHandle["need_refresh"] =
+                                        true
+                                } catch (_: Exception) {
+                                    navController.previousBackStackEntry?.savedStateHandle?.set(
+                                        "need_refresh",
+                                        true
+                                    )
                                 }
                                 navController.popBackStack(
-                                    route = com.example.projectpamt.ui.navigation.ProdukList,
+                                    route = ProdukList,
                                     inclusive = false
                                 )
                             }
@@ -195,11 +203,19 @@ private fun EditProdukContent(
     onAddCategorySave: (String) -> Unit
 ) {
     val initialSku = produk.detailProduk?.jsonObject?.get("sku")?.jsonPrimitive?.contentOrNull ?: ""
-    val initialKategori = produk.detailProduk?.jsonObject?.get("kategori")?.jsonPrimitive?.contentOrNull ?: ""
-    val initialDeskripsi = produk.detailProduk?.jsonObject?.get("deskripsi")?.jsonPrimitive?.contentOrNull ?: ""
-    val initialHargaModalDouble = produk.detailProduk?.jsonObject?.get("harga_modal")?.jsonPrimitive?.doubleOrNull ?: 0.0
-    val initialHargaModal = if (initialHargaModalDouble > 0) ValidationUtils.formatThousandSeparator(initialHargaModalDouble.toInt().toString()) else ""
-    val initialHargaJual = if (produk.harga > 0) ValidationUtils.formatThousandSeparator(produk.harga.toInt().toString()) else ""
+    val initialKategori =
+        produk.detailProduk?.jsonObject?.get("kategori")?.jsonPrimitive?.contentOrNull ?: ""
+    val initialDeskripsi =
+        produk.detailProduk?.jsonObject?.get("deskripsi")?.jsonPrimitive?.contentOrNull ?: ""
+    val initialHargaModalDouble =
+        produk.detailProduk?.jsonObject?.get("harga_modal")?.jsonPrimitive?.doubleOrNull ?: 0.0
+    val initialHargaModal =
+        if (initialHargaModalDouble > 0) ValidationUtils.formatThousandSeparator(
+            initialHargaModalDouble.toInt().toString()
+        ) else ""
+    val initialHargaJual = if (produk.harga > 0) ValidationUtils.formatThousandSeparator(
+        produk.harga.toInt().toString()
+    ) else ""
     val initialStok = produk.stok.toInt().toString()
     val initialSatuan = produk.namaSatuan
     val initialImageUrl = produk.imageUrl
@@ -228,13 +244,15 @@ private fun EditProdukContent(
     ) {
         val cleanHargaModal = hargaModal.replace(".", "").replace(",", "")
         val cleanHargaJual = hargaJual.replace(".", "").replace(",", "")
-        
+
         nama.trim() != produk.nama.trim() ||
                 sku.trim() != initialSku.trim() ||
                 kategori.trim() != initialKategori.trim() ||
                 deskripsi.trim() != initialDeskripsi.trim() ||
-                cleanHargaModal != (if (initialHargaModalDouble > 0) initialHargaModalDouble.toLong().toString() else "") ||
-                cleanHargaJual != (if (produk.harga > 0) produk.harga.toLong().toString() else "") ||
+                cleanHargaModal != (if (initialHargaModalDouble > 0) initialHargaModalDouble.toLong()
+            .toString() else "") ||
+                cleanHargaJual != (if (produk.harga > 0) produk.harga.toLong()
+            .toString() else "") ||
                 stok.toDoubleOrNull() != produk.stok ||
                 satuan != produk.namaSatuan ||
                 selectedImageUri?.toString() != initialImageUrl

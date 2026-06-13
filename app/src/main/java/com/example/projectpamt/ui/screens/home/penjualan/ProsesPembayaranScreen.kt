@@ -30,8 +30,8 @@ import com.example.projectpamt.data.model.Pelanggan
 import com.example.projectpamt.ui.theme.*
 import com.example.projectpamt.utils.ValidationUtils
 import com.example.projectpamt.utils.formatRupiah
-import com.example.projectpamt.viewmodel.penjualan.CartItem
-import com.example.projectpamt.viewmodel.penjualan.PembayaranUiState
+import com.example.projectpamt.viewmodel.penjualan.uistate.CartItem
+import com.example.projectpamt.viewmodel.penjualan.uistate.PembayaranUiState
 import com.example.projectpamt.viewmodel.penjualan.PembayaranViewModel
 import kotlinx.serialization.json.Json
 import com.example.projectpamt.ui.navigation.ProsesPembayaran

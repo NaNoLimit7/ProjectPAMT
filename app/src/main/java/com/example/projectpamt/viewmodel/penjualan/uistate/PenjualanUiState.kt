@@ -1,4 +1,4 @@
-package com.example.projectpamt.viewmodel.penjualan
+package com.example.projectpamt.viewmodel.penjualan.uistate
 
 import com.example.projectpamt.data.model.Pelanggan
 import com.example.projectpamt.data.model.Produk

@@ -42,7 +42,6 @@ import com.example.projectpamt.viewmodel.pelanggan.PelangganViewModel
 import com.example.projectpamt.viewmodel.produk.ProdukViewModel
 import com.example.projectpamt.data.model.Produk
 import com.example.projectpamt.ui.screens.home.profil.ProfilScreen
-import com.example.projectpamt.ui.navigation.TransaksiKas
 import com.example.projectpamt.ui.screens.home.kas.TransaksiKasScreen
 import kotlin.reflect.typeOf
 
@@ -269,7 +268,6 @@ fun AppNavHost(
 
         composable<PengeluaranList> {
             PengeluaranScreen(
-                modifier = modifier,
                 viewModel = pengeluaranViewModel,
                 navController = navController,
                 snackbarHostState = snackbarHostState
@@ -278,7 +276,6 @@ fun AppNavHost(
 
         composable<TambahPengeluaran> {
             TambahPengeluaranScreen(
-                modifier = modifier,
                 pengeluaranViewModel = pengeluaranViewModel,
                 kategoriViewModel = kategoriViewModel,
                 kasViewModel = kasViewModel,

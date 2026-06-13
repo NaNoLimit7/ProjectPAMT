@@ -71,7 +71,6 @@ import androidx.compose.material3.SnackbarHostState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PengeluaranScreen(
-    modifier: Modifier = Modifier,
     viewModel: PengeluaranViewModel,
     navController: NavController,
     snackbarHostState: SnackbarHostState
@@ -88,9 +87,10 @@ fun PengeluaranScreen(
         }
     }
 
-    // Auto-refresh when returning from add/edit screens
+
     val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
-    val needRefresh by savedStateHandle?.getStateFlow("need_refresh", false)?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
+    val needRefresh by savedStateHandle?.getStateFlow("need_refresh", false)
+        ?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
 
     LaunchedEffect(needRefresh) {
         if (needRefresh) {
@@ -100,7 +100,6 @@ fun PengeluaranScreen(
     }
 
     PengeluaranContent(
-        modifier = modifier,
         uiState = uiState,
         isRefreshing = viewModel.isRefreshing,
         onRefresh = viewModel::refresh,
@@ -115,7 +114,6 @@ fun PengeluaranScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PengeluaranContent(
-    modifier: Modifier = Modifier,
     uiState: PengeluaranUiState,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
@@ -132,7 +130,7 @@ private fun PengeluaranContent(
             .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // ── FIXED HEADER ──────────────────────────────────────────────
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -149,7 +147,7 @@ private fun PengeluaranContent(
                     .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Back Button
+
                 Row(
                     modifier = Modifier
                         .clickable { onBackClick() }
@@ -171,7 +169,7 @@ private fun PengeluaranContent(
                     )
                 }
 
-                // Title Area
+
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
                         text = "Pengeluaran",
@@ -188,38 +186,53 @@ private fun PengeluaranContent(
                 }
             }
 
-            // ── SCROLLABLE LIST AREA ────────────────────────────────────────
+
             when (uiState) {
                 is PengeluaranUiState.Loading -> {
-                    Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         CircularProgressIndicator(color = GreenPrimary)
                     }
                 }
+
                 is PengeluaranUiState.Error -> {
-                    Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Text(text = uiState.message, color = DangerRed, fontSize = 16.sp)
                     }
                 }
+
                 is PengeluaranUiState.Success -> {
                     val rawList = uiState.data
-                    
-                    // Filter search query
+
+
                     val filteredList = remember(rawList, searchQuery) {
                         if (searchQuery.isBlank()) {
                             rawList
                         } else {
                             rawList.filter {
                                 it.deskripsi?.contains(searchQuery, ignoreCase = true) == true ||
-                                        it.kategori?.name?.contains(searchQuery, ignoreCase = true) == true
+                                        it.kategori?.name?.contains(
+                                            searchQuery,
+                                            ignoreCase = true
+                                        ) == true
                             }
                         }
                     }
 
-                    // Compute dynamic totals based on current date
+
                     val now = Calendar.getInstance()
                     val currentMonth = now.get(Calendar.MONTH)
                     val currentYear = now.get(Calendar.YEAR)
-                    
+
                     val lastMonthCal = Calendar.getInstance().apply {
                         add(Calendar.MONTH, -1)
                     }
@@ -236,8 +249,12 @@ private fun PengeluaranContent(
                             } else {
                                 val date = try {
                                     parse(dateStr)?.let { Date.from(it) }
-                                } catch (e: Exception) {
-                                    try { df.parse(dateStr) } catch(ex: Exception) { null }
+                                } catch (_: Exception) {
+                                    try {
+                                        df.parse(dateStr)
+                                    } catch (_: Exception) {
+                                        null
+                                    }
                                 }
                                 if (date == null) {
                                     false
@@ -260,9 +277,13 @@ private fun PengeluaranContent(
                                 false
                             } else {
                                 val date = try {
-                                    java.time.Instant.parse(dateStr)?.let { Date.from(it) }
-                                } catch (e: Exception) {
-                                    try { df.parse(dateStr) } catch(ex: Exception) { null }
+                                    parse(dateStr)?.let { Date.from(it) }
+                                } catch (_: Exception) {
+                                    try {
+                                        df.parse(dateStr)
+                                    } catch (_: Exception) {
+                                        null
+                                    }
                                 }
                                 if (date == null) {
                                     false
@@ -274,7 +295,7 @@ private fun PengeluaranContent(
                         }
                     }.sumOf { it.total }
 
-                    // Compute comparison text & colors
+
                     val trendText = remember(totalExpenses, totalExpensesLastMonth) {
                         if (totalExpensesLastMonth == 0.0) {
                             if (totalExpenses == 0.0) {
@@ -283,7 +304,8 @@ private fun PengeluaranContent(
                                 "Baru bulan ini"
                             }
                         } else {
-                            val percent = ((totalExpenses - totalExpensesLastMonth) / totalExpensesLastMonth) * 100
+                            val percent =
+                                ((totalExpenses - totalExpensesLastMonth) / totalExpensesLastMonth) * 100
                             val rounded = kotlin.math.round(percent * 10) / 10
                             if (rounded > 0) {
                                 "↑ $rounded% vs bulan lalu"
@@ -297,9 +319,9 @@ private fun PengeluaranContent(
 
                     val trendBgColor = remember(totalExpenses, totalExpensesLastMonth) {
                         if (totalExpenses >= totalExpensesLastMonth) {
-                            Color(0xFFFEE2E2) // light red
+                            Color(0xFFFEE2E2)
                         } else {
-                            Color(0xFFDCFCE7) // light green
+                            Color(0xFFDCFCE7)
                         }
                     }
 
@@ -314,137 +336,143 @@ private fun PengeluaranContent(
                     PullToRefreshBox(
                         isRefreshing = isRefreshing,
                         onRefresh = onRefresh,
-                        modifier = Modifier.weight(1f).fillMaxWidth()
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
                     ) {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 24.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                        // Card: Total Pengeluaran
-                        item {
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .shadow(
-                                        elevation = 20.dp,
-                                        spotColor = Color(0x0D1E2430),
-                                        ambientColor = Color(0x0D1E2430)
-                                    ),
-                                shape = RoundedCornerShape(20.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
-                                border = BorderStroke(1.dp, BorderSlate)
-                            ) {
-                                Column(
+
+                            item {
+                                Card(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(20.dp),
-                                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                                        .shadow(
+                                            elevation = 20.dp,
+                                            spotColor = Color(0x0D1E2430),
+                                            ambientColor = Color(0x0D1E2430)
+                                        ),
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                                    border = BorderStroke(1.dp, BorderSlate)
                                 ) {
-                                    Text(
-                                        text = "Total Pengeluaran Bulan Ini",
-                                        fontSize = 14.sp,
-                                        color = TextMuted,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        text = formatRupiah(totalExpenses),
-                                        fontSize = 32.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = DangerRed
-                                    )
-                                    Row(
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        verticalAlignment = Alignment.CenterVertically
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(20.dp),
+                                        verticalArrangement = Arrangement.spacedBy(12.dp)
                                     ) {
-                                        Box(
-                                            modifier = Modifier
-                                                .background(
-                                                    color = trendBgColor,
-                                                    shape = RoundedCornerShape(100.dp)
-                                                )
-                                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                        Text(
+                                            text = "Total Pengeluaran Bulan Ini",
+                                            fontSize = 14.sp,
+                                            color = TextMuted,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Text(
+                                            text = formatRupiah(totalExpenses),
+                                            fontSize = 32.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = DangerRed
+                                        )
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Text(
-                                                text = trendText,
-                                                fontSize = 12.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = trendTextColor
-                                            )
+                                            Box(
+                                                modifier = Modifier
+                                                    .background(
+                                                        color = trendBgColor,
+                                                        shape = RoundedCornerShape(100.dp)
+                                                    )
+                                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                            ) {
+                                                Text(
+                                                    text = trendText,
+                                                    fontSize = 12.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = trendTextColor
+                                                )
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
 
-                        // Search Bar
-                        item {
-                            AppTextField(
-                                value = searchQuery,
-                                onValueChange = { searchQuery = it },
-                                placeholder = "Cari pengeluaran...",
-                                leadingIcon = Icons.Default.Search,
-                                singleLine = true
-                            )
-                        }
 
-                        // Section Title
-                        item {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "TRANSAKSI TERBARU",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = TextMuted,
-                                    letterSpacing = 0.6.sp
-                                )
-                                Text(
-                                    text = SimpleDateFormat("MMMM yyyy", Locale("id", "ID")).format(Date()),
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = GreenPrimary
+                            item {
+                                AppTextField(
+                                    value = searchQuery,
+                                    onValueChange = { searchQuery = it },
+                                    placeholder = "Cari pengeluaran...",
+                                    leadingIcon = Icons.Default.Search,
+                                    singleLine = true
                                 )
                             }
-                        }
 
-                        // List Items
-                        if (filteredList.isEmpty()) {
+
                             item {
-                                Box(
+                                Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = 40.dp),
-                                    contentAlignment = Alignment.Center
+                                        .padding(top = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = "Tidak ada transaksi pengeluaran",
+                                        text = "TRANSAKSI TERBARU",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
                                         color = TextMuted,
-                                        fontSize = 14.sp
+                                        letterSpacing = 0.6.sp
+                                    )
+                                    Text(
+                                        text = SimpleDateFormat(
+                                            "MMMM yyyy",
+                                            Locale("id", "ID")
+                                        ).format(Date()),
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = GreenPrimary
                                     )
                                 }
                             }
-                        } else {
-                            items(filteredList, key = { it.idPengeluaran ?: "" }) { expense ->
-                                ExpenseItem(
-                                    expense = expense,
-                                    onClick = { onItemClick(expense) }
-                                )
+
+
+                            if (filteredList.isEmpty()) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 40.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "Tidak ada transaksi pengeluaran",
+                                            color = TextMuted,
+                                            fontSize = 14.sp
+                                        )
+                                    }
+                                }
+                            } else {
+                                items(filteredList, key = { it.idPengeluaran ?: "" }) { expense ->
+                                    ExpenseItem(
+                                        expense = expense,
+                                        onClick = { onItemClick(expense) }
+                                    )
+                                }
                             }
                         }
                     }
                 }
-                }
+
                 else -> {}
             }
         }
 
-        // Floating Action Button
+
         FloatingActionButton(
             onClick = onAddClick,
             modifier = Modifier

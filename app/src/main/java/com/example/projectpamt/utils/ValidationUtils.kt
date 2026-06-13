@@ -68,17 +68,6 @@ object ValidationUtils {
         return ValidationResult(true)
     }
 
-    fun validateKasSaldo(saldo: String): ValidationResult {
-        if (saldo.isBlank()) {
-            return ValidationResult(false, "Saldo tidak boleh kosong.")
-        }
-        val doubleValue = saldo.toDoubleOrNull()
-        if (doubleValue == null || doubleValue < 0.0) {
-            return ValidationResult(false, "Saldo harus berupa angka non-negatif.")
-        }
-        return ValidationResult(true)
-    }
-
     fun formatThousandSeparator(input: String): String {
         val clean = input.replace(".", "").replace(",", "").filter { it.isDigit() }
         if (clean.isEmpty()) return ""

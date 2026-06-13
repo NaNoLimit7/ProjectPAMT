@@ -59,7 +59,7 @@ import com.example.projectpamt.R
 import com.example.projectpamt.data.model.Pelanggan
 import com.example.projectpamt.ui.theme.BackgroundSlate
 import com.example.projectpamt.ui.theme.GreenPrimary
-import com.example.projectpamt.viewmodel.pelanggan.PelangganUiState
+import com.example.projectpamt.viewmodel.pelanggan.uistate.PelangganUiState
 import com.example.projectpamt.viewmodel.pelanggan.PelangganViewModel
 
 @Composable

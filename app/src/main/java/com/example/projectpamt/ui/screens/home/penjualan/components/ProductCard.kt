@@ -35,7 +35,7 @@ import com.example.projectpamt.utils.formatRupiah
 @Composable
 fun ProductCard(
     produk: Produk,
-    modifier: Modifier = Modifier.Companion,
+    modifier: Modifier = Modifier,
     onAddClick: () -> Unit
 ) {
     // Tentukan warna badge stok: biru jika stok cukup, oranye jika sisa sedikit

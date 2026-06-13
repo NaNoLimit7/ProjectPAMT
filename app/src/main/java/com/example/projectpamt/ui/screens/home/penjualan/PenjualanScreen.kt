@@ -58,8 +58,8 @@ import com.example.projectpamt.ui.screens.home.penjualan.components.CustomerDrop
 import com.example.projectpamt.ui.screens.home.penjualan.components.ProductCard
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.utils.formatRupiah
-import com.example.projectpamt.viewmodel.penjualan.CartItem
-import com.example.projectpamt.viewmodel.penjualan.PenjualanDataUiState
+import com.example.projectpamt.viewmodel.penjualan.uistate.CartItem
+import com.example.projectpamt.viewmodel.penjualan.uistate.PenjualanDataUiState
 import com.example.projectpamt.viewmodel.penjualan.PenjualanViewModel
 import kotlinx.serialization.json.Json
 

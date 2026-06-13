@@ -16,26 +16,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 import com.example.projectpamt.ui.utils.toAppError
 import com.example.projectpamt.ui.utils.toUserMessage
 import com.example.projectpamt.ui.utils.DateTimeUtils
-
-sealed class DashboardUiState {
-    abstract val message: String?
-
-    object Idle : DashboardUiState() {
-        override val message: String? = null
-    }
-    object Loading : DashboardUiState() {
-        override val message: String? = null
-    }
-    data class Success(val state: DashboardState) : DashboardUiState() {
-        override val message: String? = null
-    }
-    data class Error(override val message: String) : DashboardUiState()
-}
 
 class DashboardViewModel(
     private val penjualanRepository: PenjualanRepository = PenjualanRepository(),
@@ -94,7 +77,7 @@ class DashboardViewModel(
                 // Calculate weekly sales (last 7 days grouped by day of week)
                 val dayNames = listOf("Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab")
                 val weeklyMap = mutableMapOf<String, Double>()
-                
+
                 // Initialize map with days in order of last 7 days ending today
                 val orderOfDays = mutableListOf<String>()
                 val tempCal = Calendar.getInstance()
@@ -186,7 +169,7 @@ class DashboardViewModel(
 
                 val dayNames = listOf("Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab")
                 val weeklyMap = mutableMapOf<String, Double>()
-                
+
                 val orderOfDays = mutableListOf<String>()
                 val tempCal = Calendar.getInstance()
                 for (i in 0..6) {

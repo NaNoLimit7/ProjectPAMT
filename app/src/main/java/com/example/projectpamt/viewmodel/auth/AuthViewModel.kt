@@ -54,10 +54,12 @@ class AuthViewModel(
                         _name.value = fullName
                         _email.value = user?.email ?: ""
                         _phone.value = metadata?.get("phone")?.jsonPrimitive?.contentOrNull ?: ""
-                        _role.value = metadata?.get("role")?.jsonPrimitive?.contentOrNull ?: "Store Manager"
+                        _role.value =
+                            metadata?.get("role")?.jsonPrimitive?.contentOrNull ?: "Store Manager"
 
                         AuthCheckState.Authenticated
                     }
+
                     is SessionStatus.NotAuthenticated -> AuthCheckState.NotAuthenticated
                     is SessionStatus.Initializing -> AuthCheckState.Checking
                     is SessionStatus.RefreshFailure -> {
@@ -69,8 +71,10 @@ class AuthViewModel(
                                 ?: ""
                             _name.value = fullName
                             _email.value = user?.email ?: ""
-                            _phone.value = metadata?.get("phone")?.jsonPrimitive?.contentOrNull ?: ""
-                            _role.value = metadata?.get("role")?.jsonPrimitive?.contentOrNull ?: "Store Manager"
+                            _phone.value =
+                                metadata?.get("phone")?.jsonPrimitive?.contentOrNull ?: ""
+                            _role.value = metadata?.get("role")?.jsonPrimitive?.contentOrNull
+                                ?: "Store Manager"
 
                             AuthCheckState.Authenticated
                         } else {
@@ -143,7 +147,4 @@ class AuthViewModel(
         }
     }
 
-    fun resetState() {
-        _uiState.value = AuthUiState.Idle
-    }
 }

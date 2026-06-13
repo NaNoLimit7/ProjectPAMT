@@ -34,7 +34,7 @@ import com.example.projectpamt.data.model.LogKasItem
 import com.example.projectpamt.ui.theme.*
 import com.example.projectpamt.utils.buildAnnotatedLogDescription
 import com.example.projectpamt.utils.formatRupiah
-import com.example.projectpamt.viewmodel.kas.TransaksiKasUiState
+import com.example.projectpamt.viewmodel.kas.uistate.TransaksiKasUiState
 import com.example.projectpamt.viewmodel.kas.TransaksiKasViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -170,7 +170,7 @@ private fun TransaksiKasContent(
                 } else {
                     "Lainnya"
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 "Lainnya"
             }
         }
@@ -398,7 +398,7 @@ private fun TransactionRowCard(
             } else {
                 ""
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             ""
         }
     }

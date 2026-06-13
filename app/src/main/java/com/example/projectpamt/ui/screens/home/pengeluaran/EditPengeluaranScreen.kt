@@ -73,7 +73,7 @@ import com.example.projectpamt.ui.theme.TextDark
 import com.example.projectpamt.ui.theme.TextMuted
 import com.example.projectpamt.utils.ValidationUtils
 import com.example.projectpamt.utils.formatRupiah
-import com.example.projectpamt.viewmodel.kas.KasUiState
+import com.example.projectpamt.viewmodel.kas.uistate.KasUiState
 import com.example.projectpamt.viewmodel.kas.KasViewModel
 import com.example.projectpamt.viewmodel.kategori.KategoriViewModel
 import com.example.projectpamt.viewmodel.kategori.KategoriUiState

@@ -8,14 +8,21 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.repository.PenjualanRepository
 import com.example.projectpamt.ui.utils.toAppError
 import com.example.projectpamt.ui.utils.toUserMessage
+import com.example.projectpamt.viewmodel.pelanggan.uistate.AktivitasFilter
+import com.example.projectpamt.viewmodel.pelanggan.uistate.AktivitasPelangganUiState
+import com.example.projectpamt.viewmodel.pelanggan.uistate.AktivitasSummary
+import com.example.projectpamt.viewmodel.pelanggan.uistate.AktivitasType
+import com.example.projectpamt.viewmodel.pelanggan.uistate.PelangganAktivitas
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.doubleOrNull
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -28,8 +35,8 @@ class AktivitasPelangganViewModel(
     private var currentCustomerId: String = ""
     private var currentFilter: AktivitasFilter = AktivitasFilter.SEMUA_WAKTU
 
-    private val indonesianLocale = java.util.Locale.Builder().setLanguage("in").setRegion("ID").build()
-    private val dateFormatter = java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy • HH:mm", indonesianLocale)
+    private val indonesianLocale = Locale.Builder().setLanguage("in").setRegion("ID").build()
+    private val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy • HH:mm", indonesianLocale)
 
     var isRefreshing by mutableStateOf(false)
         private set
@@ -65,22 +72,22 @@ class AktivitasPelangganViewModel(
             try {
                 // Fetch real transactions for the customer
                 val transactions = penjualanRepository.getPenjualanByPelanggan(currentCustomerId)
-                
-                val now = java.time.LocalDateTime.now()
-                
+
+                val now = LocalDateTime.now()
+
                 // Map Penjualan to PelangganAktivitas
                 val allActivities = transactions.map { penjualan ->
                     val dateTime = try {
-                        val zdt = java.time.ZonedDateTime.parse(penjualan.createdAt)
+                        val zdt = ZonedDateTime.parse(penjualan.createdAt)
                         zdt.toLocalDateTime()
-                    } catch (e: Exception) {
-                        java.time.LocalDateTime.now()
+                    } catch (_: Exception) {
+                        LocalDateTime.now()
                     }
 
                     // Count items from detailPenjualan JSON array
                     var totalQuantity = 0
                     val details = penjualan.detailPenjualan
-                    if (details is kotlinx.serialization.json.JsonArray) {
+                    if (details is JsonArray) {
                         for (element in details) {
                             try {
                                 val obj = element.jsonObject
@@ -88,7 +95,7 @@ class AktivitasPelangganViewModel(
                                     ?: obj["quantity"]?.jsonPrimitive?.doubleOrNull
                                     ?: 1.0
                                 totalQuantity += qty.toInt()
-                            } catch (e: Exception) {
+                            } catch (_: Exception) {
                                 totalQuantity += 1
                             }
                         }
@@ -107,7 +114,7 @@ class AktivitasPelangganViewModel(
                 // Calculate Summary
                 val totalBelanja = allActivities.sumOf { it.total }
                 val totalTransaksi = allActivities.size
-                
+
                 // Calculate "terakhir aktif"
                 val terakhirAktif = if (allActivities.isNotEmpty()) {
                     val lastDate = allActivities.first().tanggal
@@ -130,6 +137,7 @@ class AktivitasPelangganViewModel(
                             it.dateTime.year == now.year && it.dateTime.month == now.month
                         }
                     }
+
                     AktivitasFilter.TIGA_BULAN_TERAKHIR -> {
                         val limitDate = now.toLocalDate().withDayOfMonth(1).minusMonths(2)
                         allActivities.filter {
@@ -137,6 +145,7 @@ class AktivitasPelangganViewModel(
                             activityDate.isAfter(limitDate) || activityDate.isEqual(limitDate)
                         }
                     }
+
                     AktivitasFilter.TAHUN_INI -> {
                         allActivities.filter {
                             it.dateTime.year == now.year

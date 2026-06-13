@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.projectpamt.data.repository.LogTotalKasRepository
 import com.example.projectpamt.ui.utils.toAppError
 import com.example.projectpamt.ui.utils.toUserMessage
+import com.example.projectpamt.viewmodel.kas.uistate.LogTotalKasUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

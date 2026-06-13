@@ -11,7 +11,7 @@ import kotlin.time.Instant
 
 @Serializable
 data class Kas(
-    // Nullable saat insert baru
+
     @SerialName("id_kas") val idKas: String? = null,
     val nama: String,
     val saldo: Double,
@@ -35,6 +35,6 @@ data class Kas(
             }
         }
 
-        // Dummy list dihapus
+
     }
 }

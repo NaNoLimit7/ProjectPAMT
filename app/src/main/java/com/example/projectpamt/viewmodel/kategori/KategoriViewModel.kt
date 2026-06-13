@@ -66,36 +66,4 @@ class KategoriViewModel(
             }
         }
     }
-
-    fun updateKategori(id: String, name: String) {
-        viewModelScope.launch {
-            _uiState.value = KategoriUiState.Loading
-            try {
-                val kategoriUpdate = Kategori(idKategori = id, name = name)
-                repository.updateKategori(id, kategoriUpdate)
-                fetchKategori()
-            } catch (e: Exception) {
-                _uiState.value = KategoriUiState.Error(e.toAppError().toUserMessage())
-            }
-        }
-    }
-
-    fun deleteKategori(id: String) {
-        viewModelScope.launch {
-            _uiState.value = KategoriUiState.Loading
-            try {
-                repository.deleteKategori(id)
-                fetchKategori()
-            } catch (e: Exception) {
-                _uiState.value = KategoriUiState.Error(e.toAppError().toUserMessage())
-            }
-        }
-    }
-
-    fun clearUiState() {
-        if (_uiState.value is KategoriUiState.Error) {
-            _uiState.value = KategoriUiState.Idle
-            fetchKategori()
-        }
-    }
 }

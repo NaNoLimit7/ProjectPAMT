@@ -55,7 +55,7 @@ import com.example.projectpamt.ui.theme.GreenMintActive
 import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.TextDark
 import com.example.projectpamt.utils.formatRupiah
-import com.example.projectpamt.viewmodel.kas.KasUiState
+import com.example.projectpamt.viewmodel.kas.uistate.KasUiState
 import com.example.projectpamt.viewmodel.kas.KasViewModel
 
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox

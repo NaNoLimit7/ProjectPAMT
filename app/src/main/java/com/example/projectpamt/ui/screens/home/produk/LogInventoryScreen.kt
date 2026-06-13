@@ -135,7 +135,7 @@ fun LogInventoryScreen(
                             .padding(24.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = state.message ?: "Terjadi kesalahan", color = DangerRed, fontSize = 14.sp)
+                        Text(text = state.message, color = DangerRed, fontSize = 14.sp)
                     }
                 }
 

@@ -76,8 +76,6 @@ import com.example.projectpamt.utils.toIndonesianFormattedDate
 import com.example.projectpamt.viewmodel.auth.AuthViewModel
 import java.util.Date
 
-// Data model untuk state Dashboard
-
 data class DashboardState(
     val penjualanBulanIni: Double = 0.0,
     val totalProduk: Int = 0,
@@ -89,9 +87,6 @@ data class DashboardState(
     val namaPengguna: String = ""
 )
 
-//  Screen (stateful)
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     modifier: Modifier = Modifier,

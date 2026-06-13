@@ -65,7 +65,7 @@ import com.example.projectpamt.ui.theme.GreenPrimary
 import com.example.projectpamt.ui.theme.TextDark
 import com.example.projectpamt.utils.ValidationUtils
 import com.example.projectpamt.utils.formatRupiah
-import com.example.projectpamt.viewmodel.kas.KasUiState
+import com.example.projectpamt.viewmodel.kas.uistate.KasUiState
 import com.example.projectpamt.viewmodel.kas.KasViewModel
 import com.example.projectpamt.viewmodel.kategori.KategoriViewModel
 import com.example.projectpamt.viewmodel.kategori.KategoriUiState
@@ -78,9 +78,8 @@ import java.util.Locale
 
 @Composable
 fun TambahPengeluaranScreen(
-    modifier: Modifier = Modifier,
     pengeluaranViewModel: PengeluaranViewModel,
-    kategoriViewModel: KategoriViewModel, // Kept to avoid breaking AppNavHost
+    kategoriViewModel: KategoriViewModel,
     kasViewModel: KasViewModel,
     navController: NavController
 ) {
@@ -90,7 +89,7 @@ fun TambahPengeluaranScreen(
 
     val isLoading = uiState is PengeluaranUiState.Loading
 
-    // Fetch lists
+
     LaunchedEffect(Unit) {
         kasViewModel.fetchAllActiveKas()
         kategoriViewModel.fetchKategori()
@@ -107,7 +106,6 @@ fun TambahPengeluaranScreen(
     }
 
     TambahPengeluaranContent(
-        modifier = modifier,
         isLoading = isLoading,
         activeKas = activeKas,
         categories = categories,
@@ -130,7 +128,6 @@ fun TambahPengeluaranScreen(
 
 @Composable
 private fun TambahPengeluaranContent(
-    modifier: Modifier = Modifier,
     isLoading: Boolean,
     activeKas: List<Kas>,
     categories: List<Kategori>,
@@ -144,7 +141,8 @@ private fun TambahPengeluaranContent(
     var selectedDate by remember { mutableStateOf(Date()) }
     var selectedKas by remember { mutableStateOf<Kas?>(null) }
     var selectedKategori by remember(categories) {
-        mutableStateOf(categories.firstOrNull { it.idKategori == "5602b255-f3d1-4339-86ff-3da58c0437be" } ?: categories.firstOrNull())
+        mutableStateOf(categories.firstOrNull { it.idKategori == "5602b255-f3d1-4339-86ff-3da58c0437be" }
+            ?: categories.firstOrNull())
     }
 
     var expandedKas by remember { mutableStateOf(false) }
@@ -152,9 +150,7 @@ private fun TambahPengeluaranContent(
 
     var totalError by remember { mutableStateOf<String?>(null) }
     var deskripsiError by remember { mutableStateOf<String?>(null) }
-    var kasError by remember { mutableStateOf<String?>(null) }
 
-    // Date Picker Dialog Setup
     val calendar = remember { Calendar.getInstance() }
     val datePickerDialog = remember {
         android.app.DatePickerDialog(
@@ -169,7 +165,15 @@ private fun TambahPengeluaranContent(
         )
     }
 
-    val isEnabled = remember(deskripsi, totalAmount, selectedKas, selectedKategori, deskripsiError, totalError, isLoading) {
+    val isEnabled = remember(
+        deskripsi,
+        totalAmount,
+        selectedKas,
+        selectedKategori,
+        deskripsiError,
+        totalError,
+        isLoading
+    ) {
         deskripsi.isNotBlank() && totalAmount.isNotBlank() && selectedKas != null && selectedKategori != null &&
                 deskripsiError == null && totalError == null && !isLoading
     }
@@ -180,7 +184,7 @@ private fun TambahPengeluaranContent(
             .background(BackgroundSlate)
             .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
-        // ── Scrollable Form Area ─────────────────────────────────────────────
+
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -188,7 +192,7 @@ private fun TambahPengeluaranContent(
                 .verticalScroll(rememberScrollState())
                 .imePadding()
         ) {
-            // ── HEADER SECTION (Fixed style) ──────────────────────────────────
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -205,7 +209,7 @@ private fun TambahPengeluaranContent(
                     .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Back Button
+
                 Row(
                     modifier = Modifier
                         .clickable { onBackClick() }
@@ -228,7 +232,7 @@ private fun TambahPengeluaranContent(
                     )
                 }
 
-                // Title Area
+
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
                         text = "Tambah Pengeluaran",
@@ -239,14 +243,14 @@ private fun TambahPengeluaranContent(
                 }
             }
 
-            // ── FORM SECTION ──────────────────────────────────────────────────
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // CARD 1: Total Nominal
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -276,8 +280,12 @@ private fun TambahPengeluaranContent(
                             value = totalAmount,
                             onValueChange = { input ->
                                 val digits = input.filter { it.isDigit() }
-                                totalAmount = if (digits.isEmpty()) "" else ValidationUtils.formatThousandSeparator(digits)
-                                totalError = if (totalAmount.isBlank()) "Total nominal tidak boleh kosong." else null
+                                totalAmount =
+                                    if (digits.isEmpty()) "" else ValidationUtils.formatThousandSeparator(
+                                        digits
+                                    )
+                                totalError =
+                                    if (totalAmount.isBlank()) "Total nominal tidak boleh kosong." else null
                             },
                             placeholder = "Rp 0",
                             keyboardOptions = KeyboardOptions(
@@ -290,7 +298,7 @@ private fun TambahPengeluaranContent(
                     }
                 }
 
-                // CARD 2: Detail Transaksi
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -310,8 +318,9 @@ private fun TambahPengeluaranContent(
                             .padding(20.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        // Date field
-                        val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.US).format(selectedDate)
+
+                        val formattedDate =
+                            SimpleDateFormat("dd/MM/yyyy", Locale.US).format(selectedDate)
                         Box(modifier = Modifier.fillMaxWidth()) {
                             AppTextField(
                                 value = formattedDate,
@@ -330,12 +339,13 @@ private fun TambahPengeluaranContent(
                             )
                         }
 
-                        // Keterangan / Deskripsi field
+
                         AppTextField(
                             value = deskripsi,
                             onValueChange = {
                                 deskripsi = it
-                                deskripsiError = if (it.isBlank()) "Keterangan tidak boleh kosong." else null
+                                deskripsiError =
+                                    if (it.isBlank()) "Keterangan tidak boleh kosong." else null
                             },
                             externalLabel = "Keterangan / Deskripsi",
                             placeholder = "Contoh: Bayar Zakat Mal atau Tagihan Listrik",
@@ -348,7 +358,7 @@ private fun TambahPengeluaranContent(
                             errorMessage = deskripsiError
                         )
 
-                        // Pilih Kategori Dropdown Field
+
                         Box(modifier = Modifier.fillMaxWidth()) {
                             AppTextField(
                                 value = selectedKategori?.name ?: "",
@@ -368,7 +378,9 @@ private fun TambahPengeluaranContent(
                             DropdownMenu(
                                 expanded = expandedKategori,
                                 onDismissRequest = { expandedKategori = false },
-                                modifier = Modifier.fillMaxWidth(0.8f).background(Color.White)
+                                modifier = Modifier
+                                    .fillMaxWidth(0.8f)
+                                    .background(Color.White)
                             ) {
                                 categories.forEach { kategori ->
                                     DropdownMenuItem(
@@ -382,7 +394,7 @@ private fun TambahPengeluaranContent(
                             }
                         }
 
-                        // Pilih Kas Dropdown Field
+
                         Box(modifier = Modifier.fillMaxWidth()) {
                             AppTextField(
                                 value = selectedKas?.nama ?: "",
@@ -402,7 +414,9 @@ private fun TambahPengeluaranContent(
                             DropdownMenu(
                                 expanded = expandedKas,
                                 onDismissRequest = { expandedKas = false },
-                                modifier = Modifier.fillMaxWidth(0.8f).background(Color.White)
+                                modifier = Modifier
+                                    .fillMaxWidth(0.8f)
+                                    .background(Color.White)
                             ) {
                                 activeKas.forEach { kas ->
                                     DropdownMenuItem(
@@ -418,7 +432,7 @@ private fun TambahPengeluaranContent(
                     }
                 }
 
-                // Green Info Banner
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -443,7 +457,7 @@ private fun TambahPengeluaranContent(
             }
         }
 
-        // ── FIXED FOOTER ACTION SECTION ──────────────────────────────────────
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()

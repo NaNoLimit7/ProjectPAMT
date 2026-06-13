@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
 import com.example.projectpamt.data.repository.PelangganRepository
 import com.example.projectpamt.ui.utils.toAppError
 import com.example.projectpamt.ui.utils.toUserMessage
+import com.example.projectpamt.viewmodel.pelanggan.uistate.PelangganUiState
 
 class PelangganViewModel(
     private val repository: PelangganRepository = PelangganRepository()
@@ -72,7 +72,13 @@ class PelangganViewModel(
         }
     }
 
-    fun updatePelanggan(id: String, nama: String, telepon: String, aktif: Boolean, onSuccess: () -> Unit = {}) {
+    fun updatePelanggan(
+        id: String,
+        nama: String,
+        telepon: String,
+        aktif: Boolean,
+        onSuccess: () -> Unit = {}
+    ) {
         viewModelScope.launch {
             _uiState.value = PelangganUiState.Loading
             try {
@@ -104,10 +110,4 @@ class PelangganViewModel(
         }
     }
 
-    fun clearUiState() {
-        if (_uiState.value is PelangganUiState.Error) {
-            _uiState.value = PelangganUiState.Idle
-            fetchPelanggan()
-        }
-    }
 }
