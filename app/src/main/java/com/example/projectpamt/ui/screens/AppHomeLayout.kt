@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -32,12 +35,14 @@ fun AppHomeLayout(
     val navController = rememberNavController()
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStack?.destination
+    val snackbarHostState = remember { SnackbarHostState() }
 
     DynamicStatusBar(backgroundColor = GreenPrimary)
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets(0),
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             val routeWithBottomBar = listOf(
                 Dashboard::class,
@@ -66,7 +71,8 @@ fun AppHomeLayout(
             modifier = Modifier.padding(innerPadding),
             authViewModel = authViewModel,
             startDestination = Dashboard,
-            navController = navController
+            navController = navController,
+            snackbarHostState = snackbarHostState
         )
     }
 }

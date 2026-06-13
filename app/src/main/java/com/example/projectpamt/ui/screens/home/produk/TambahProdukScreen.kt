@@ -97,7 +97,10 @@ fun TambahProdukScreen(
                 stok = stok,
                 namaSatuan = satuan,
                 detailProduk = detailJson,
-                onSuccess = { navController.popBackStack() }
+                onSuccess = {
+                    navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
+                    navController.popBackStack()
+                }
             )
         },
         onAddCategorySave = { newCategoryName ->

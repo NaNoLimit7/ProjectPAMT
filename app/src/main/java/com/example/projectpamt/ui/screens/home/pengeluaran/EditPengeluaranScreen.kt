@@ -136,6 +136,7 @@ fun EditPengeluaranScreen(
                     kategori = kategoriObj,
                     kas = kasObj
                 ) {
+                    navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
                     navController.popBackStack()
                 }
             }
@@ -167,6 +168,7 @@ fun EditPengeluaranScreen(
                         showCancelDialog = false
                         pengeluaran.idPengeluaran?.let { id ->
                             pengeluaranViewModel.deletePengeluaran(id) {
+                                navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
                                 navController.popBackStack()
                             }
                         }

@@ -55,11 +55,17 @@ import com.example.projectpamt.ui.theme.TextDark
 import com.example.projectpamt.viewmodel.pelanggan.PelangganUiState
 import com.example.projectpamt.viewmodel.pelanggan.PelangganViewModel
 
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PelangganScreen(
     modifier: Modifier = Modifier,
     viewModel: PelangganViewModel = viewModel(),
-    navController: NavController
+    navController: NavController,
+    snackbarHostState: SnackbarHostState
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var searchQuery by remember { mutableStateOf("") }
@@ -69,9 +75,28 @@ fun PelangganScreen(
         viewModel.fetchPelanggan()
     }
 
+    LaunchedEffect(uiState.message) {
+        uiState.message?.let {
+            snackbarHostState.showSnackbar(it)
+        }
+    }
+
+    // Auto-refresh when returning from add/edit screens
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    val needRefresh by savedStateHandle?.getStateFlow("need_refresh", false)?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
+
+    LaunchedEffect(needRefresh) {
+        if (needRefresh) {
+            viewModel.refresh()
+            savedStateHandle?.set("need_refresh", false)
+        }
+    }
+
     PelangganContent(
         modifier = modifier,
         uiState = uiState,
+        isRefreshing = viewModel.isRefreshing,
+        onRefresh = viewModel::refresh,
         searchQuery = searchQuery,
         onSearchQueryChange = { searchQuery = it },
         onAddCustomerClick = { navController.navigate(TambahPelanggan) },
@@ -80,10 +105,13 @@ fun PelangganScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PelangganContent(
     modifier: Modifier = Modifier,
     uiState: PelangganUiState,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
     onAddCustomerClick: () -> Unit,
@@ -100,11 +128,16 @@ private fun PelangganContent(
         else -> 0
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BackgroundSlate)
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+        modifier = modifier.fillMaxSize()
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(BackgroundSlate)
+        ) {
         // ── FIXED HEADER ──────────────────────────────────────────────
         Column(
             modifier = Modifier
@@ -360,4 +393,5 @@ private fun PelangganContent(
             }
         }
     }
+}
 }

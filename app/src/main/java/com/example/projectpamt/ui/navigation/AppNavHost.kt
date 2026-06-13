@@ -52,6 +52,7 @@ fun AppNavHost(
     authViewModel: AuthViewModel,
     startDestination: Any,
     navController: NavHostController,
+    snackbarHostState: androidx.compose.material3.SnackbarHostState = androidx.compose.runtime.remember { androidx.compose.material3.SnackbarHostState() },
 ) {
     val pelangganViewModel: PelangganViewModel = viewModel()
     val produkViewModel: ProdukViewModel = viewModel()
@@ -83,14 +84,16 @@ fun AppNavHost(
             DashboardScreen(
                 modifier = modifier,
                 authViewModel = authViewModel,
-                navController = navController
+                navController = navController,
+                snackbarHostState = snackbarHostState
             )
         }
 
         composable<PenjualanList> {
             PenjualanScreen(
                 modifier = modifier,
-                navController = navController
+                navController = navController,
+                snackbarHostState = snackbarHostState
             )
         }
 
@@ -98,7 +101,8 @@ fun AppNavHost(
             ProdukScreen(
                 modifier = modifier,
                 viewModel = produkViewModel,
-                navController = navController
+                navController = navController,
+                snackbarHostState = snackbarHostState
             )
         }
 
@@ -106,7 +110,8 @@ fun AppNavHost(
             PelangganScreen(
                 modifier = modifier,
                 viewModel = pelangganViewModel,
-                navController = navController
+                navController = navController,
+                snackbarHostState = snackbarHostState
             )
         }
 
@@ -114,7 +119,8 @@ fun AppNavHost(
             KasScreen(
                 modifier = modifier,
                 viewModel = kasViewModel,
-                navController = navController
+                navController = navController,
+                snackbarHostState = snackbarHostState
             )
         }
 
@@ -179,7 +185,8 @@ fun AppNavHost(
             AktivitasPelangganScreen(
                 modifier = modifier,
                 pelanggan = route.pelanggan,
-                navController = navController
+                navController = navController,
+                snackbarHostState = snackbarHostState
             )
         }
 
@@ -212,19 +219,22 @@ fun AppNavHost(
 
         composable<RiwayatPenjualan> {
             RiwayatPenjualanScreen(
-                navController = navController
+                navController = navController,
+                snackbarHostState = snackbarHostState
             )
         }
 
         composable<LogInventoryList> {
             LogInventoryScreen(
-                navController = navController
+                navController = navController,
+                snackbarHostState = snackbarHostState
             )
         }
 
         composable<LogTotalKas> {
             LogTotalKasScreen(
-                navController = navController
+                navController = navController,
+                snackbarHostState = snackbarHostState
             )
         }
 
@@ -234,7 +244,8 @@ fun AppNavHost(
             val route = backStackEntry.toRoute<LogKas>()
             LogKasScreen(
                 kas = route.kas,
-                navController = navController
+                navController = navController,
+                snackbarHostState = snackbarHostState
             )
         }
 
@@ -260,7 +271,8 @@ fun AppNavHost(
             PengeluaranScreen(
                 modifier = modifier,
                 viewModel = pengeluaranViewModel,
-                navController = navController
+                navController = navController,
+                snackbarHostState = snackbarHostState
             )
         }
 

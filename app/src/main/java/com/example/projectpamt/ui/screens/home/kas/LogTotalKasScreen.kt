@@ -34,105 +34,121 @@ import com.example.projectpamt.utils.formatRupiah
 import com.example.projectpamt.viewmodel.kas.LogTotalKasUiState
 import com.example.projectpamt.viewmodel.kas.LogTotalKasViewModel
 
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.SnackbarHostState
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogTotalKasScreen(
     viewModel: LogTotalKasViewModel = viewModel(),
-    navController: NavController
+    navController: NavController,
+    snackbarHostState: SnackbarHostState
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BackgroundSlate)
-            .windowInsetsPadding(WindowInsets.navigationBars)
+    LaunchedEffect(uiState.message) {
+        uiState.message?.let {
+            snackbarHostState.showSnackbar(it)
+        }
+    }
+
+    PullToRefreshBox(
+        isRefreshing = viewModel.isRefreshing,
+        onRefresh = viewModel::refresh,
+        modifier = Modifier.fillMaxSize()
     ) {
-        // ── HEADER SECTION ──────────────────────────────────────────────────
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = GreenPrimary,
-                    shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-                )
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .fillMaxSize()
+                .background(BackgroundSlate)
+                .windowInsetsPadding(WindowInsets.navigationBars)
         ) {
-            // Back Button
-            Row(
+            // ── HEADER SECTION ──────────────────────────────────────────────────
+            Column(
                 modifier = Modifier
-                    .clickable { navController.popBackStack() }
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxWidth()
+                    .background(
+                        color = GreenPrimary,
+                        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                    )
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Kembali",
-                    tint = Color.White.copy(alpha = 0.9f),
-                    modifier = Modifier.size(20.dp)
-                )
-                Text(
-                    text = "Kembali",
-                    color = Color.White.copy(alpha = 0.9f),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            // Title Area
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = "Log Total",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    text = "Riwayat saldo gabungan seluruh akun kas",
-                    fontSize = 14.sp,
-                    color = Color(0xFFDCFCE7)
-                )
-            }
-        }
-
-        // ── CONTENT BODY ────────────────────────────────────────────────────
-        when (val state = uiState) {
-            is LogTotalKasUiState.Loading -> {
-                Box(
+                // Back Button
+                Row(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
+                        .clickable { navController.popBackStack() }
+                        .padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    CircularProgressIndicator(color = GreenPrimary)
-                }
-            }
-
-            is LogTotalKasUiState.Error -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f)
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Kembali",
+                        tint = Color.White.copy(alpha = 0.9f),
+                        modifier = Modifier.size(20.dp)
+                    )
                     Text(
-                        text = state.message,
-                        color = DangerRed,
+                        text = "Kembali",
+                        color = Color.White.copy(alpha = 0.9f),
                         fontSize = 14.sp,
-                        textAlign = TextAlign.Center
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                // Title Area
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = "Log Total",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "Riwayat saldo gabungan seluruh akun kas",
+                        fontSize = 14.sp,
+                        color = Color(0xFFDCFCE7)
                     )
                 }
             }
 
-            is LogTotalKasUiState.Success -> {
-                LogTotalKasContent(summary = state.data)
-            }
+            // ── CONTENT BODY ────────────────────────────────────────────────────
+            when (val state = uiState) {
+                is LogTotalKasUiState.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = GreenPrimary)
+                    }
+                }
 
-            else -> {}
+                is LogTotalKasUiState.Error -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f)
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = state.message ?: "Terjadi kesalahan",
+                            color = DangerRed,
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+
+                is LogTotalKasUiState.Success -> {
+                    LogTotalKasContent(summary = state.data)
+                }
+
+                else -> {}
+            }
         }
     }
 }

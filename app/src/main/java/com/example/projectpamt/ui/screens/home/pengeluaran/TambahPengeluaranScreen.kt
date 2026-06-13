@@ -121,6 +121,7 @@ fun TambahPengeluaranScreen(
                 kategori = kategoriObj,
                 kas = kasObj
             ) {
+                navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
                 navController.popBackStack()
             }
         }

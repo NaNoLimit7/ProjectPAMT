@@ -77,6 +77,7 @@ fun TambahKasScreen(
         onBackClick = { navController.popBackStack() },
         onSaveClick = { nama, saldo, keterangan, aktif ->
             viewModel.addKas(nama, saldo, keterangan, aktif) {
+                navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
                 navController.popBackStack()
             }
         }

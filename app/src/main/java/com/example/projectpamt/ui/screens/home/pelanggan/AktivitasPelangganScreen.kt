@@ -46,12 +46,18 @@ import com.example.projectpamt.viewmodel.pelanggan.AktivitasFilter
 import com.example.projectpamt.viewmodel.pelanggan.AktivitasPelangganUiState
 import com.example.projectpamt.viewmodel.pelanggan.AktivitasPelangganViewModel
 
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AktivitasPelangganScreen(
     pelanggan: Pelanggan,
     modifier: Modifier = Modifier,
     viewModel: AktivitasPelangganViewModel = viewModel(),
-    navController: NavController
+    navController: NavController,
+    snackbarHostState: SnackbarHostState
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -62,19 +68,30 @@ fun AktivitasPelangganScreen(
         }
     }
 
+    LaunchedEffect(uiState.message) {
+        uiState.message?.let {
+            snackbarHostState.showSnackbar(it)
+        }
+    }
+
     AktivitasPelangganContent(
         pelanggan = pelanggan,
         uiState = uiState,
+        isRefreshing = viewModel.isRefreshing,
+        onRefresh = viewModel::refresh,
         modifier = modifier,
         onBackClick = { navController.popBackStack() },
         onFilterSelected = { filter -> viewModel.setFilter(filter) }
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AktivitasPelangganContent(
     pelanggan: Pelanggan,
     uiState: AktivitasPelangganUiState,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
     onFilterSelected: (AktivitasFilter) -> Unit
@@ -142,12 +159,15 @@ private fun AktivitasPelangganContent(
         }
 
         // ── 2. STATE HANDLING & DYNAMIC BODY (Scrollable) ───────────────────
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            contentPadding = PaddingValues(bottom = 24.dp)
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
+            modifier = Modifier.weight(1f).fillMaxWidth()
         ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 24.dp)
+            ) {
             when (uiState) {
                 is AktivitasPelangganUiState.Loading -> {
                     item {
@@ -208,5 +228,6 @@ private fun AktivitasPelangganContent(
             }
         }
     }
+}
 }
 

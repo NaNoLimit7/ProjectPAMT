@@ -64,11 +64,17 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PengeluaranScreen(
     modifier: Modifier = Modifier,
     viewModel: PengeluaranViewModel,
-    navController: NavController
+    navController: NavController,
+    snackbarHostState: SnackbarHostState
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -76,9 +82,28 @@ fun PengeluaranScreen(
         viewModel.fetchPengeluaran()
     }
 
+    LaunchedEffect(uiState.message) {
+        uiState.message?.let {
+            snackbarHostState.showSnackbar(it)
+        }
+    }
+
+    // Auto-refresh when returning from add/edit screens
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    val needRefresh by savedStateHandle?.getStateFlow("need_refresh", false)?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
+
+    LaunchedEffect(needRefresh) {
+        if (needRefresh) {
+            viewModel.refresh()
+            savedStateHandle?.set("need_refresh", false)
+        }
+    }
+
     PengeluaranContent(
         modifier = modifier,
         uiState = uiState,
+        isRefreshing = viewModel.isRefreshing,
+        onRefresh = viewModel::refresh,
         onBackClick = { navController.popBackStack() },
         onAddClick = { navController.navigate(TambahPengeluaran) },
         onItemClick = { pengeluaran ->
@@ -87,10 +112,13 @@ fun PengeluaranScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PengeluaranContent(
     modifier: Modifier = Modifier,
     uiState: PengeluaranUiState,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
     onBackClick: () -> Unit,
     onAddClick: () -> Unit,
     onItemClick: (Pengeluaran) -> Unit
@@ -283,13 +311,16 @@ private fun PengeluaranContent(
                         }
                     }
 
-                    LazyColumn(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 24.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    PullToRefreshBox(
+                        isRefreshing = isRefreshing,
+                        onRefresh = onRefresh,
+                        modifier = Modifier.weight(1f).fillMaxWidth()
                     ) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 24.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
                         // Card: Total Pengeluaran
                         item {
                             Card(
@@ -407,6 +438,7 @@ private fun PengeluaranContent(
                             }
                         }
                     }
+                }
                 }
                 else -> {}
             }

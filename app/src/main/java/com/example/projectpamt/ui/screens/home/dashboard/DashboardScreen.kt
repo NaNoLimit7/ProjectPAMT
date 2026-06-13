@@ -29,6 +29,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -88,18 +91,26 @@ data class DashboardState(
 
 //  Screen (stateful)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel,
     dashboardViewModel: DashboardViewModel = viewModel(),
-    navController: NavController
+    navController: NavController,
+    snackbarHostState: SnackbarHostState
 ) {
     val fullname by authViewModel.fullname.collectAsStateWithLifecycle()
     val uiState by dashboardViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(fullname) {
         dashboardViewModel.fetchDashboardData(fullname.ifEmpty { "Pengguna" })
+    }
+
+    LaunchedEffect(uiState.message) {
+        uiState.message?.let {
+            snackbarHostState.showSnackbar(it)
+        }
     }
 
     when (uiState) {
@@ -142,24 +153,30 @@ fun DashboardScreen(
         }
         is DashboardUiState.Success -> {
             val state = (uiState as DashboardUiState.Success).state
-            DashboardContent(
-                modifier = modifier,
-                state = state,
-                onNavigateTambahPenjualan = {
-                    navController.navigate(PenjualanList) {
-                        popUpTo(Dashboard) {
-                            saveState = true
+            PullToRefreshBox(
+                isRefreshing = dashboardViewModel.isRefreshing,
+                onRefresh = { dashboardViewModel.refresh(fullname.ifEmpty { "Pengguna" }) },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                DashboardContent(
+                    modifier = modifier,
+                    state = state,
+                    onNavigateTambahPenjualan = {
+                        navController.navigate(PenjualanList) {
+                            popUpTo(Dashboard) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                onNavigateTambahProduk = { navController.navigate(TambahProduk) },
-                onNavigateTambahPelanggan = { navController.navigate(TambahPelanggan)},
-                onNavigateTambahPengeluaran = { navController.navigate(PengeluaranList) },
-                onViewAllPenjualan = { navController.navigate(RiwayatPenjualan) },
-                onNavigateProfil = { navController.navigate(Profil) }
-            )
+                    },
+                    onNavigateTambahProduk = { navController.navigate(TambahProduk) },
+                    onNavigateTambahPelanggan = { navController.navigate(TambahPelanggan)},
+                    onNavigateTambahPengeluaran = { navController.navigate(PengeluaranList) },
+                    onViewAllPenjualan = { navController.navigate(RiwayatPenjualan) },
+                    onNavigateProfil = { navController.navigate(Profil) }
+                )
+            }
         }
         else -> {}
     }

@@ -118,6 +118,7 @@ fun EditProdukScreen(
                     namaSatuan = satuan,
                     detailProduk = detailJson,
                     onSuccess = {
+                        navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
                         navController.popBackStack()
                     }
                 )
@@ -139,6 +140,11 @@ fun EditProdukScreen(
                         showDeleteDialog = false
                         produk.idProduk?.let { id ->
                             produkViewModel.nonaktifkanProduk(id) {
+                                try {
+                                    navController.getBackStackEntry<com.example.projectpamt.ui.navigation.ProdukList>().savedStateHandle.set("need_refresh", true)
+                                } catch (e: Exception) {
+                                    navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
+                                }
                                 navController.popBackStack(
                                     route = com.example.projectpamt.ui.navigation.ProdukList,
                                     inclusive = false

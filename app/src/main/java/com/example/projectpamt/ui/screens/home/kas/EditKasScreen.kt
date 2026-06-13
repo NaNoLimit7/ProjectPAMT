@@ -90,6 +90,7 @@ fun EditKasScreen(
         onSaveClick = { nama, aktif, keterangan ->
             kas.idKas?.let { id ->
                 viewModel.updateKas(id, nama, aktif, keterangan) {
+                    navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
                     navController.popBackStack()
                 }
             }
@@ -128,6 +129,7 @@ fun EditKasScreen(
                         showDeleteDialog = false
                         kas.idKas?.let { id ->
                             viewModel.softDeleteKas(id, deleteReason) {
+                                navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
                                 navController.popBackStack()
                             }
                         }

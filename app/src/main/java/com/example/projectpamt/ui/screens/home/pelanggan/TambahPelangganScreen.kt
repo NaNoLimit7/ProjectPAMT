@@ -74,6 +74,7 @@ fun TambahPelangganScreen(
         onBackClick = { navController.popBackStack() },
         onSaveClick = { nama, telepon ->
             viewModel.addPelanggan(nama, telepon) {
+                navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
                 navController.popBackStack()
             }
         }

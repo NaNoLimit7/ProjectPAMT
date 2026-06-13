@@ -58,19 +58,23 @@ import com.example.projectpamt.utils.formatRupiah
 import com.example.projectpamt.viewmodel.kas.KasUiState
 import com.example.projectpamt.viewmodel.kas.KasViewModel
 
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KasScreen(
     modifier: Modifier = Modifier,
     viewModel: KasViewModel = viewModel(),
-    navController: NavController
+    navController: NavController,
+    snackbarHostState: SnackbarHostState
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
 
     var showInfoDialog by remember { mutableStateOf(false) }
     var infoDialogTitle by remember { mutableStateOf("") }
     var infoDialogMessage by remember { mutableStateOf("") }
-
 
     if (showInfoDialog) {
         AlertDialog(
@@ -88,6 +92,23 @@ fun KasScreen(
         )
     }
 
+    LaunchedEffect(uiState.message) {
+        uiState.message?.let {
+            snackbarHostState.showSnackbar(it)
+        }
+    }
+
+    // Auto-refresh when returning from add/edit screens
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    val needRefresh by savedStateHandle?.getStateFlow("need_refresh", false)?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
+
+    LaunchedEffect(needRefresh) {
+        if (needRefresh) {
+            viewModel.refresh()
+            savedStateHandle?.set("need_refresh", false)
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.fetchAllActiveKas()
     }
@@ -95,6 +116,8 @@ fun KasScreen(
     KasContent(
         modifier = modifier,
         uiState = uiState,
+        isRefreshing = viewModel.isRefreshing,
+        onRefresh = viewModel::refresh,
         onAddKasClick = {
             navController.navigate(TambahKas)
         },
@@ -113,12 +136,13 @@ fun KasScreen(
     )
 }
 
-
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun KasContent(
     modifier: Modifier = Modifier,
     uiState: KasUiState,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
     onAddKasClick: () -> Unit,
     onLihatLogClick: (Kas) -> Unit,
     onTransaksiClick: (Kas) -> Unit,
@@ -131,11 +155,16 @@ private fun KasContent(
         else -> 0.0
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BackgroundSlate)
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+        modifier = modifier.fillMaxSize()
     ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(BackgroundSlate)
+        ) {
 
         Column(
             modifier = Modifier
@@ -364,4 +393,5 @@ private fun KasContent(
             }
         }
     }
+}
 }

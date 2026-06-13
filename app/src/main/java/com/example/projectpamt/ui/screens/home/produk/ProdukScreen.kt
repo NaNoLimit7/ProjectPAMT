@@ -56,14 +56,37 @@ import com.example.projectpamt.ui.navigation.LogInventoryList
 import com.example.projectpamt.viewmodel.produk.ProdukUiState
 import com.example.projectpamt.viewmodel.produk.ProdukViewModel
 
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProdukScreen(
     modifier: Modifier = Modifier,
     viewModel: ProdukViewModel = viewModel(),
-    navController: NavController
+    navController: NavController,
+    snackbarHostState: SnackbarHostState
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var searchQuery by remember { mutableStateOf("") }
+
+    LaunchedEffect(uiState.message) {
+        uiState.message?.let {
+            snackbarHostState.showSnackbar(it)
+        }
+    }
+
+    // Auto-refresh when returning from add/edit screens
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    val needRefresh by savedStateHandle?.getStateFlow("need_refresh", false)?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
+
+    LaunchedEffect(needRefresh) {
+        if (needRefresh) {
+            viewModel.refresh()
+            savedStateHandle?.set("need_refresh", false)
+        }
+    }
 
     // Memuat data produk aktif saat pertama kali masuk screen
     LaunchedEffect(Unit) {
@@ -73,6 +96,8 @@ fun ProdukScreen(
     ProdukContent(
         modifier = modifier,
         uiState = uiState,
+        isRefreshing = viewModel.isRefreshing,
+        onRefresh = viewModel::refresh,
         searchQuery = searchQuery,
         onSearchQueryChange = { searchQuery = it },
         onAddProductClick = { navController.navigate(TambahProduk) },
@@ -82,10 +107,13 @@ fun ProdukScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProdukContent(
     modifier: Modifier = Modifier,
     uiState: ProdukUiState,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
     onAddProductClick: () -> Unit,
@@ -93,163 +121,148 @@ private fun ProdukContent(
     onEditClick: (Produk) -> Unit,
     onHistoryClick: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BackgroundSlate)
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+        modifier = modifier.fillMaxSize()
     ) {
-        // ── 1. HEADER SECTION (Fixed) ────────────────────────────────────────
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = GreenPrimary,
-                    shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-                )
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .fillMaxSize()
+                .background(BackgroundSlate)
         ) {
-            // Title Area
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            // ── 1. HEADER SECTION (Fixed) ────────────────────────────────────────
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = GreenPrimary,
+                        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                    )
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(
-                        text = "Produk",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        letterSpacing = (-0.75).sp
-                    )
-                    Text(
-                        text = "Kelola inventori dan stok",
-                        fontSize = 14.sp,
-                        color = Color(0xFFDBEAFE)
-                    )
-                }
-
-                // Ikon Keranjang Belanja/Tas
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .border(BorderStroke(2.dp, Color.White.copy(alpha = 0.3f)), CircleShape)
-                        .clickable { onHistoryClick() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.history),
-                        contentDescription = "Bag",
-                        tint = Color.White,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-        }
-
-        // SCROLLABLE AREA
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            contentPadding = PaddingValues(bottom = 24.dp)
-        ) {
-            // ── 2. SEARCH & ADD SECTION ──────────────────────────────────────────
-            item {
+                // Title Area
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 20.dp, end = 20.dp, top = 24.dp, bottom = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Search Input
-                    TextField(
-                        value = searchQuery,
-                        onValueChange = onSearchQueryChange,
-                        modifier = Modifier
-                            .weight(1f)
-                            .border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(16.dp)),
-                        placeholder = {
-                            Text("Cari produk...", color = Color(0xFF9CA3AF), fontSize = 16.sp)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(R.drawable.search),
-                                contentDescription = null,
-                                tint = Color(0xFF9CA3AF),
-                                modifier = Modifier.size(15.dp)
-                            )
-                        },
-                        singleLine = true,
-                        shape = RoundedCornerShape(16.dp),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = TextDark,
-                            unfocusedTextColor = TextDark
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            text = "Produk",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            letterSpacing = (-0.75).sp
                         )
-                    )
+                        Text(
+                            text = "Kelola inventori dan stok",
+                            fontSize = 14.sp,
+                            color = Color(0xFFDBEAFE)
+                        )
+                    }
 
-                    // Add Button (+)
+                    // Ikon Keranjang Belanja/Tas
                     Box(
                         modifier = Modifier
-                            .size(48.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(GreenPrimary)
-                            .clickable { onAddProductClick() },
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .border(BorderStroke(2.dp, Color.White.copy(alpha = 0.3f)), CircleShape)
+                            .clickable { onHistoryClick() },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.add),
-                            contentDescription = "Tambah",
+                            imageVector = ImageVector.vectorResource(R.drawable.history),
+                            contentDescription = "Bag",
                             tint = Color.White,
-                            modifier = Modifier.size(15.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }
             }
 
-            // ── 3. PRODUCT LIST SECTION ──────────────────────────────────────────
-            item {
-                when (uiState) {
-                    is ProdukUiState.Loading -> {
-                        Box(
-                            modifier = modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = GreenPrimary)
-                        }
-                    }
+            // SCROLLABLE AREA
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(bottom = 24.dp)
+            ) {
+                // ── 2. SEARCH & ADD SECTION ──────────────────────────────────────────
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 20.dp, end = 20.dp, top = 24.dp, bottom = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Search Input
+                        TextField(
+                            value = searchQuery,
+                            onValueChange = onSearchQueryChange,
+                            modifier = Modifier
+                                .weight(1f)
+                                .border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(16.dp)),
+                            placeholder = {
+                                Text("Cari produk...", color = Color(0xFF9CA3AF), fontSize = 16.sp)
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(R.drawable.search),
+                                    contentDescription = null,
+                                    tint = Color(0xFF9CA3AF),
+                                    modifier = Modifier.size(15.dp)
+                                )
+                            },
+                            singleLine = true,
+                            shape = RoundedCornerShape(16.dp),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.White,
+                                unfocusedContainerColor = Color.White,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                focusedTextColor = TextDark,
+                                unfocusedTextColor = TextDark
+                            )
+                        )
 
-                    is ProdukUiState.Error -> {
+                        // Add Button (+)
                         Box(
-                            modifier = modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(GreenPrimary)
+                                .clickable { onAddProductClick() },
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = uiState.message,
-                                color = Color.Red,
-                                fontSize = 14.sp
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.add),
+                                contentDescription = "Tambah",
+                                tint = Color.White,
+                                modifier = Modifier.size(15.dp)
                             )
                         }
                     }
+                }
 
-                    is ProdukUiState.Success -> {
-                        val filteredList = uiState.data.filter {
-                            it.nama.contains(searchQuery, ignoreCase = true)
+                // ── 3. PRODUCT LIST SECTION ──────────────────────────────────────────
+                item {
+                    when (uiState) {
+                        is ProdukUiState.Loading -> {
+                            Box(
+                                modifier = modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = GreenPrimary)
+                            }
                         }
 
-                        if (filteredList.isEmpty()) {
+                        is ProdukUiState.Error -> {
                             Box(
                                 modifier = modifier
                                     .fillMaxWidth()
@@ -257,30 +270,51 @@ private fun ProdukContent(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "Produk tidak ditemukan",
-                                    color = Color.Gray,
+                                    text = uiState.message ?: "Terjadi kesalahan",
+                                    color = Color.Red,
                                     fontSize = 14.sp
                                 )
                             }
-                        } else {
-                            Column(
-                                modifier = modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 20.dp),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                filteredList.forEach { produk ->
-                                    InventoryProductCard(
-                                        produk = produk,
-                                        onDetailClick = { onDetailClick(produk) },
-                                        onEditClick = { onEditClick(produk) }
+                        }
+
+                        is ProdukUiState.Success -> {
+                            val filteredList = uiState.data.filter {
+                                it.nama.contains(searchQuery, ignoreCase = true)
+                            }
+
+                            if (filteredList.isEmpty()) {
+                                Box(
+                                    modifier = modifier
+                                        .fillMaxWidth()
+                                        .height(200.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "Produk tidak ditemukan",
+                                        color = Color.Gray,
+                                        fontSize = 14.sp
                                     )
+                                }
+                            } else {
+                                Column(
+                                    modifier = modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 20.dp),
+                                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+                                    filteredList.forEach { produk ->
+                                        InventoryProductCard(
+                                            produk = produk,
+                                            onDetailClick = { onDetailClick(produk) },
+                                            onEditClick = { onEditClick(produk) }
+                                        )
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    else -> {}
+                        else -> {}
+                    }
                 }
             }
         }

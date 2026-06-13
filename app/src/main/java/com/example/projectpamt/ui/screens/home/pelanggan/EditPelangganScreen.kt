@@ -80,6 +80,7 @@ fun EditPelangganScreen(
         onDeleteClick = {
             pelanggan.idPelanggan?.let { id ->
                 viewModel.deletePelanggan(id) {
+                    navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
                     navController.popBackStack()
                 }
             }
@@ -87,6 +88,7 @@ fun EditPelangganScreen(
         onSaveClick = { nama, telepon, aktif ->
             pelanggan.idPelanggan?.let { id ->
                 viewModel.updatePelanggan(id, nama, telepon, aktif) {
+                    navController.previousBackStackEntry?.savedStateHandle?.set("need_refresh", true)
                     navController.popBackStack()
                 }
             }

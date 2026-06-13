@@ -64,11 +64,17 @@ import com.example.projectpamt.viewmodel.penjualan.PenjualanViewModel
 import kotlinx.serialization.json.Json
 
 
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PenjualanScreen(
     modifier: Modifier = Modifier,
     viewModel: PenjualanViewModel = viewModel(),
     navController: NavController,
+    snackbarHostState: SnackbarHostState
 ) {
     val uiState by viewModel.dataState.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
@@ -82,6 +88,23 @@ fun PenjualanScreen(
         ?.getStateFlow<Boolean?>("clear_cart", null)
         ?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(null) }
 
+    LaunchedEffect(uiState.message) {
+        uiState.message?.let {
+            snackbarHostState.showSnackbar(it)
+        }
+    }
+
+    // Auto-refresh when returning from add/edit screens
+    val savedStateHandle = navController.currentBackStackEntry?.savedStateHandle
+    val needRefresh by savedStateHandle?.getStateFlow("need_refresh", false)?.collectAsStateWithLifecycle() ?: remember { mutableStateOf(false) }
+
+    LaunchedEffect(needRefresh) {
+        if (needRefresh) {
+            viewModel.refresh()
+            savedStateHandle?.set("need_refresh", false)
+        }
+    }
+
     LaunchedEffect(clearCart) {
         if (clearCart == true) {
             viewModel.clearCart()
@@ -92,6 +115,8 @@ fun PenjualanScreen(
     PenjualanContent(
         modifier = modifier,
         dataState = uiState,
+        isRefreshing = viewModel.isRefreshing,
+        onRefresh = viewModel::refresh,
         searchQuery = searchQuery,
         cartItems = cartItems,
         selectedPelanggan = selectedPelanggan,
@@ -125,12 +150,13 @@ fun PenjualanScreen(
     )
 }
 
-
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PenjualanContent(
     modifier: Modifier = Modifier,
     dataState: PenjualanDataUiState,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
     searchQuery: String,
     cartItems: List<CartItem>,
     selectedPelanggan: Pelanggan?,
@@ -144,9 +170,14 @@ private fun PenjualanContent(
     onProcessPaymentClick: () -> Unit,
     onHistoryClick: () -> Unit,
 ) {
-    Box(
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
         modifier = modifier.fillMaxSize()
     ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -474,4 +505,5 @@ private fun PenjualanContent(
             )
         }
     }
+}
 }

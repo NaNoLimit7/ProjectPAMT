@@ -32,108 +32,124 @@ import com.example.projectpamt.viewmodel.produk.LogInventoryFilter
 import com.example.projectpamt.viewmodel.produk.LogInventoryUiState
 import com.example.projectpamt.viewmodel.produk.LogInventoryViewModel
 
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.SnackbarHostState
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogInventoryScreen(
     viewModel: LogInventoryViewModel = viewModel(),
-    navController: NavController
+    navController: NavController,
+    snackbarHostState: SnackbarHostState
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var selectedLog by remember { mutableStateOf<LogInventory?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BackgroundSlate)
-            .windowInsetsPadding(WindowInsets.navigationBars)
+    LaunchedEffect(uiState.message) {
+        uiState.message?.let {
+            snackbarHostState.showSnackbar(it)
+        }
+    }
+
+    PullToRefreshBox(
+        isRefreshing = viewModel.isRefreshing,
+        onRefresh = viewModel::refresh,
+        modifier = Modifier.fillMaxSize()
     ) {
-        // ── HEADER ──────────────────────────────────────────────────────────
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = GreenPrimary,
-                    shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-                )
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .fillMaxSize()
+                .background(BackgroundSlate)
+                .windowInsetsPadding(WindowInsets.navigationBars)
         ) {
-            // Back Button
-            Row(
+            // ── HEADER ──────────────────────────────────────────────────────────
+            Column(
                 modifier = Modifier
-                    .clickable { navController.popBackStack() }
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxWidth()
+                    .background(
+                        color = GreenPrimary,
+                        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                    )
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Kembali",
-                    tint = Color.White.copy(alpha = 0.9f),
-                    modifier = Modifier.size(20.dp)
-                )
-                Text(
-                    text = "Kembali",
-                    color = Color.White.copy(alpha = 0.9f),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            // Title Area
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = "Log Inventori",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    text = "Riwayat perubahan stok dan harga produk",
-                    fontSize = 14.sp,
-                    color = Color(0xFFDCFCE7)
-                )
-            }
-        }
-
-        // ── CONTENT BODY ────────────────────────────────────────────────────
-        when (val state = uiState) {
-            is LogInventoryUiState.Loading -> {
-                Box(
+                // Back Button
+                Row(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
+                        .clickable { navController.popBackStack() }
+                        .padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    CircularProgressIndicator(color = GreenPrimary)
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Kembali",
+                        tint = Color.White.copy(alpha = 0.9f),
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = "Kembali",
+                        color = Color.White.copy(alpha = 0.9f),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                // Title Area
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = "Log Inventori",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "Riwayat perubahan stok dan harga produk",
+                        fontSize = 14.sp,
+                        color = Color(0xFFDCFCE7)
+                    )
                 }
             }
 
-            is LogInventoryUiState.Error -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f)
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = state.message, color = DangerRed, fontSize = 14.sp)
+            // ── CONTENT BODY ────────────────────────────────────────────────────
+            when (val state = uiState) {
+                is LogInventoryUiState.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = GreenPrimary)
+                    }
                 }
-            }
 
-            is LogInventoryUiState.Success -> {
-                LogInventoryContent(
-                    state = state,
-                    onSearchChange = viewModel::setSearchQuery,
-                    onFilterSelect = viewModel::setFilter,
-                    onLogClick = { selectedLog = it }
-                )
-            }
+                is LogInventoryUiState.Error -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f)
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = state.message ?: "Terjadi kesalahan", color = DangerRed, fontSize = 14.sp)
+                    }
+                }
 
-            else -> {}
+                is LogInventoryUiState.Success -> {
+                    LogInventoryContent(
+                        state = state,
+                        onSearchChange = viewModel::setSearchQuery,
+                        onFilterSelect = viewModel::setFilter,
+                        onLogClick = { selectedLog = it }
+                    )
+                }
+
+                else -> {}
+            }
         }
     }
 
