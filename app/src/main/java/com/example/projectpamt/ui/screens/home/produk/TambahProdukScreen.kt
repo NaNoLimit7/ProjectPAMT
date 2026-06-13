@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,6 +66,7 @@ fun TambahProdukScreen(
 ) {
     val produkUiState by produkViewModel.uiState.collectAsStateWithLifecycle()
     val kategoriUiState by kategoriViewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     val isLoading = produkUiState is ProdukUiState.Loading
 
@@ -82,21 +84,29 @@ fun TambahProdukScreen(
         categories = categories,
         onBackClick = { navController.popBackStack() },
         onSaveClick = { nama, sku, kategori, deskripsi, hargaModal, hargaJual, stok, satuan, imageUri ->
-            val detailJson = buildJsonObject {
+            // Bangun detail JSON tanpa image_url (ditangani ViewModel)
+            val detailBase = buildJsonObject {
                 put("sku", sku)
                 put("kategori", kategori)
                 put("deskripsi", deskripsi)
                 put("harga_modal", hargaModal)
-                if (imageUri != null) {
-                    put("image_url", imageUri.toString())
-                }
             }
+            // Compress gambar (resize dan ubah ke ByteArray JPEG) sebelum diupload
+            val imageBytes = imageUri?.let { uri ->
+                com.example.projectpamt.ui.utils.ImageUtils.compressImageFromUri(context, uri)
+            }
+            val mimeType = imageUri?.let {
+                context.contentResolver.getType(it) ?: "image/jpeg"
+            } ?: "image/jpeg"
+
             produkViewModel.addProduk(
                 nama = nama,
                 harga = hargaJual,
                 stok = stok,
                 namaSatuan = satuan,
-                detailProduk = detailJson,
+                detailProdukBase = detailBase,
+                imageBytes = imageBytes,
+                imageMimeType = mimeType,
                 onSuccess = {
                     navController.previousBackStackEntry?.savedStateHandle?.set(
                         "need_refresh",

@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -66,9 +67,10 @@ import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
-import androidx.core.net.toUri
 import com.example.projectpamt.data.model.Kategori
 import com.example.projectpamt.ui.navigation.ProdukList
+import com.example.projectpamt.ui.utils.ImageUtils
+import com.example.projectpamt.ui.utils.ImageUtils.compressImageFromUri
 
 @Composable
 fun EditProdukScreen(
@@ -80,6 +82,7 @@ fun EditProdukScreen(
 ) {
     val produkUiState by produkViewModel.uiState.collectAsStateWithLifecycle()
     val kategoriUiState by kategoriViewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     val isLoading = produkUiState is ProdukUiState.Loading
 
@@ -101,15 +104,21 @@ fun EditProdukScreen(
         onBackClick = { navController.popBackStack() },
         onDeleteClick = { showDeleteDialog = true },
         onSaveClick = { nama, sku, kategori, deskripsi, hargaModal, hargaJual, stok, satuan, imageUri ->
-            val detailJson = buildJsonObject {
+            // Bangun detail JSON tanpa image_url (ditangani ViewModel)
+            val detailBase = buildJsonObject {
                 put("sku", sku)
                 put("kategori", kategori)
                 put("deskripsi", deskripsi)
                 put("harga_modal", hargaModal)
-                if (imageUri != null) {
-                    put("image_url", imageUri.toString())
-                }
             }
+            // Compress gambar (resize dan ubah ke ByteArray JPEG) jika user mengganti gambar
+            val imageBytes = imageUri?.let { uri ->
+                compressImageFromUri(context, uri)
+            }
+            val mimeType = imageUri?.let {
+                context.contentResolver.getType(it) ?: "image/jpeg"
+            } ?: "image/jpeg"
+
             produk.idProduk?.let { id ->
                 produkViewModel.updateProduk(
                     id = id,
@@ -117,7 +126,10 @@ fun EditProdukScreen(
                     harga = hargaJual,
                     stok = stok,
                     namaSatuan = satuan,
-                    detailProduk = detailJson,
+                    detailProdukBase = detailBase,
+                    imageBytes = imageBytes,
+                    imageMimeType = mimeType,
+                    existingImageUrl = produk.imageUrl, // pertahankan URL lama jika tidak diganti
                     onSuccess = {
                         navController.previousBackStackEntry?.savedStateHandle?.set(
                             "need_refresh",
@@ -219,7 +231,6 @@ private fun EditProdukContent(
     val initialStok = produk.stok.toInt().toString()
     val initialSatuan = produk.namaSatuan
     val initialImageUrl = produk.imageUrl
-    val initialImageUri = if (!initialImageUrl.isNullOrBlank()) initialImageUrl.toUri() else null
 
     var nama by remember { mutableStateOf(produk.nama) }
     var sku by remember { mutableStateOf(initialSku) }
@@ -229,7 +240,9 @@ private fun EditProdukContent(
     var hargaJual by remember { mutableStateOf(initialHargaJual) }
     var stok by remember { mutableStateOf(initialStok) }
     var satuan by remember { mutableStateOf(initialSatuan) }
-    var selectedImageUri by remember { mutableStateOf<Uri?>(initialImageUri) }
+    // selectedImageUri: HANYA berisi URI lokal gambar BARU yang dipilih user.
+    // Gambar lama ditampilkan via existingImageUrl di FotoProdukSection.
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     var namaError by remember { mutableStateOf<String?>(null) }
     var skuError by remember { mutableStateOf<String?>(null) }
@@ -340,6 +353,7 @@ private fun EditProdukContent(
             // 1. FOTO PRODUK SECTION
             FotoProdukSection(
                 selectedImageUri = selectedImageUri,
+                existingImageUrl = initialImageUrl, // gambar lama dari Supabase
                 onImageSelected = { selectedImageUri = it }
             )
 

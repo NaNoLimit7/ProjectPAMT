@@ -3,6 +3,7 @@ package com.example.projectpamt.data.repository
 import com.example.projectpamt.data.SupabaseClientProvider
 import com.example.projectpamt.data.model.Produk
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.storage.storage
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
@@ -61,5 +62,19 @@ class ProdukRepository {
         supabase.postgrest["produk"].update(produkBaru) {
             filter { eq("id_produk", idProduk) }
         }
+    }
+
+    /**
+     * Upload bytes gambar ke Supabase Storage bucket "produk-images".
+     * @return Public URL gambar yang dapat diakses dari perangkat manapun.
+     */
+    suspend fun uploadGambarProduk(
+        fileName: String,
+        imageBytes: ByteArray,
+        mimeType: String = "image/jpeg"
+    ): String {
+        val bucket = supabase.storage["produk-images"]
+        bucket.upload(fileName, imageBytes) { upsert = true }
+        return bucket.publicUrl(fileName)
     }
 }

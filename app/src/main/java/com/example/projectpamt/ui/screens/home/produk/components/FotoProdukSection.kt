@@ -45,8 +45,12 @@ import com.example.projectpamt.ui.theme.GreenPrimary
 fun FotoProdukSection(
     selectedImageUri: Uri?,
     onImageSelected: (Uri) -> Unit,
+    existingImageUrl: String? = null,   // URL gambar lama dari database (edit mode)
     modifier: Modifier = Modifier
 ) {
+    // displayModel: URI lokal (prioritas) → URL remote → null (placeholder)
+    val displayModel: Any? = selectedImageUri ?: existingImageUrl
+
     val photoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -100,15 +104,15 @@ fun FotoProdukSection(
                             }
                         } else Modifier
                     )
-                    .clickable(enabled = selectedImageUri == null) {
+                    .clickable(enabled = displayModel == null) {
                         photoLauncher.launch("image/*")
                     },
                 contentAlignment = Alignment.Center
             ) {
-                if (selectedImageUri != null) {
+                if (displayModel != null) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         SubcomposeAsyncImage(
-                            model = selectedImageUri,
+                            model = displayModel,
                             contentDescription = "Preview Foto",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize(),

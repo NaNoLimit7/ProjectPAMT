@@ -1,5 +1,6 @@
 package com.example.projectpamt.viewmodel.produk
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -14,6 +15,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class ProdukViewModel(
     private val repository: ProdukRepository = ProdukRepository()
@@ -60,24 +64,39 @@ class ProdukViewModel(
         harga: Double,
         stok: Double,
         namaSatuan: String,
-        detailProduk: JsonElement?,
+        detailProdukBase: JsonObject,
+        imageBytes: ByteArray? = null,
+        imageMimeType: String = "image/jpeg",
         onSuccess: () -> Unit = {}
     ) {
         viewModelScope.launch {
             _uiState.value = ProdukUiState.Loading
             try {
+                // 1. Upload gambar ke Storage jika ada, dapatkan public URL
+                val imageUrl = if (imageBytes != null) {
+                    val fileName = "produk_${System.currentTimeMillis()}.jpg"
+                    repository.uploadGambarProduk(fileName, imageBytes, imageMimeType)
+                } else null
+
+                // 2. Gabungkan image_url ke detailProduk JSON
+                val detailFinal: JsonObject = buildJsonObject {
+                    detailProdukBase.forEach { (k, v) -> put(k, v) }
+                    if (imageUrl != null) put("image_url", imageUrl)
+                }
+
                 val produkBaru = Produk(
                     nama = nama,
                     harga = harga,
                     stok = stok,
                     namaSatuan = namaSatuan,
-                    detailProduk = detailProduk,
+                    detailProduk = detailFinal,
                     aktif = true
                 )
                 repository.tambahProduk(produkBaru)
                 fetchProdukAktif()
                 onSuccess()
             } catch (e: Exception) {
+                Log.d("PRODUK", e.message.toString())
                 _uiState.value = ProdukUiState.Error(e.toAppError().toUserMessage())
             }
         }
@@ -102,19 +121,34 @@ class ProdukViewModel(
         harga: Double,
         stok: Double,
         namaSatuan: String,
-        detailProduk: JsonElement?,
+        detailProdukBase: JsonObject,
+        imageBytes: ByteArray? = null,       // null = gambar tidak diganti
+        imageMimeType: String = "image/jpeg",
+        existingImageUrl: String? = null,     // URL gambar lama dari database
         onSuccess: () -> Unit = {}
     ) {
         viewModelScope.launch {
             _uiState.value = ProdukUiState.Loading
             try {
+                // 1. Upload gambar baru jika ada, atau gunakan URL lama
+                val imageUrl = if (imageBytes != null) {
+                    val fileName = "produk_${System.currentTimeMillis()}.jpg"
+                    repository.uploadGambarProduk(fileName, imageBytes, imageMimeType)
+                } else existingImageUrl
+
+                // 2. Gabungkan image_url ke detailProduk JSON
+                val detailFinal: JsonObject = buildJsonObject {
+                    detailProdukBase.forEach { (k, v) -> put(k, v) }
+                    if (imageUrl != null) put("image_url", imageUrl)
+                }
+
                 val produkBaru = Produk(
                     idProduk = id,
                     nama = nama,
                     harga = harga,
                     stok = stok,
                     namaSatuan = namaSatuan,
-                    detailProduk = detailProduk,
+                    detailProduk = detailFinal,
                     aktif = true
                 )
                 repository.updateProduk(id, produkBaru)
@@ -149,13 +183,6 @@ class ProdukViewModel(
             } catch (e: Exception) {
                 _uiState.value = ProdukUiState.Error(e.toAppError().toUserMessage())
             }
-        }
-    }
-
-    fun clearUiState() {
-        if (_uiState.value is ProdukUiState.Error) {
-            _uiState.value = ProdukUiState.Idle
-            fetchProdukAktif()
         }
     }
 }
