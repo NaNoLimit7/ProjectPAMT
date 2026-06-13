@@ -67,153 +67,11 @@ fun KasScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     // Dialog states
-    var showAddDialog by remember { mutableStateOf(false) }
-    var newKasNama by remember { mutableStateOf("") }
-    var newKasSaldo by remember { mutableStateOf("") }
-    var newKasNamaError by remember { mutableStateOf<String?>(null) }
-    var newKasSaldoError by remember { mutableStateOf<String?>(null) }
-
-    var editingKas by remember { mutableStateOf<Kas?>(null) }
-    var editKasNama by remember { mutableStateOf("") }
-    var editKasNamaError by remember { mutableStateOf<String?>(null) }
-
     var showInfoDialog by remember { mutableStateOf(false) }
     var infoDialogTitle by remember { mutableStateOf("") }
     var infoDialogMessage by remember { mutableStateOf("") }
 
-    val isAddConfirmEnabled = newKasNama.isNotBlank() && newKasSaldo.isNotBlank() &&
-            newKasNamaError == null && newKasSaldoError == null
 
-    val isEditConfirmEnabled = editKasNama.isNotBlank() && editKasNamaError == null
-
-    // Dialog Tambah Kas
-    if (showAddDialog) {
-        AlertDialog(
-            onDismissRequest = { 
-                showAddDialog = false 
-                newKasNama = ""
-                newKasSaldo = ""
-                newKasNamaError = null
-                newKasSaldoError = null
-            },
-            title = { Text("Tambah Akun Kas", fontWeight = FontWeight.Bold) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    AppTextField(
-                        value = newKasNama,
-                        onValueChange = {
-                            newKasNama = it
-                            newKasNamaError = ValidationUtils.validateKasName(it).errorMessage
-                        },
-                        label = "Nama Kas",
-                        isError = newKasNamaError != null,
-                        errorMessage = newKasNamaError
-                    )
-                    AppTextField(
-                        value = newKasSaldo,
-                        onValueChange = {
-                            newKasSaldo = it
-                            newKasSaldoError = ValidationUtils.validateKasSaldo(it).errorMessage
-                        },
-                        label = "Saldo Awal (Rp)",
-                        isError = newKasSaldoError != null,
-                        errorMessage = newKasSaldoError
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        val nameVal = ValidationUtils.validateKasName(newKasNama)
-                        val saldoVal = ValidationUtils.validateKasSaldo(newKasSaldo)
-                        newKasNamaError = nameVal.errorMessage
-                        newKasSaldoError = saldoVal.errorMessage
-                        
-                        if (nameVal.isValid && saldoVal.isValid) {
-                            val saldoDouble = newKasSaldo.toDoubleOrNull() ?: 0.0
-                            viewModel.addKas(newKasNama, saldoDouble)
-                            showAddDialog = false
-                            newKasNama = ""
-                            newKasSaldo = ""
-                            newKasNamaError = null
-                            newKasSaldoError = null
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
-                    enabled = isAddConfirmEnabled
-                ) {
-                    Text("Simpan")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { 
-                    showAddDialog = false 
-                    newKasNama = ""
-                    newKasSaldo = ""
-                    newKasNamaError = null
-                    newKasSaldoError = null
-                }) {
-                    Text("Batal")
-                }
-            }
-        )
-    }
-
-    // Dialog Edit Kas
-    if (editingKas != null) {
-        AlertDialog(
-            onDismissRequest = { 
-                editingKas = null 
-                editKasNama = ""
-                editKasNamaError = null
-            },
-            title = { Text("Ubah Nama Kas", fontWeight = FontWeight.Bold) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    AppTextField(
-                        value = editKasNama,
-                        onValueChange = {
-                            editKasNama = it
-                            editKasNamaError = ValidationUtils.validateKasName(it).errorMessage
-                        },
-                        label = "Nama Kas Baru",
-                        isError = editKasNamaError != null,
-                        errorMessage = editKasNamaError
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        val nameVal = ValidationUtils.validateKasName(editKasNama)
-                        editKasNamaError = nameVal.errorMessage
-                        
-                        if (nameVal.isValid) {
-                            editingKas?.idKas?.let { id ->
-                                viewModel.updateNamaKas(id, editKasNama)
-                                editingKas = null
-                                editKasNama = ""
-                                editKasNamaError = null
-                            }
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary),
-                    enabled = isEditConfirmEnabled
-                ) {
-                    Text("Simpan")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { 
-                    editingKas = null 
-                    editKasNama = ""
-                    editKasNamaError = null
-                }) {
-                    Text("Batal")
-                }
-            }
-        )
-    }
 
     // Info Dialog (mock action status)
     if (showInfoDialog) {
@@ -239,7 +97,9 @@ fun KasScreen(
     KasContent(
         modifier = modifier,
         uiState = uiState,
-        onAddKasClick = { showAddDialog = true },
+        onAddKasClick = {
+            navController.navigate(com.example.projectpamt.ui.navigation.TambahKas)
+        },
         onTransaksiClick = { kas ->
             infoDialogTitle = "Transaksi Kas"
             infoDialogMessage = "Membuka halaman transaksi untuk ${kas.nama}. Saldo saat ini: ${formatRupiah(kas.saldo)}."
@@ -249,8 +109,7 @@ fun KasScreen(
             navController.navigate(com.example.projectpamt.ui.navigation.LogKas(kas))
         },
         onEditClick = { kas ->
-            editKasNama = kas.nama
-            editingKas = kas
+            navController.navigate(com.example.projectpamt.ui.navigation.EditKas(kas))
         },
         onLogTotalClick = {
             navController.navigate(com.example.projectpamt.ui.navigation.LogTotalKas)
@@ -276,57 +135,67 @@ private fun KasContent(
         else -> 0.0
     }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundSlate)
     ) {
+        // ── FIXED HEADER ──────────────────────────────────────────────
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = GreenPrimary)
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            // Judul Layar & Ikon
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = "Manajemen Kas",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "Kelola akun kas Anda",
+                        fontSize = 14.sp,
+                        color = Color.White.copy(alpha = 0.8f)
+                    )
+                }
+
+                // Wallet Icon
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.kas),
+                    contentDescription = "Kas",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
             contentPadding = PaddingValues(bottom = 24.dp)
         ) {
-            // ── 1. HEADER GREEN AREA (Judul & Bento Card) ──────────────────────
+            // ── BENTO CARD TOTAL SALDO (Green Card Area) ─────────────────────
             item {
-                Column(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
                             color = GreenPrimary,
                             shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
                         )
-                        .windowInsetsPadding(WindowInsets.statusBars)
-                        .padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                        .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
                 ) {
-                    // Judul Layar & Ikon
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(
-                                text = "Manajemen Kas",
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                            Text(
-                                text = "Kelola akun kas Anda",
-                                fontSize = 14.sp,
-                                color = Color.White.copy(alpha = 0.8f)
-                            )
-                        }
-
-                        // Wallet Icon
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.kas),
-                            contentDescription = "Kas",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-
                     // Bento Card Total Saldo (Glassmorphism)
                     Column(
                         modifier = Modifier
@@ -437,7 +306,7 @@ private fun KasContent(
                 when (uiState) {
                     is KasUiState.Loading -> {
                         Box(
-                            modifier = Modifier
+                            modifier = modifier
                                 .fillMaxWidth()
                                 .height(200.dp),
                             contentAlignment = Alignment.Center
@@ -448,7 +317,7 @@ private fun KasContent(
 
                     is KasUiState.Error -> {
                         Box(
-                            modifier = Modifier
+                            modifier = modifier
                                 .fillMaxWidth()
                                 .height(200.dp),
                             contentAlignment = Alignment.Center
@@ -463,7 +332,7 @@ private fun KasContent(
 
                     is KasUiState.Success -> {
                         Column(
-                            modifier = Modifier
+                            modifier = modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 20.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp)

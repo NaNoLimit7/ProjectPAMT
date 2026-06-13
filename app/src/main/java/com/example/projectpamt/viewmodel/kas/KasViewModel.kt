@@ -30,20 +30,22 @@ class KasViewModel : ViewModel() {
         }
     }
 
-    fun addKas(nama: String, saldo: Double) {
+    fun addKas(nama: String, saldo: Double, keterangan: String, aktif: Boolean, onSuccess: () -> Unit) {
         viewModelScope.launch {
             _uiState.value = KasUiState.Loading
             try {
                 val newId = (_kasList.value.mapNotNull { it.idKas?.toIntOrNull() }.maxOrNull() ?: 0) + 1
+                val logText = if (keterangan.isNotBlank()) " ($keterangan)" else ""
                 val kasBaru = Kas(
                     idKas = newId.toString(),
                     nama = nama,
                     saldo = saldo,
-                    aktif = true,
-                    updatedAtText = "Baru saja ditambahkan"
+                    aktif = aktif,
+                    updatedAtText = "Baru saja ditambahkan$logText"
                 )
-                _kasList.value = _kasList.value + kasBaru
+                _kasList.value += kasBaru
                 fetchAllActiveKas()
+                onSuccess()
             } catch (e: Exception) {
                 _uiState.value = KasUiState.Error(e.message ?: "Gagal menambahkan kas baru")
             }
@@ -101,6 +103,44 @@ class KasViewModel : ViewModel() {
                     }
                 }
                 fetchAllActiveKas()
+            } catch (e: Exception) {
+                _uiState.value = KasUiState.Error(e.message ?: "Gagal menonaktifkan kas")
+            }
+        }
+    }
+
+    fun updateKas(id: String, nama: String, aktif: Boolean, keteranganUser: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _uiState.value = KasUiState.Loading
+            try {
+                _kasList.value = _kasList.value.map { kas ->
+                    if (kas.idKas == id) {
+                        kas.copy(nama = nama, aktif = aktif, updatedAtText = "Baru saja diubah")
+                    } else {
+                        kas
+                    }
+                }
+                fetchAllActiveKas()
+                onSuccess()
+            } catch (e: Exception) {
+                _uiState.value = KasUiState.Error(e.message ?: "Gagal mengubah kas")
+            }
+        }
+    }
+
+    fun softDeleteKas(id: String, keteranganUser: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _uiState.value = KasUiState.Loading
+            try {
+                _kasList.value = _kasList.value.map { kas ->
+                    if (kas.idKas == id) {
+                        kas.copy(aktif = false, updatedAtText = "Baru saja dinonaktifkan")
+                    } else {
+                        kas
+                    }
+                }
+                fetchAllActiveKas()
+                onSuccess()
             } catch (e: Exception) {
                 _uiState.value = KasUiState.Error(e.message ?: "Gagal menonaktifkan kas")
             }

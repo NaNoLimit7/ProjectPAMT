@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.screens.home.pelanggan
+package com.example.projectpamt.ui.screens.home.kas
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -24,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -31,8 +32,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import com.example.projectpamt.ui.components.AppTextField
-import com.example.projectpamt.ui.utils.ValidationUtils
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -43,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -56,73 +56,127 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.projectpamt.R
-import com.example.projectpamt.data.model.Pelanggan
+import com.example.projectpamt.data.model.Kas
+import com.example.projectpamt.ui.components.AppTextField
 import com.example.projectpamt.ui.theme.BackgroundSlate
+import com.example.projectpamt.ui.theme.BorderSlate
+import com.example.projectpamt.ui.theme.DangerRed
 import com.example.projectpamt.ui.theme.GreenPrimary
-import com.example.projectpamt.viewmodel.pelanggan.PelangganUiState
-import com.example.projectpamt.viewmodel.pelanggan.PelangganViewModel
+import com.example.projectpamt.ui.theme.TextDark
+import com.example.projectpamt.ui.theme.TextMuted
+import com.example.projectpamt.ui.utils.ValidationUtils
+import com.example.projectpamt.ui.utils.formatRupiah
+import com.example.projectpamt.viewmodel.kas.KasUiState
+import com.example.projectpamt.viewmodel.kas.KasViewModel
 
 @Composable
-fun EditPelangganScreen(
-    pelanggan: Pelanggan,
+fun EditKasScreen(
+    kas: Kas,
     modifier: Modifier = Modifier,
-    viewModel: PelangganViewModel,
+    viewModel: KasViewModel,
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val isLoading = uiState is PelangganUiState.Loading
+    val isLoading = uiState is KasUiState.Loading
 
-    EditPelangganContent(
-        pelanggan = pelanggan,
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    EditKasContent(
+        kas = kas,
         modifier = modifier,
         isLoading = isLoading,
         onBackClick = { navController.popBackStack() },
-        onDeleteClick = {
-            pelanggan.idPelanggan?.let { id ->
-                viewModel.deletePelanggan(id) {
-                    navController.popBackStack()
-                }
-            }
-        },
-        onSaveClick = { nama, telepon, aktif ->
-            pelanggan.idPelanggan?.let { id ->
-                viewModel.updatePelanggan(id, nama, telepon, aktif) {
+        onDeleteClick = { showDeleteDialog = true },
+        onSaveClick = { nama, aktif, keterangan ->
+            kas.idKas?.let { id ->
+                viewModel.updateKas(id, nama, aktif, keterangan) {
                     navController.popBackStack()
                 }
             }
         }
     )
+
+    if (showDeleteDialog) {
+        var deleteReason by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { 
+                showDeleteDialog = false 
+                deleteReason = ""
+            },
+            title = { Text("Nonaktifkan Akun Kas", fontWeight = FontWeight.Bold, color = TextDark) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Apakah Anda yakin ingin menonaktifkan akun kas ini? Akun kas yang dinonaktifkan tidak akan muncul pada daftar transaksi aktif.")
+                    
+                    AppTextField(
+                        value = deleteReason,
+                        onValueChange = { deleteReason = it },
+                        externalLabel = "Alasan Penonaktifan *",
+                        placeholder = "Masukkan alasan penonaktifan",
+                        leadingIcon = ImageVector.vectorResource(R.drawable.edit),
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Sentences,
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Done
+                        )
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDeleteDialog = false
+                        kas.idKas?.let { id ->
+                            viewModel.softDeleteKas(id, deleteReason) {
+                                navController.popBackStack()
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = DangerRed),
+                    enabled = deleteReason.isNotBlank()
+                ) {
+                    Text("Nonaktifkan", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { 
+                        showDeleteDialog = false 
+                        deleteReason = ""
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFF1F5F9),
+                        contentColor = Color(0xFF6B7280)
+                    )
+                ) {
+                    Text("Batal")
+                }
+            },
+            containerColor = Color.White
+        )
+    }
 }
 
 @Composable
-private fun EditPelangganContent(
-    pelanggan: Pelanggan,
+private fun EditKasContent(
+    kas: Kas,
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    onSaveClick: (String, String, Boolean) -> Unit
+    onSaveClick: (String, Boolean, String) -> Unit
 ) {
-    var nama by remember { mutableStateOf(pelanggan.nama) }
-    var telepon by remember { mutableStateOf(pelanggan.telepon) }
-    var aktif by remember { mutableStateOf(pelanggan.aktif) }
+    var nama by remember { mutableStateOf(kas.nama) }
+    var aktif by remember { mutableStateOf(kas.aktif) }
+    var keterangan by remember { mutableStateOf("") }
     var namaError by remember { mutableStateOf<String?>(null) }
-    var teleponError by remember { mutableStateOf<String?>(null) }
 
-    val isChanged = remember(nama, telepon, aktif, pelanggan) {
-        val cleanPhone = telepon.replace("-", "").replace(" ", "")
-        val cleanOriginalPhone = pelanggan.telepon.replace("-", "").replace(" ", "")
-        nama.trim() != pelanggan.nama.trim() ||
-                cleanPhone != cleanOriginalPhone ||
-                aktif != pelanggan.aktif
+    val isChanged = remember(nama, aktif, kas) {
+        nama.trim() != kas.nama.trim() || aktif != kas.aktif
     }
-    val isEnabled = remember(nama, telepon, namaError, teleponError, isChanged, isLoading) {
-        nama.isNotBlank() &&
-                telepon.isNotBlank() &&
-                namaError == null &&
-                teleponError == null &&
-                isChanged &&
-                !isLoading
+
+    val isEnabled = remember(nama, namaError, keterangan, isChanged, isLoading) {
+        nama.isNotBlank() && namaError == null && keterangan.isNotBlank() && isChanged && !isLoading
     }
 
     Column(
@@ -139,17 +193,12 @@ private fun EditPelangganContent(
                 .verticalScroll(rememberScrollState())
                 .imePadding()
         ) {
-            // ── HEADER SECTION ──────────────────────────────────────────────
+            // ── HEADER SECTION (Fixed) ──────────────────────────────────────
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(
                         elevation = 4.dp,
-                        spotColor = Color(0x1A000000),
-                        ambientColor = Color(0x1A000000)
-                    )
-                    .shadow(
-                        elevation = 6.dp,
                         spotColor = Color(0x1A000000),
                         ambientColor = Color(0x1A000000)
                     )
@@ -159,7 +208,7 @@ private fun EditPelangganContent(
                     )
                     .windowInsetsPadding(WindowInsets.statusBars)
                     .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // Back Button
                 Row(
@@ -179,7 +228,7 @@ private fun EditPelangganContent(
                         text = "Kembali",
                         fontSize = 18.sp,
                         lineHeight = 28.sp,
-                        fontWeight = FontWeight(400),
+                        fontWeight = FontWeight.Normal,
                         color = Color.White.copy(alpha = 0.9f)
                     )
                 }
@@ -187,15 +236,15 @@ private fun EditPelangganContent(
                 // Title Area
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
-                        text = "Edit Pelanggan",
+                        text = "Edit Akun Kas",
                         fontSize = 24.sp,
-                        fontWeight = FontWeight(700),
+                        fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Text(
-                        text = pelanggan.nama,
+                        text = kas.nama,
                         fontSize = 14.sp,
-                        color = Color(0xFFDBEAFE),
+                        color = Color(0xFFDCFCE7),
                         fontWeight = FontWeight.Normal
                     )
                 }
@@ -208,7 +257,7 @@ private fun EditPelangganContent(
                     .padding(horizontal = 20.dp, vertical = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // CARD 1: Data Pelanggan Form
+                // CARD 1: Data Kas Form
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -219,16 +268,16 @@ private fun EditPelangganContent(
                         ),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
-                    border = BorderStroke(1.dp, Color(0x4DBECABE)),
+                    border = BorderStroke(1.dp, BorderSlate),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 17.dp, horizontal = 17.dp),
+                            .padding(vertical = 20.dp, horizontal = 20.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        // Title: Data Pelanggan with Icon
+                        // Title: Data Kas with Icon
                         Column {
                             Row(
                                 modifier = Modifier
@@ -238,16 +287,16 @@ private fun EditPelangganContent(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
                                 Icon(
-                                    imageVector = ImageVector.vectorResource(R.drawable.profil),
+                                    imageVector = ImageVector.vectorResource(R.drawable.kas),
                                     contentDescription = null,
                                     tint = GreenPrimary,
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Text(
-                                    text = "Data Pelanggan",
+                                    text = "Data Akun Kas",
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF181D18)
+                                    color = TextDark
                                 )
                             }
                             HorizontalDivider(
@@ -257,15 +306,15 @@ private fun EditPelangganContent(
                             )
                         }
 
-                        // Nama Lengkap Input
+                        // Nama Kas Input
                         AppTextField(
                             value = nama,
                             onValueChange = {
                                 nama = it
-                                namaError = ValidationUtils.validateName(it).errorMessage
+                                namaError = ValidationUtils.validateKasName(it).errorMessage
                             },
-                            externalLabel = "Nama Lengkap *",
-                            placeholder = "Masukkan nama lengkap",
+                            externalLabel = "Nama Akun Kas *",
+                            placeholder = "Masukkan nama kas",
                             leadingIcon = ImageVector.vectorResource(R.drawable.nama),
                             keyboardOptions = KeyboardOptions(
                                 capitalization = KeyboardCapitalization.Words,
@@ -276,27 +325,53 @@ private fun EditPelangganContent(
                             errorMessage = namaError
                         )
 
-                        // Nomor Telepon Input
+                        // Keterangan Perubahan Input
                         AppTextField(
-                            value = telepon,
-                            onValueChange = {
-                                telepon = it
-                                teleponError = ValidationUtils.validatePhone(it).errorMessage
-                            },
-                            externalLabel = "Nomor Telepon *",
-                            placeholder = "Contoh: 0812-3456-7890",
-                            leadingIcon = ImageVector.vectorResource(R.drawable.telepon),
+                            value = keterangan,
+                            onValueChange = { keterangan = it },
+                            externalLabel = "Keterangan Perubahan *",
+                            placeholder = "Contoh: Koreksi ejaan nama / penyesuaian status",
+                            leadingIcon = ImageVector.vectorResource(R.drawable.edit),
                             keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Phone,
+                                capitalization = KeyboardCapitalization.Sentences,
+                                keyboardType = KeyboardType.Text,
                                 imeAction = ImeAction.Done
-                            ),
-                            isError = teleponError != null,
-                            errorMessage = teleponError
+                            )
                         )
+
+                        // Saldo Awal Display (Informational/Read-Only)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 4.dp)
+                        ) {
+                            Text(
+                                text = "Total Saldo Saat Ini",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = TextMuted,
+                                modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(Color(0xFFF8FAFC))
+                                    .border(1.dp, BorderSlate, RoundedCornerShape(12.dp))
+                                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                            ) {
+                                Text(
+                                    text = formatRupiah(kas.saldo),
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = GreenPrimary
+                                )
+                            }
+                        }
                     }
                 }
 
-                // CARD 2: Status Pelanggan Toggle
+                // CARD 2: Status Kas Toggle
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -307,7 +382,7 @@ private fun EditPelangganContent(
                         ),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
-                    border = BorderStroke(1.dp, Color(0x4DBECABE)),
+                    border = BorderStroke(1.dp, BorderSlate),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
                 ) {
                     Row(
@@ -319,15 +394,15 @@ private fun EditPelangganContent(
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(
-                                text = "Pelanggan Aktif",
+                                text = "Kas Aktif",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF181D18)
+                                color = TextDark
                             )
                             Text(
-                                text = "Dapat melakukan transaksi",
+                                text = "Dapat digunakan untuk transaksi",
                                 fontSize = 14.sp,
-                                color = Color(0xFF6B7280)
+                                color = TextMuted
                             )
                         }
 
@@ -337,8 +412,8 @@ private fun EditPelangganContent(
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
                                 checkedTrackColor = GreenPrimary,
-                                uncheckedThumbColor = Color(0xFF9CA3AF),
-                                uncheckedTrackColor = Color(0xFFE5E7EB),
+                                uncheckedThumbColor = Color(0xFF94A3B8),
+                                uncheckedTrackColor = Color(0xFFE2E8F0),
                                 uncheckedBorderColor = Color.Transparent
                             )
                         )
@@ -349,7 +424,7 @@ private fun EditPelangganContent(
 
         // ── FIXED FOOTER ACTION SECTION ──────────────────────────────────────
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .shadow(
                     elevation = 20.dp,
@@ -357,7 +432,7 @@ private fun EditPelangganContent(
                     ambientColor = Color(0x0D1E2430)
                 )
                 .background(Color.White)
-                .border(BorderStroke(1.dp, Color(0x33BECABE)))
+                .border(BorderStroke(1.dp, BorderSlate))
                 .padding(horizontal = 20.dp, vertical = 20.dp)
         ) {
             Row(
@@ -368,13 +443,12 @@ private fun EditPelangganContent(
                 // Tombol Hapus (weight = 1)
                 Button(
                     onClick = { onDeleteClick() },
-                    modifier = Modifier
-                        .height(48.dp),
+                    modifier = Modifier.height(48.dp),
                     shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Color(0xFFBA1A1A)),
+                    border = BorderStroke(1.dp, DangerRed),
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = Color.White,
-                        contentColor = Color(0xFFBA1A1A)
+                        contentColor = DangerRed
                     ),
                     enabled = !isLoading
                 ) {
@@ -385,7 +459,7 @@ private fun EditPelangganContent(
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.delete),
                             contentDescription = "Hapus",
-                            tint = Color(0xFFBA1A1A),
+                            tint = DangerRed,
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
@@ -399,35 +473,21 @@ private fun EditPelangganContent(
                 // Tombol Simpan Perubahan (weight = 2)
                 Button(
                     onClick = {
-                        val namaVal = ValidationUtils.validateName(nama)
-                        val teleponVal = ValidationUtils.validatePhone(telepon)
-                        
-                        namaError = namaVal.errorMessage
-                        teleponError = teleponVal.errorMessage
-                        
-                        if (namaVal.isValid && teleponVal.isValid) {
-                            onSaveClick(nama, telepon, aktif)
+                        val nameVal = ValidationUtils.validateKasName(nama)
+                        namaError = nameVal.errorMessage
+                        if (nameVal.isValid) {
+                            onSaveClick(nama, aktif, keterangan)
                         }
                     },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .shadow(
-                            elevation = 6.dp,
-                            spotColor = Color(0x1A2563EB),
-                            ambientColor = Color(0x1A2563EB)
-                        )
-                        .shadow(
-                            elevation = 15.dp,
-                            spotColor = Color(0x332563EB),
-                            ambientColor = Color(0x332563EB)
-                        ),
+                        .weight(1f)
+                        .height(48.dp),
                     enabled = isEnabled,
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF007A45),
+                        containerColor = GreenPrimary,
                         contentColor = Color.White,
-                        disabledContainerColor = Color(0xFF007A45).copy(alpha = 0.5f),
+                        disabledContainerColor = GreenPrimary.copy(alpha = 0.5f),
                         disabledContentColor = Color.White.copy(alpha = 0.8f)
                     )
                 ) {

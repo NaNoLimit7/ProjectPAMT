@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -66,6 +67,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import androidx.core.net.toUri
+import com.example.projectpamt.data.model.Kategori
 
 @Composable
 fun EditProdukScreen(
@@ -170,7 +172,7 @@ private fun EditProdukContent(
     modifier: Modifier = Modifier,
     produk: Produk,
     isLoading: Boolean,
-    categories: List<com.example.projectpamt.data.model.Kategori>,
+    categories: List<Kategori>,
     onBackClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onSaveClick: (
@@ -251,136 +253,133 @@ private fun EditProdukContent(
         modifier = Modifier
             .fillMaxSize()
             .background(BackgroundSlate)
+            .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
+        // HEADER SECTION (Fixed)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = GreenPrimary,
+                    shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                )
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .clickable { onBackClick() }
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Kembali",
+                    tint = Color.White,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = "Kembali",
+                    fontSize = 18.sp,
+                    lineHeight = 28.sp,
+                    fontWeight = FontWeight(400),
+                    color = Color.White.copy(alpha = 0.9f)
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Edit Produk",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+        }
+
+        // SCROLLABLE FORM
         Column(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
                 .imePadding()
+                .padding(horizontal = 20.dp, vertical = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // HEADER SECTION
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = GreenPrimary,
-                        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-                    )
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .clickable { onBackClick() }
-                        .padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Kembali",
-                        tint = Color.White,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Text(
-                        text = "Kembali",
-                        fontSize = 18.sp,
-                        lineHeight = 28.sp,
-                        fontWeight = FontWeight(400),
-                        color = Color.White.copy(alpha = 0.9f)
-                    )
-                }
+            // 1. FOTO PRODUK SECTION
+            FotoProdukSection(
+                selectedImageUri = selectedImageUri,
+                onImageSelected = { selectedImageUri = it }
+            )
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Edit Produk",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-            }
+            // 2. INFORMASI PRODUK SECTION
+            InformasiProdukSection(
+                nama = nama,
+                onNamaChange = {
+                    nama = it
+                    namaError = ValidationUtils.validateProductName(it).errorMessage
+                },
+                namaError = namaError,
+                sku = sku,
+                onSkuChange = {
+                    sku = it
+                    skuError = ValidationUtils.validateSKU(it).errorMessage
+                },
+                skuError = skuError,
+                kategori = kategori,
+                onKategoriChange = { kategori = it },
+                categories = categories,
+                onAddCategoryClick = { showBottomSheet = true },
+                deskripsi = deskripsi,
+                onDeskripsiChange = { deskripsi = it }
+            )
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
-                // 1. FOTO PRODUK SECTION
-                FotoProdukSection(
-                    selectedImageUri = selectedImageUri,
-                    onImageSelected = { selectedImageUri = it }
-                )
-
-                // 2. INFORMASI PRODUK SECTION
-                InformasiProdukSection(
-                    nama = nama,
-                    onNamaChange = {
-                        nama = it
-                        namaError = ValidationUtils.validateProductName(it).errorMessage
-                    },
-                    namaError = namaError,
-                    sku = sku,
-                    onSkuChange = {
-                        sku = it
-                        skuError = ValidationUtils.validateSKU(it).errorMessage
-                    },
-                    skuError = skuError,
-                    kategori = kategori,
-                    onKategoriChange = { kategori = it },
-                    categories = categories,
-                    onAddCategoryClick = { showBottomSheet = true },
-                    deskripsi = deskripsi,
-                    onDeskripsiChange = { deskripsi = it }
-                )
-
-                // 3. HARGA & STOK SECTION (stokLabel set to "Stok Saat Ini *")
-                HargaStokSection(
-                    hargaModal = hargaModal,
-                    onHargaModalChange = { input ->
-                        val digits = input.filter { it.isDigit() }
-                        if (digits.isEmpty()) {
-                            hargaModal = ""
-                            hargaModalError = ValidationUtils.validatePrice("").errorMessage
-                        } else {
-                            val formatted = ValidationUtils.formatThousandSeparator(digits)
-                            hargaModal = formatted
-                            hargaModalError = ValidationUtils.validatePrice(formatted).errorMessage
-                        }
-                    },
-                    hargaModalError = hargaModalError,
-                    hargaJual = hargaJual,
-                    onHargaJualChange = { input ->
-                        val digits = input.filter { it.isDigit() }
-                        if (digits.isEmpty()) {
-                            hargaJual = ""
-                            hargaJualError = ValidationUtils.validatePrice("").errorMessage
-                        } else {
-                            val formatted = ValidationUtils.formatThousandSeparator(digits)
-                            hargaJual = formatted
-                            hargaJualError = ValidationUtils.validatePrice(formatted).errorMessage
-                        }
-                    },
-                    hargaJualError = hargaJualError,
-                    stok = stok,
-                    onStokChange = { input ->
-                        val digits = input.filter { it.isDigit() }
-                        stok = digits
-                        stokError = ValidationUtils.validateStock(digits).errorMessage
-                    },
-                    stokError = stokError,
-                    satuan = satuan,
-                    onSatuanChange = { satuan = it },
-                    stokLabel = "Stok Saat Ini *"
-                )
-            }
+            // 3. HARGA & STOK SECTION (stokLabel set to "Stok Saat Ini *")
+            HargaStokSection(
+                hargaModal = hargaModal,
+                onHargaModalChange = { input ->
+                    val digits = input.filter { it.isDigit() }
+                    if (digits.isEmpty()) {
+                        hargaModal = ""
+                        hargaModalError = ValidationUtils.validatePrice("").errorMessage
+                    } else {
+                        val formatted = ValidationUtils.formatThousandSeparator(digits)
+                        hargaModal = formatted
+                        hargaModalError = ValidationUtils.validatePrice(formatted).errorMessage
+                    }
+                },
+                hargaModalError = hargaModalError,
+                hargaJual = hargaJual,
+                onHargaJualChange = { input ->
+                    val digits = input.filter { it.isDigit() }
+                    if (digits.isEmpty()) {
+                        hargaJual = ""
+                        hargaJualError = ValidationUtils.validatePrice("").errorMessage
+                    } else {
+                        val formatted = ValidationUtils.formatThousandSeparator(digits)
+                        hargaJual = formatted
+                        hargaJualError = ValidationUtils.validatePrice(formatted).errorMessage
+                    }
+                },
+                hargaJualError = hargaJualError,
+                stok = stok,
+                onStokChange = { input ->
+                    val digits = input.filter { it.isDigit() }
+                    stok = digits
+                    stokError = ValidationUtils.validateStock(digits).errorMessage
+                },
+                stokError = stokError,
+                satuan = satuan,
+                onSatuanChange = { satuan = it },
+                stokLabel = "Stok Saat Ini *"
+            )
         }
 
         // FIXED FOOTER ACTION BAR

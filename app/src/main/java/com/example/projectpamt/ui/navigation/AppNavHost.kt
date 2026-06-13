@@ -21,11 +21,11 @@ import com.example.projectpamt.ui.screens.home.penjualan.ProsesPembayaranScreen
 import com.example.projectpamt.ui.screens.home.penjualan.PembayaranBerhasilScreen
 import com.example.projectpamt.ui.screens.home.penjualan.RiwayatPenjualanScreen
 import com.example.projectpamt.ui.screens.home.produk.LogInventoryScreen
-import com.example.projectpamt.ui.navigation.LogInventoryList
 import com.example.projectpamt.ui.screens.home.kas.LogTotalKasScreen
-import com.example.projectpamt.ui.navigation.LogTotalKas
-import com.example.projectpamt.ui.navigation.LogKas
 import com.example.projectpamt.ui.screens.home.kas.LogKasScreen
+import com.example.projectpamt.ui.screens.home.kas.EditKasScreen
+import com.example.projectpamt.ui.screens.home.kas.TambahKasScreen
+import com.example.projectpamt.viewmodel.kas.KasViewModel
 import com.example.projectpamt.data.model.Kas
 import com.example.projectpamt.ui.screens.home.produk.DetailProdukScreen
 import com.example.projectpamt.ui.screens.home.produk.EditProdukScreen
@@ -201,14 +201,12 @@ fun AppNavHost(
 
         composable<RiwayatPenjualan> {
             RiwayatPenjualanScreen(
-                modifier = modifier,
                 navController = navController
             )
         }
 
         composable<LogInventoryList> {
             LogInventoryScreen(
-                modifier = modifier,
                 navController = navController
             )
         }
@@ -227,6 +225,25 @@ fun AppNavHost(
             LogKasScreen(
                 modifier = modifier,
                 kas = route.kas,
+                navController = navController
+            )
+        }
+
+        composable<EditKas>(
+            typeMap = mapOf(typeOf<Kas>() to Kas.KasNavType)
+        ) { backStackEntry ->
+            val route = backStackEntry.toRoute<EditKas>()
+            EditKasScreen(
+                kas = route.kas,
+                viewModel = viewModel(modelClass = KasViewModel::class.java),
+                navController = navController
+            )
+        }
+
+        composable<TambahKas> {
+            TambahKasScreen(
+                modifier = modifier,
+                viewModel = viewModel(modelClass = KasViewModel::class.java),
                 navController = navController
             )
         }

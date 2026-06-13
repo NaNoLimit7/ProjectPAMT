@@ -1,4 +1,4 @@
-package com.example.projectpamt.ui.screens.home.pelanggan
+package com.example.projectpamt.ui.screens.home.kas
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -31,9 +31,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import com.example.projectpamt.ui.components.AppTextField
-import com.example.projectpamt.ui.utils.ValidationUtils
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import com.example.projectpamt.ui.theme.TextMuted
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,26 +55,30 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.projectpamt.R
+import com.example.projectpamt.ui.components.AppTextField
 import com.example.projectpamt.ui.theme.BackgroundSlate
+import com.example.projectpamt.ui.theme.BorderSlate
 import com.example.projectpamt.ui.theme.GreenPrimary
-import com.example.projectpamt.viewmodel.pelanggan.PelangganUiState
-import com.example.projectpamt.viewmodel.pelanggan.PelangganViewModel
+import com.example.projectpamt.ui.theme.TextDark
+import com.example.projectpamt.ui.utils.ValidationUtils
+import com.example.projectpamt.viewmodel.kas.KasUiState
+import com.example.projectpamt.viewmodel.kas.KasViewModel
 
 @Composable
-fun TambahPelangganScreen(
+fun TambahKasScreen(
     modifier: Modifier = Modifier,
-    viewModel: PelangganViewModel,
+    viewModel: KasViewModel,
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val isLoading = uiState is PelangganUiState.Loading
+    val isLoading = uiState is KasUiState.Loading
 
-    TambahPelangganContent(
+    TambahKasContent(
         modifier = modifier,
         isLoading = isLoading,
         onBackClick = { navController.popBackStack() },
-        onSaveClick = { nama, telepon ->
-            viewModel.addPelanggan(nama, telepon) {
+        onSaveClick = { nama, saldo, keterangan, aktif ->
+            viewModel.addKas(nama, saldo, keterangan, aktif) {
                 navController.popBackStack()
             }
         }
@@ -81,22 +86,24 @@ fun TambahPelangganScreen(
 }
 
 @Composable
-private fun TambahPelangganContent(
+private fun TambahKasContent(
     modifier: Modifier = Modifier,
     isLoading: Boolean,
     onBackClick: () -> Unit,
-    onSaveClick: (
-        nama: String,
-        telepon: String
-    ) -> Unit
+    onSaveClick: (String, Double, String, Boolean) -> Unit
 ) {
     var nama by remember { mutableStateOf("") }
-    var telepon by remember { mutableStateOf("") }
+    var saldo by remember { mutableStateOf("") }
+    var keterangan by remember { mutableStateOf("") }
+    var aktif by remember { mutableStateOf(true) }
+    
     var namaError by remember { mutableStateOf<String?>(null) }
-    var teleponError by remember { mutableStateOf<String?>(null) }
+    var saldoError by remember { mutableStateOf<String?>(null) }
 
-    val isEnabled = nama.isNotBlank() && telepon.isNotBlank() &&
-            namaError == null && teleponError == null && !isLoading
+    val isEnabled = remember(nama, saldo, namaError, saldoError, isLoading) {
+        nama.isNotBlank() && saldo.isNotBlank() &&
+                namaError == null && saldoError == null && !isLoading
+    }
 
     Column(
         modifier = Modifier
@@ -112,17 +119,12 @@ private fun TambahPelangganContent(
                 .verticalScroll(rememberScrollState())
                 .imePadding()
         ) {
-            // ── HEADER SECTION ──────────────────────────────────────────────
+            // ── HEADER SECTION (Fixed) ──────────────────────────────────────
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(
                         elevation = 4.dp,
-                        spotColor = Color(0x1A000000),
-                        ambientColor = Color(0x1A000000)
-                    )
-                    .shadow(
-                        elevation = 6.dp,
                         spotColor = Color(0x1A000000),
                         ambientColor = Color(0x1A000000)
                     )
@@ -132,7 +134,7 @@ private fun TambahPelangganContent(
                     )
                     .windowInsetsPadding(WindowInsets.statusBars)
                     .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // Back Button
                 Row(
@@ -152,32 +154,36 @@ private fun TambahPelangganContent(
                         text = "Kembali",
                         fontSize = 18.sp,
                         lineHeight = 28.sp,
-                        fontWeight = FontWeight(400),
+                        fontWeight = FontWeight.Normal,
                         color = Color.White.copy(alpha = 0.9f)
                     )
                 }
 
                 // Title Area
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
-                        text = "Tambah Pelanggan",
+                        text = "Tambah Akun Kas",
                         fontSize = 24.sp,
-                        fontWeight = FontWeight(700),
+                        fontWeight = FontWeight.Bold,
                         color = Color.White
+                    )
+                    Text(
+                        text = "Mendaftarkan akun kas baru",
+                        fontSize = 14.sp,
+                        color = Color(0xFFDCFCE7),
+                        fontWeight = FontWeight.Normal
                     )
                 }
             }
 
             // ── FORM SECTION ────────────────────────────────────────────────
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 24.dp)
+                    .padding(horizontal = 20.dp, vertical = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // CARD 1: Data Kas Form
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -188,16 +194,16 @@ private fun TambahPelangganContent(
                         ),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
-                    border = BorderStroke(1.dp, Color(0x4DBECABE)),
+                    border = BorderStroke(1.dp, BorderSlate),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 17.dp, horizontal = 17.dp),
+                            .padding(vertical = 20.dp, horizontal = 20.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        // Title: Data Pelanggan with Icon
+                        // Title: Data Kas with Icon
                         Column {
                             Row(
                                 modifier = Modifier
@@ -207,16 +213,16 @@ private fun TambahPelangganContent(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
                                 Icon(
-                                    imageVector = ImageVector.vectorResource(R.drawable.profil),
+                                    imageVector = ImageVector.vectorResource(R.drawable.kas),
                                     contentDescription = null,
                                     tint = GreenPrimary,
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Text(
-                                    text = "Data Pelanggan",
+                                    text = "Data Akun Kas Baru",
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF181D18)
+                                    color = TextDark
                                 )
                             }
                             HorizontalDivider(
@@ -226,16 +232,15 @@ private fun TambahPelangganContent(
                             )
                         }
 
-
-                        // Nama Lengkap Input
+                        // Nama Kas Input
                         AppTextField(
                             value = nama,
                             onValueChange = {
                                 nama = it
-                                namaError = ValidationUtils.validateName(it).errorMessage
+                                namaError = ValidationUtils.validateKasName(it).errorMessage
                             },
-                            externalLabel = "Nama Lengkap *",
-                            placeholder = "Masukkan nama lengkap",
+                            externalLabel = "Nama Akun Kas *",
+                            placeholder = "Masukkan nama kas baru",
                             leadingIcon = ImageVector.vectorResource(R.drawable.nama),
                             keyboardOptions = KeyboardOptions(
                                 capitalization = KeyboardCapitalization.Words,
@@ -246,23 +251,77 @@ private fun TambahPelangganContent(
                             errorMessage = namaError
                         )
 
-                        // Nomor Telepon Input
+                        // Saldo Awal Input
                         AppTextField(
-                            value = telepon,
-                            onValueChange = {
-                                telepon = it
-                                teleponError = ValidationUtils.validatePhone(it).errorMessage
+                            value = saldo,
+                            onValueChange = { input ->
+                                val digits = input.filter { it.isDigit() }
+                                saldo = if (digits.isEmpty()) "" else ValidationUtils.formatThousandSeparator(digits)
+                                saldoError = if (saldo.isBlank()) "Saldo tidak boleh kosong." else null
                             },
-                            externalLabel = "Nomor Telepon *",
-                            placeholder = "Contoh: 0812-3456-7890",
-                            leadingIcon = ImageVector.vectorResource(R.drawable.telepon),
+                            externalLabel = "Saldo Awal (Rp) *",
+                            placeholder = "Contoh: 1.000.000",
+                            leadingIcon = ImageVector.vectorResource(R.drawable.kas),
                             keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Phone,
-                                imeAction = ImeAction.Done
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
                             ),
-                            isError = teleponError != null,
-                            errorMessage = teleponError
+                            isError = saldoError != null,
+                            errorMessage = saldoError
                         )
+
+                        // Keterangan Input
+                        AppTextField(
+                            value = keterangan,
+                            onValueChange = { keterangan = it },
+                            externalLabel = "Keterangan",
+                            placeholder = "Tambahkan catatan singkat...",
+                            leadingIcon = ImageVector.vectorResource(R.drawable.edit),
+                            keyboardOptions = KeyboardOptions(
+                                capitalization = KeyboardCapitalization.Sentences,
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Done
+                            )
+                        )
+
+                        HorizontalDivider(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                            color = Color(0x33BECABE),
+                            thickness = 1.dp
+                        )
+
+                        // Aktif Switch
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(
+                                    text = "Aktif",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = TextDark
+                                )
+                                Text(
+                                    text = "Status akun saat ini",
+                                    fontSize = 14.sp,
+                                    color = TextMuted
+                                )
+                            }
+
+                            Switch(
+                                checked = aktif,
+                                onCheckedChange = { aktif = it },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.White,
+                                    checkedTrackColor = GreenPrimary,
+                                    uncheckedThumbColor = Color(0xFF94A3B8),
+                                    uncheckedTrackColor = Color(0xFFE2E8F0),
+                                    uncheckedBorderColor = Color.Transparent
+                                )
+                            )
+                        }
                     }
                 }
             }
@@ -270,7 +329,7 @@ private fun TambahPelangganContent(
 
         // ── FIXED FOOTER ACTION SECTION ──────────────────────────────────────
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .shadow(
                     elevation = 20.dp,
@@ -278,40 +337,33 @@ private fun TambahPelangganContent(
                     ambientColor = Color(0x0D1E2430)
                 )
                 .background(Color.White)
-                .border(BorderStroke(1.dp, Color(0x33BECABE)))
+                .border(BorderStroke(1.dp, BorderSlate))
                 .padding(horizontal = 20.dp, vertical = 20.dp)
         ) {
+            // Tombol Simpan (Full Width)
             Button(
                 onClick = {
-                    val namaVal = ValidationUtils.validateName(nama)
-                    val teleponVal = ValidationUtils.validatePhone(telepon)
+                    val nameVal = ValidationUtils.validateKasName(nama)
+                    namaError = nameVal.errorMessage
                     
-                    namaError = namaVal.errorMessage
-                    teleponError = teleponVal.errorMessage
-                    
-                    if (namaVal.isValid && teleponVal.isValid) {
-                        onSaveClick(nama, telepon)
+                    if (saldo.isBlank()) {
+                        saldoError = "Saldo tidak boleh kosong."
+                    }
+
+                    if (nameVal.isValid && saldoError == null) {
+                        val saldoDouble = ValidationUtils.parseThousandSeparator(saldo)
+                        onSaveClick(nama, saldoDouble, keterangan, aktif)
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(
-                        elevation = 6.dp,
-                        spotColor = Color(0x1A2563EB),
-                        ambientColor = Color(0x1A2563EB)
-                    )
-                    .shadow(
-                        elevation = 15.dp,
-                        spotColor = Color(0x332563EB),
-                        ambientColor = Color(0x332563EB)
-                    )
                     .height(48.dp),
                 enabled = isEnabled,
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF007A45),
+                    containerColor = GreenPrimary,
                     contentColor = Color.White,
-                    disabledContainerColor = Color(0xFF007A45).copy(alpha = 0.5f),
+                    disabledContainerColor = GreenPrimary.copy(alpha = 0.5f),
                     disabledContentColor = Color.White.copy(alpha = 0.8f)
                 )
             ) {
@@ -322,7 +374,7 @@ private fun TambahPelangganContent(
                     )
                 } else {
                     Text(
-                        text = "Simpan Pelanggan",
+                        text = "Simpan Akun Kas",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.28.sp

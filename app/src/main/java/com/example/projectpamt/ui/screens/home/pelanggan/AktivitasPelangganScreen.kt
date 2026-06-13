@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -99,128 +100,133 @@ private fun AktivitasPelangganContent(
     onBackClick: () -> Unit,
     onFilterSelected: (AktivitasFilter) -> Unit
 ) {
-    LazyColumn(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundSlate),
-        contentPadding = PaddingValues(bottom = 24.dp)
+            .background(BackgroundSlate)
+            .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
-        // ── 1. HEADER SECTION ────────────────────────────────────────────────
-        item {
-            Column(
+        // ── 1. HEADER SECTION (Fixed) ────────────────────────────────────────
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(
+                    elevation = 4.dp,
+                    spotColor = Color(0x1A000000),
+                    ambientColor = Color(0x1A000000)
+                )
+                .background(
+                    color = GreenPrimary,
+                    shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                )
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            // Back Button
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(
-                        elevation = 4.dp,
-                        spotColor = Color(0x1A000000),
-                        ambientColor = Color(0x1A000000)
-                    )
-                    .background(
-                        color = GreenPrimary,
-                        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-                    )
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                    .clickable { onBackClick() }
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Back Button
-                Row(
-                    modifier = Modifier
-                        .clickable { onBackClick() }
-                        .padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Kembali",
-                        tint = Color.White,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Text(
-                        text = "Kembali",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color.White.copy(alpha = 0.9f)
-                    )
-                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Kembali",
+                    tint = Color.White,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = "Kembali",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.White.copy(alpha = 0.9f)
+                )
+            }
 
-                // Title Area
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(
-                        text = "Aktivitas Pelanggan",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Text(
-                        text = pelanggan.nama,
-                        fontSize = 14.sp,
-                        color = Color(0xFFDBEAFE),
-                        fontWeight = FontWeight.Normal
-                    )
-                }
+            // Title Area
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = "Aktivitas Pelanggan",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    text = pelanggan.nama,
+                    fontSize = 14.sp,
+                    color = Color(0xFFDBEAFE),
+                    fontWeight = FontWeight.Normal
+                )
             }
         }
 
-        // ── 2. STATE HANDLING & DYNAMIC BODY ─────────────────────────────────
-        when (uiState) {
-            is AktivitasPelangganUiState.Loading -> {
-                item {
-                    Box(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .height(400.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = GreenPrimary)
+        // ── 2. STATE HANDLING & DYNAMIC BODY (Scrollable) ───────────────────
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            contentPadding = PaddingValues(bottom = 24.dp)
+        ) {
+            when (uiState) {
+                is AktivitasPelangganUiState.Loading -> {
+                    item {
+                        Box(
+                            modifier = modifier
+                                .fillMaxWidth()
+                                .height(400.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = GreenPrimary)
+                        }
                     }
                 }
-            }
 
-            is AktivitasPelangganUiState.Error -> {
-                item {
-                    Box(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .height(400.dp)
-                            .padding(24.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = uiState.message,
-                            color = Color(0xFFBA1A1A),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
+                is AktivitasPelangganUiState.Error -> {
+                    item {
+                        Box(
+                            modifier = modifier
+                                .fillMaxWidth()
+                                .height(400.dp)
+                                .padding(24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = uiState.message,
+                                color = Color(0xFFBA1A1A),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                }
+
+                is AktivitasPelangganUiState.Success -> {
+                    // Summary Cards
+                    item {
+                        SummarySection(summary = uiState.summary)
+                    }
+
+                    // Filters Chips Row
+                    item {
+                        FilterChipsRow(
+                            selectedFilter = uiState.selectedFilter,
+                            onFilterSelected = onFilterSelected
+                        )
+                    }
+
+                    // Transaction List Card
+                    item {
+                        TransactionListCard(
+                            listAktivitas = uiState.listAktivitas,
+                            modifier = modifier
                         )
                     }
                 }
+
+                else -> {}
             }
-
-            is AktivitasPelangganUiState.Success -> {
-                // Summary Cards
-                item {
-                    SummarySection(summary = uiState.summary)
-                }
-
-                // Filters Chips Row
-                item {
-                    FilterChipsRow(
-                        selectedFilter = uiState.selectedFilter,
-                        onFilterSelected = onFilterSelected
-                    )
-                }
-
-                // Transaction List Card
-                item {
-                    TransactionListCard(
-                        listAktivitas = uiState.listAktivitas,
-                        modifier = modifier
-                    )
-                }
-            }
-
-            else -> {}
         }
     }
 }

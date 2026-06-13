@@ -43,6 +43,11 @@ import com.example.projectpamt.ui.components.CircleContainer
 import com.example.projectpamt.ui.components.DashboardCard
 import com.example.projectpamt.ui.components.QuickActionButton
 import com.example.projectpamt.ui.components.WeeklyBarChart
+import com.example.projectpamt.ui.navigation.Dashboard
+import com.example.projectpamt.ui.navigation.PenjualanList
+import com.example.projectpamt.ui.navigation.RiwayatPenjualan
+import com.example.projectpamt.ui.navigation.TambahPelanggan
+import com.example.projectpamt.ui.navigation.TambahProduk
 import com.example.projectpamt.ui.theme.ActionBlue
 import com.example.projectpamt.ui.theme.ActionGreen
 import com.example.projectpamt.ui.theme.ActionOrange
@@ -104,12 +109,19 @@ fun DashboardScreen(
     DashboardContent(
         modifier = modifier,
         state = dummyState,
-        onNavigatePenjualan = {},
-        onNavigateTambahPenjualan = {},
-        onNavigateTambahProduk = {},
-        onNavigateTambahPelanggan = {},
-        onNavigateTambahPengeluaran = {},
-        onViewAllPenjualan = {}
+        onNavigateTambahPenjualan = {
+            navController.navigate(PenjualanList) {
+                popUpTo(Dashboard) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+        },
+        onNavigateTambahProduk = { navController.navigate(TambahProduk) },
+        onNavigateTambahPelanggan = { navController.navigate(TambahPelanggan)},
+        onNavigateTambahPengeluaran = { /* TODO: NAVIGASI TAMBAH PENGELUARAN */},
+        onViewAllPenjualan = { navController.navigate(RiwayatPenjualan) }
     )
 }
 
@@ -119,7 +131,6 @@ fun DashboardScreen(
 fun DashboardContent(
     modifier: Modifier = Modifier,
     state: DashboardState,
-    onNavigatePenjualan: () -> Unit,
     onNavigateTambahPenjualan: () -> Unit,
     onNavigateTambahProduk: () -> Unit,
     onNavigateTambahPelanggan: () -> Unit,
@@ -284,7 +295,7 @@ fun DashboardContent(
                     )
                     QuickActionButton(
                         icon = ImageVector.vectorResource(R.drawable.kas),
-                        label = "Tambah\nPengeluaran",
+                        label = "Kelola\nPengeluaran",
                         accentColor = ActionOrange,
                         onClick = onNavigateTambahPengeluaran,
                         modifier = Modifier.weight(1f),
@@ -336,7 +347,6 @@ private fun DashboardContentPreview() {
                     ),
                     namaPengguna = "Dika Setiawan"
                 ),
-                onNavigatePenjualan = {},
                 onNavigateTambahPenjualan = {},
                 onNavigateTambahProduk = {},
                 onNavigateTambahPelanggan = {},

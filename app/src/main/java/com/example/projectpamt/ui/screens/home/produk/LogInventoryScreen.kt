@@ -51,7 +51,6 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogInventoryScreen(
-    modifier: Modifier = Modifier,
     viewModel: LogInventoryViewModel = viewModel(),
     navController: NavController
 ) {
@@ -63,96 +62,100 @@ fun LogInventoryScreen(
     var selectedLog by remember { mutableStateOf<LogInventory?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets(0)
-    ) { innerPadding ->
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BackgroundSlate)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+    ) {
+        // ── HEADER ──────────────────────────────────────────────────────────
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .background(BackgroundSlate)
-                .padding(innerPadding)
+                .fillMaxWidth()
+                .background(
+                    color = GreenPrimary,
+                    shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                )
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ── HEADER ──────────────────────────────────────────────────────────
-            Column(
+            // Back Button
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = GreenPrimary,
-                        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-                    )
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .clickable { navController.popBackStack() }
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Back Button
-                Row(
-                    modifier = Modifier
-                        .clickable { navController.popBackStack() }
-                        .padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Kembali",
-                        tint = Color.White.copy(alpha = 0.9f),
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        text = "Kembali",
-                        color = Color.White.copy(alpha = 0.9f),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-
-                // Title Area
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(
-                        text = "Log Inventori",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Text(
-                        text = "Riwayat perubahan stok dan harga produk",
-                        fontSize = 14.sp,
-                        color = Color(0xFFDCFCE7)
-                    )
-                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Kembali",
+                    tint = Color.White.copy(alpha = 0.9f),
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = "Kembali",
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
             }
 
-            // ── CONTENT BODY ────────────────────────────────────────────────────
-            when (val state = uiState) {
-                is LogInventoryUiState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize().weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = GreenPrimary)
-                    }
-                }
-                is LogInventoryUiState.Error -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize().weight(1f).padding(24.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = state.message, color = DangerRed, fontSize = 14.sp)
-                    }
-                }
-                is LogInventoryUiState.Success -> {
-                    SuccessContent(
-                        state = state,
-                        onSearchChange = viewModel::setSearchQuery,
-                        onFilterSelect = viewModel::setFilter,
-                        onLogClick = { selectedLog = it }
-                    )
-                }
-                else -> {}
+            // Title Area
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = "Log Inventori",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    text = "Riwayat perubahan stok dan harga produk",
+                    fontSize = 14.sp,
+                    color = Color(0xFFDCFCE7)
+                )
             }
         }
+
+        // ── CONTENT BODY ────────────────────────────────────────────────────
+        when (val state = uiState) {
+            is LogInventoryUiState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = GreenPrimary)
+                }
+            }
+
+            is LogInventoryUiState.Error -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f)
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = state.message, color = DangerRed, fontSize = 14.sp)
+                }
+            }
+
+            is LogInventoryUiState.Success -> {
+                SuccessContent(
+                    state = state,
+                    onSearchChange = viewModel::setSearchQuery,
+                    onFilterSelect = viewModel::setFilter,
+                    onLogClick = { selectedLog = it }
+                )
+            }
+
+            else -> {}
+        }
     }
+
 
     // ── DETAILS BOTTOM SHEET ────────────────────────────────────────────────
     if (selectedLog != null) {
@@ -290,7 +293,8 @@ private fun LogItem(
     val dateStr = log.updatedAt ?: ""
     val formattedTime = remember(dateStr) {
         try {
-            val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
+            val date =
+                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
             if (date != null) {
                 SimpleDateFormat("d MMM yyyy, HH:mm", Locale("id", "ID")).format(date)
             } else {
@@ -309,11 +313,13 @@ private fun LogItem(
             val text = if (diff == d.toDouble()) "+$d" else "+$diff"
             Quadruple(text, Color(0xFF2E7D32), Color(0xFFE8F5E9), "Stok Masuk")
         }
+
         diff < 0 -> {
             val d = (-diff).toInt()
             val text = if (diff == d.toDouble()) "-$d" else "-$diff"
             Quadruple(text, DangerRed, Color(0xFFFFEBEE), "Stok Keluar")
         }
+
         else -> {
             Quadruple("Update", TextMuted, BorderSlate, "Update Produk")
         }
@@ -436,7 +442,8 @@ private fun LogDetailSheetContent(
     val dateStr = log.updatedAt ?: ""
     val formattedTime = remember(dateStr) {
         try {
-            val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
+            val date =
+                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
             if (date != null) {
                 SimpleDateFormat("d MMMM yyyy HH:mm", Locale("id", "ID")).format(date)
             } else {
@@ -454,10 +461,12 @@ private fun LogDetailSheetContent(
             val text = "+${diff.toInt()} pcs (Stok Masuk / Penambahan)"
             Pair(text, Color(0xFF2E7D32))
         }
+
         diff < 0 -> {
             val text = "${diff.toInt()} pcs (Stok Keluar / Terjual)"
             Pair(text, DangerRed)
         }
+
         else -> {
             Pair("Tidak ada perubahan stok (Update Info/Harga)", TextMuted)
         }
@@ -499,10 +508,10 @@ private fun LogDetailSheetContent(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
                     )
-                    
+
                     val clipboardManager = LocalClipboardManager.current
                     var copied by remember { mutableStateOf(false) }
-                    
+
                     LaunchedEffect(copied) {
                         if (copied) {
                             delay(2000)
@@ -518,7 +527,11 @@ private fun LogDetailSheetContent(
                             .size(16.dp)
                             .clickable {
                                 log.idLogInventory?.let { id ->
-                                    clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(id))
+                                    clipboardManager.setText(
+                                        androidx.compose.ui.text.AnnotatedString(
+                                            id
+                                        )
+                                    )
                                     copied = true
                                 }
                             }
@@ -542,7 +555,7 @@ private fun LogDetailSheetContent(
             LogInfoRow(label = "ID Produk", value = log.idProduk, enableCopy = true)
             LogInfoRow(label = "Nama Produk (Snapshot)", value = log.namaLama)
             LogInfoRow(label = "Harga Jual (Snapshot)", value = formatRupiah(log.hargaLama))
-            
+
             HorizontalDivider(color = BorderSlate, modifier = Modifier.padding(vertical = 4.dp))
 
             Text(
@@ -601,7 +614,7 @@ private fun LogInfoRow(
             if (enableCopy && value.isNotBlank() && value != "-") {
                 val clipboardManager = LocalClipboardManager.current
                 var copied by remember { mutableStateOf(false) }
-                
+
                 LaunchedEffect(copied) {
                     if (copied) {
                         delay(2000)

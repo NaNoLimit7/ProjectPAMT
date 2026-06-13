@@ -78,3 +78,9 @@ object LogTotalKas
 
 @Serializable
 data class LogKas(val kas: Kas)
+
+@Serializable
+data class EditKas(val kas: Kas)
+
+@Serializable
+object TambahKas

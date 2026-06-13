@@ -100,168 +100,52 @@ private fun PelangganContent(
         else -> 0
     }
 
-    LazyColumn(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundSlate),
-        contentPadding = PaddingValues(bottom = 24.dp)
+            .background(BackgroundSlate)
     ) {
-        // ── 1. HEADER SECTION ────────────────────────────────────────────────
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = GreenPrimary,
-                        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-                    )
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .padding(start = 24.dp, end = 24.dp, top = 24.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
-            ) {
-                // Title Area (Tanpa tombol Kembali)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(
-                            text = "Pelanggan",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                        Text(
-                            text = "Kelola profil pengguna",
-                            fontSize = 14.sp,
-                            color = Color(0xFFDBEAFE)
-                        )
-                    }
-
-                    // Ikon Pelanggan
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(CircleShape)
-                            .border(BorderStroke(2.dp, Color.White.copy(alpha = 0.3f)), CircleShape)
-                            .clickable { /* TODO: Aksi pelanggan */ },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.pelanggan),
-                            contentDescription = "Pelanggan",
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-
-                // Bento Stats Cards
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    // Card Total Pelanggan
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color.White.copy(alpha = 0.1f))
-                            .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
-                            .padding(17.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = "Total Pelanggan",
-                            fontSize = 14.sp,
-                            color = Color(0xFFDBEAFE)
-                        )
-                        Text(
-                            text = totalPelangganCount.toString(),
-                            fontSize = 30.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-
-                    // Card Pelanggan Aktif
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color.White.copy(alpha = 0.1f))
-                            .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
-                            .padding(17.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = "Aktif",
-                            fontSize = 14.sp,
-                            color = Color(0xFFDBEAFE)
-                        )
-                        Text(
-                            text = aktifPelangganCount.toString(),
-                            fontSize = 30.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-                }
-            }
-        }
-
-        // ── 2. SEARCH & ADD SECTION ──────────────────────────────────────────
-        item {
+        // ── FIXED HEADER ──────────────────────────────────────────────
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = GreenPrimary)
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            // Title Area (Tanpa tombol Kembali)
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, top = 24.dp, bottom = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Search Input
-                TextField(
-                    value = searchQuery,
-                    onValueChange = onSearchQueryChange,
-                    modifier = Modifier
-                        .weight(1f)
-                        .border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(12.dp)),
-                    placeholder = {
-                        Text("Cari pelanggan...", color = Color(0xFF9CA3AF), fontSize = 16.sp)
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.search),
-                            contentDescription = null,
-                            tint = Color(0xFF9CA3AF),
-                            modifier = Modifier.size(16.dp)
-                        )
-                    },
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedTextColor = TextDark,
-                        unfocusedTextColor = TextDark
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = "Pelanggan",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
                     )
-                )
+                    Text(
+                        text = "Kelola profil pengguna",
+                        fontSize = 14.sp,
+                        color = Color(0xFFDBEAFE)
+                    )
+                }
 
-                // Add Button (+)
+                // Ikon Pelanggan
                 Box(
                     modifier = Modifier
                         .size(48.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(GreenPrimary)
-                        .clickable { onAddCustomerClick() },
+                        .clip(CircleShape)
+                        .border(BorderStroke(2.dp, Color.White.copy(alpha = 0.3f)), CircleShape)
+                        .clickable { /* TODO: Aksi pelanggan */ },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.add),
-                        contentDescription = "Tambah",
+                        imageVector = ImageVector.vectorResource(R.drawable.pelanggan),
+                        contentDescription = "Pelanggan",
                         tint = Color.White,
                         modifier = Modifier.size(20.dp)
                     )
@@ -269,41 +153,158 @@ private fun PelangganContent(
             }
         }
 
-        // ── 3. CUSTOMER LIST SECTION ─────────────────────────────────────────
-        item {
-            when (uiState) {
-                is PelangganUiState.Loading -> {
-                    Box(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .height(200.dp),
-                        contentAlignment = Alignment.Center
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            contentPadding = PaddingValues(bottom = 24.dp)
+        ) {
+            // ── BENTO STATS CARDS (Green Card Area) ─────────────────────────
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = GreenPrimary,
+                            shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                        )
+                        .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
+                ) {
+                    // Bento Stats Cards
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        CircularProgressIndicator(color = GreenPrimary)
+                        // Card Total Pelanggan
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color.White.copy(alpha = 0.1f))
+                                .border(
+                                    1.dp,
+                                    Color.White.copy(alpha = 0.1f),
+                                    RoundedCornerShape(16.dp)
+                                )
+                                .padding(17.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = "Total Pelanggan",
+                                fontSize = 14.sp,
+                                color = Color(0xFFDBEAFE)
+                            )
+                            Text(
+                                text = totalPelangganCount.toString(),
+                                fontSize = 30.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+
+                        // Card Pelanggan Aktif
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color.White.copy(alpha = 0.1f))
+                                .border(
+                                    1.dp,
+                                    Color.White.copy(alpha = 0.1f),
+                                    RoundedCornerShape(16.dp)
+                                )
+                                .padding(17.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = "Aktif",
+                                fontSize = 14.sp,
+                                color = Color(0xFFDBEAFE)
+                            )
+                            Text(
+                                text = aktifPelangganCount.toString(),
+                                fontSize = 30.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
                     }
                 }
+            }
 
-                is PelangganUiState.Error -> {
+            // ── 2. SEARCH & ADD SECTION ──────────────────────────────────────────
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, end = 20.dp, top = 24.dp, bottom = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Search Input
+                    TextField(
+                        value = searchQuery,
+                        onValueChange = onSearchQueryChange,
+                        modifier = Modifier
+                            .weight(1f)
+                            .border(1.dp, Color(0xFFE5E7EB), RoundedCornerShape(12.dp)),
+                        placeholder = {
+                            Text("Cari pelanggan...", color = Color(0xFF9CA3AF), fontSize = 16.sp)
+                        },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.search),
+                                contentDescription = null,
+                                tint = Color(0xFF9CA3AF),
+                                modifier = Modifier.size(16.dp)
+                            )
+                        },
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedTextColor = TextDark,
+                            unfocusedTextColor = TextDark
+                        )
+                    )
+
+                    // Add Button (+)
                     Box(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .height(200.dp),
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(GreenPrimary)
+                            .clickable { onAddCustomerClick() },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = uiState.message,
-                            color = Color.Red,
-                            fontSize = 14.sp
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.add),
+                            contentDescription = "Tambah",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }
+            }
 
-                is PelangganUiState.Success -> {
-                    val filteredList = uiState.data.filter {
-                        it.nama.contains(searchQuery, ignoreCase = true)
+            // ── 3. CUSTOMER LIST SECTION ─────────────────────────────────────────
+            item {
+                when (uiState) {
+                    is PelangganUiState.Loading -> {
+                        Box(
+                            modifier = modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = GreenPrimary)
+                        }
                     }
 
-                    if (filteredList.isEmpty()) {
+                    is PelangganUiState.Error -> {
                         Box(
                             modifier = modifier
                                 .fillMaxWidth()
@@ -311,30 +312,51 @@ private fun PelangganContent(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "Pelanggan tidak ditemukan",
-                                color = Color.Gray,
+                                text = uiState.message,
+                                color = Color.Red,
                                 fontSize = 14.sp
                             )
                         }
-                    } else {
-                        Column(
-                            modifier = modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            filteredList.forEach { pelanggan ->
-                                CustomerCard(
-                                    pelanggan = pelanggan,
-                                    onActivityClick = { onActivityClick(pelanggan) },
-                                    onEditClick = { onEditClick(pelanggan) }
+                    }
+
+                    is PelangganUiState.Success -> {
+                        val filteredList = uiState.data.filter {
+                            it.nama.contains(searchQuery, ignoreCase = true)
+                        }
+
+                        if (filteredList.isEmpty()) {
+                            Box(
+                                modifier = modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Pelanggan tidak ditemukan",
+                                    color = Color.Gray,
+                                    fontSize = 14.sp
                                 )
+                            }
+                        } else {
+                            Column(
+                                modifier = modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp),
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                filteredList.forEach { pelanggan ->
+                                    CustomerCard(
+                                        pelanggan = pelanggan,
+                                        onActivityClick = { onActivityClick(pelanggan) },
+                                        onEditClick = { onEditClick(pelanggan) }
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                else -> {}
+                    else -> {}
+                }
             }
         }
     }

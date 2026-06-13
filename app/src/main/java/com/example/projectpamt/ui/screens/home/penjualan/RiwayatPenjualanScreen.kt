@@ -51,108 +51,113 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RiwayatPenjualanScreen(
-    modifier: Modifier = Modifier,
     viewModel: RiwayatPenjualanViewModel = viewModel(),
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    
+
     // Set dynamic status bar color to GreenPrimary
     DynamicStatusBar(backgroundColor = GreenPrimary)
 
     var selectedTxn by remember { mutableStateOf<PenjualanWithDetails?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets(0)
-    ) { innerPadding ->
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BackgroundSlate)
+    ) {
+        // ── HEADER ──────────────────────────────────────────────────────────
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .background(BackgroundSlate)
-                .padding(innerPadding)
+                .fillMaxWidth()
+                .background(
+                    color = GreenPrimary,
+                    shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                )
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ── HEADER ──────────────────────────────────────────────────────────
-            Column(
+            // Back Button
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = GreenPrimary,
-                        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-                    )
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .clickable { navController.popBackStack() }
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Back Button
-                Row(
-                    modifier = Modifier
-                        .clickable { navController.popBackStack() }
-                        .padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Kembali",
-                        tint = Color.White.copy(alpha = 0.9f),
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        text = "Kembali",
-                        color = Color.White.copy(alpha = 0.9f),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-
-                // Title Area
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(
-                        text = "Riwayat Penjualan",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Text(
-                        text = "Daftar transaksi penjualan toko Anda",
-                        fontSize = 14.sp,
-                        color = Color(0xFFDCFCE7)
-                    )
-                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Kembali",
+                    tint = Color.White.copy(alpha = 0.9f),
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = "Kembali",
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
             }
 
-            // ── CONTENT BODY ────────────────────────────────────────────────────
-            when (val state = uiState) {
-                is RiwayatPenjualanUiState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize().weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = GreenPrimary)
-                    }
-                }
-                is RiwayatPenjualanUiState.Error -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize().weight(1f).padding(24.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = state.message, color = DangerRed, fontSize = 14.sp)
-                    }
-                }
-                is RiwayatPenjualanUiState.Success -> {
-                    SuccessContent(
-                        state = state,
-                        onSearchChange = viewModel::setSearchQuery,
-                        onFilterSelect = viewModel::setFilter,
-                        onTxnClick = { selectedTxn = it }
-                    )
-                }
-                else -> {}
+            // Title Area
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = "Riwayat Penjualan",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    text = "Daftar transaksi penjualan toko Anda",
+                    fontSize = 14.sp,
+                    color = Color(0xFFDCFCE7)
+                )
             }
         }
+
+        // ── CONTENT BODY ────────────────────────────────────────────────────
+        when (val state = uiState) {
+            is RiwayatPenjualanUiState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f)
+                        .windowInsetsPadding(WindowInsets.navigationBars),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = GreenPrimary)
+                }
+            }
+
+            is RiwayatPenjualanUiState.Error -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f)
+                        .windowInsetsPadding(WindowInsets.navigationBars)
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = state.message, color = DangerRed, fontSize = 14.sp)
+                }
+            }
+
+            is RiwayatPenjualanUiState.Success -> {
+                SuccessContent(
+                    modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
+                    state = state,
+                    onSearchChange = viewModel::setSearchQuery,
+                    onFilterSelect = viewModel::setFilter,
+                    onTxnClick = { selectedTxn = it }
+                )
+            }
+
+            else -> {}
+        }
     }
+
 
     // ── DETAILS BOTTOM SHEET ────────────────────────────────────────────────
     if (selectedTxn != null) {
@@ -172,13 +177,14 @@ fun RiwayatPenjualanScreen(
 
 @Composable
 private fun SuccessContent(
+    modifier: Modifier = Modifier,
     state: RiwayatPenjualanUiState.Success,
     onSearchChange: (String) -> Unit,
     onFilterSelect: (RiwayatFilter) -> Unit,
     onTxnClick: (PenjualanWithDetails) -> Unit
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -191,7 +197,11 @@ private fun SuccessContent(
                     .fillMaxWidth()
                     .padding(top = 16.dp),
                 placeholder = {
-                    Text("Cari ID Transaksi / Pelanggan...", color = TextPlaceholder, fontSize = 14.sp)
+                    Text(
+                        "Cari ID Transaksi / Pelanggan...",
+                        color = TextPlaceholder,
+                        fontSize = 14.sp
+                    )
                 },
                 leadingIcon = {
                     Icon(
@@ -344,7 +354,8 @@ private fun TransactionItem(
     val dateStr = txn.penjualan.createdAt ?: ""
     val formattedTime = remember(dateStr) {
         try {
-            val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
+            val date =
+                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
             if (date != null) {
                 SimpleDateFormat("d MMM yyyy, HH:mm", Locale("id", "ID")).format(date)
             } else {
@@ -480,7 +491,8 @@ private fun TransactionDetailSheetContent(
     val dateStr = txn.penjualan.createdAt ?: ""
     val formattedTime = remember(dateStr) {
         try {
-            val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
+            val date =
+                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
             if (date != null) {
                 SimpleDateFormat("d MMMM yyyy HH:mm", Locale("id", "ID")).format(date)
             } else {
@@ -527,10 +539,10 @@ private fun TransactionDetailSheetContent(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
                     )
-                    
+
                     val clipboardManager = LocalClipboardManager.current
                     var copied by remember { mutableStateOf(false) }
-                    
+
                     LaunchedEffect(copied) {
                         if (copied) {
                             delay(2000)
@@ -546,7 +558,11 @@ private fun TransactionDetailSheetContent(
                             .size(16.dp)
                             .clickable {
                                 txn.penjualan.idPenjualan?.let { id ->
-                                    clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(id))
+                                    clipboardManager.setText(
+                                        androidx.compose.ui.text.AnnotatedString(
+                                            id
+                                        )
+                                    )
                                     copied = true
                                 }
                             }
@@ -570,7 +586,11 @@ private fun TransactionDetailSheetContent(
             DetailInfoRow(label = "Metode Pembayaran", value = txn.kas?.nama ?: "-")
             DetailInfoRow(label = "Pelanggan", value = txn.pelanggan?.nama ?: "Umum (Cash)")
             if (txn.pelanggan != null) {
-                DetailInfoRow(label = "No. Telepon", value = txn.pelanggan.telepon, enableCopy = true)
+                DetailInfoRow(
+                    label = "No. Telepon",
+                    value = txn.pelanggan.telepon,
+                    enableCopy = true
+                )
             }
         }
 
@@ -630,7 +650,7 @@ private fun TransactionDetailSheetContent(
                 label = "Jumlah Bayar",
                 value = formatRupiah(txn.penjualan.jumlahBayar)
             )
-            
+
             val change = txn.penjualan.jumlahBayar - txn.penjualan.totalHarga
             DetailInfoRow(
                 label = "Kembalian",
@@ -679,7 +699,7 @@ private fun DetailInfoRow(
             if (enableCopy && value.isNotBlank() && value != "-") {
                 val clipboardManager = LocalClipboardManager.current
                 var copied by remember { mutableStateOf(false) }
-                
+
                 LaunchedEffect(copied) {
                     if (copied) {
                         delay(2000)

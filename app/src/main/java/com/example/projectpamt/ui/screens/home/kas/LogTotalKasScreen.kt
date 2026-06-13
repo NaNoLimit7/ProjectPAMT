@@ -50,102 +50,101 @@ fun LogTotalKasScreen(
     // Set dynamic status bar color to GreenPrimary
     DynamicStatusBar(backgroundColor = GreenPrimary)
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets(0)
-    ) { innerPadding ->
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BackgroundSlate)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+    ) {
+        // ── HEADER SECTION ──────────────────────────────────────────────────
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .background(BackgroundSlate)
-                .padding(innerPadding)
+                .fillMaxWidth()
+                .background(
+                    color = GreenPrimary,
+                    shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                )
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ── HEADER SECTION ──────────────────────────────────────────────────
-            Column(
+            // Back Button
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = GreenPrimary,
-                        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-                    )
-                    .windowInsetsPadding(WindowInsets.statusBars)
-                    .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .clickable { navController.popBackStack() }
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Back Button
-                Row(
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Kembali",
+                    tint = Color.White.copy(alpha = 0.9f),
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = "Kembali",
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            // Title Area
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = "Log Total",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    text = "Riwayat saldo gabungan seluruh akun kas",
+                    fontSize = 14.sp,
+                    color = Color(0xFFDCFCE7)
+                )
+            }
+        }
+
+        // ── CONTENT BODY ────────────────────────────────────────────────────
+        when (val state = uiState) {
+            is LogTotalKasUiState.Loading -> {
+                Box(
                     modifier = Modifier
-                        .clickable { navController.popBackStack() }
-                        .padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxSize()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Kembali",
-                        tint = Color.White.copy(alpha = 0.9f),
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        text = "Kembali",
-                        color = Color.White.copy(alpha = 0.9f),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
+                    CircularProgressIndicator(color = GreenPrimary)
                 }
+            }
 
-                // Title Area
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            is LogTotalKasUiState.Error -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f)
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
                     Text(
-                        text = "Log Total",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Text(
-                        text = "Riwayat saldo gabungan seluruh akun kas",
+                        text = state.message,
+                        color = DangerRed,
                         fontSize = 14.sp,
-                        color = Color(0xFFDCFCE7)
+                        textAlign = TextAlign.Center
                     )
                 }
             }
 
-            // ── CONTENT BODY ────────────────────────────────────────────────────
-            when (val state = uiState) {
-                is LogTotalKasUiState.Loading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = GreenPrimary)
-                    }
-                }
-                is LogTotalKasUiState.Error -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .weight(1f)
-                            .padding(24.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = state.message,
-                            color = DangerRed,
-                            fontSize = 14.sp,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-                is LogTotalKasUiState.Success -> {
-                    SuccessContent(summary = state.data)
-                }
-                else -> {}
+            is LogTotalKasUiState.Success -> {
+                SuccessContent(summary = state.data)
             }
+
+            else -> {}
         }
     }
 }
+
 
 @Composable
 private fun SuccessContent(
@@ -238,11 +237,11 @@ private fun SuccessContent(
                                 color = TextMuted,
                                 fontWeight = FontWeight.Medium
                             )
-                            
+
                             val trendVal = summary.weeklyTrendPercent
                             val trendColor = if (trendVal >= 0) Color(0xFF006D3F) else DangerRed
                             val trendSign = if (trendVal >= 0) "+" else ""
-                            
+
                             Text(
                                 text = "$trendSign$trendVal%",
                                 fontSize = 24.sp,
@@ -255,7 +254,11 @@ private fun SuccessContent(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(if (summary.weeklyTrendPercent >= 0) GreenMintBg else Color(0xFFFFEBEE)),
+                                .background(
+                                    if (summary.weeklyTrendPercent >= 0) GreenMintBg else Color(
+                                        0xFFFFEBEE
+                                    )
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -329,7 +332,8 @@ private fun DailyLogCard(
     val dateStr = logDay.tanggal
     val formattedDate = remember(dateStr) {
         try {
-            val date = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
+            val date =
+                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale("id", "ID")).parse(dateStr)
             if (date != null) {
                 SimpleDateFormat("d MMMM yyyy", Locale("id", "ID")).format(date)
             } else {

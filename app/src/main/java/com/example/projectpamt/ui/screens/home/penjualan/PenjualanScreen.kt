@@ -122,7 +122,7 @@ fun PenjualanScreen(
         onUpdateQuantity = viewModel::updateCartQuantity,
         onClearCart = viewModel::clearCart,
         onAddPelangganClick = { navController.navigate(TambahPelanggan) },
-        onProcessPaymentClick = { 
+        onProcessPaymentClick = {
             if (selectedPelanggan != null) {
                 val cartItemsJson = Json.encodeToString(cartItems)
                 val totalHarga = cartItems.sumOf { it.totalHarga }
@@ -134,7 +134,11 @@ fun PenjualanScreen(
                     )
                 )
             } else {
-                Toast.makeText(context, "Silakan pilih pelanggan terlebih dahulu", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    "Silakan pilih pelanggan terlebih dahulu",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         },
         onHistoryClick = { navController.navigate(RiwayatPenjualan) }
@@ -163,69 +167,211 @@ private fun PenjualanContent(
     Box(
         modifier = modifier.fillMaxSize()
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = if (cartItems.isNotEmpty()) 88.dp else 24.dp)
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            // ── HEADER ────────────────────────────────────────────────────
-            item {
-                PenjualanHeader(
-                    totalTransaksi = cartItems.sumOf { it.totalHarga }.toInt(),
-                    cartItemCount = cartItems.sumOf { it.quantity },
-                    onHistoryClick = onHistoryClick
-                )
-            }
-
-            // ── CUSTOMER + CART SECTION ───────────────────────────────────
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .padding(top = 20.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+            // ── FIXED HEADER ──────────────────────────────────────────────
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = GreenPrimary,)
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
                 ) {
-                    // Pilih Pelanggan label
-                    Text(
-                        text = "Pilih Pelanggan",
-                        fontSize = 14.sp,
-                        color = Color(0xFF334155)
-                    )
-
-                    // Dropdown Pelanggan
-                    if (dataState is PenjualanDataUiState.Success) {
-                        CustomerDropdown(
-                            pelangganList = dataState.pelangganList,
-                            selectedPelanggan = selectedPelanggan,
-                            onSelect = onSelectPelanggan
-                        )
-                    }
-
-                    // Tambah pelanggan cepat
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.End)
-                            .clickable { onAddPelangganClick() },
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.add_with_circle),
-                            contentDescription = null,
-                            tint = GreenPrimary,
-                            modifier = Modifier.size(12.dp)
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            text = "Penjualan",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
                         )
                         Text(
-                            text = "Tambah pelanggan cepat",
-                            fontSize = 12.sp,
-                            color = GreenPrimary
+                            text = "Sistem Transaksi Cepat",
+                            fontSize = 14.sp,
+                            color = Color(0xFFBFDBFE)
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(Color(0x8A7CE2BD))
+                            .clickable { onHistoryClick() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.history),
+                            contentDescription = "Riwayat Penjualan",
+                            tint = Color.White,
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }
             }
 
-            // ── KERANJANG SECTION ─────────────────────────────────────────
-            if (cartItems.isNotEmpty()) {
+            // ── SCROLLABLE LAZYCOLUMN ──────────────────────────────────────
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(bottom = if (cartItems.isNotEmpty()) 88.dp else 24.dp)
+            ) {
+                // ── TRANSAKSI SAAT INI (Green Card Area) ─────────────────────
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = GreenPrimary,
+                                shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                            )
+                            .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color.White.copy(alpha = 0.1f))
+                                .padding(20.dp)
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Text(
+                                    text = "Transaksi Saat Ini",
+                                    fontSize = 14.sp,
+                                    color = Color.White.copy(alpha = 0.8f)
+                                )
+                                Text(
+                                    text = formatRupiah(cartItems.sumOf { it.totalHarga }),
+                                    fontSize = 32.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    letterSpacing = (-0.5).sp
+                                )
+                            }
+
+                            val cartItemCount = cartItems.sumOf { it.quantity }
+                            if (cartItemCount > 0) {
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .clip(RoundedCornerShape(50))
+                                        .background(Color.White.copy(alpha = 0.5f))
+                                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        text = "$cartItemCount item",
+                                        fontSize = 12.sp,
+                                        color = Color.White
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ── CUSTOMER + CART SECTION ───────────────────────────────────
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp)
+                            .padding(top = 20.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Pilih Pelanggan",
+                            fontSize = 14.sp,
+                            color = Color(0xFF334155)
+                        )
+
+                        if (dataState is PenjualanDataUiState.Success) {
+                            CustomerDropdown(
+                                pelangganList = dataState.pelangganList,
+                                selectedPelanggan = selectedPelanggan,
+                                onSelect = onSelectPelanggan
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.End)
+                                .clickable { onAddPelangganClick() },
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.add_with_circle),
+                                contentDescription = null,
+                                tint = GreenPrimary,
+                                modifier = Modifier.size(12.dp)
+                            )
+                            Text(
+                                text = "Tambah pelanggan cepat",
+                                fontSize = 12.sp,
+                                color = GreenPrimary
+                            )
+                        }
+                    }
+                }
+
+                // ── KERANJANG SECTION ─────────────────────────────────────────
+                if (cartItems.isNotEmpty()) {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp)
+                                .padding(top = 24.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Keranjang",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF1E293B)
+                                )
+                                Text(
+                                    text = "Hapus Semua",
+                                    fontSize = 14.sp,
+                                    color = Color(0xFFEF4444),
+                                    modifier = Modifier.clickable { onClearCart() }
+                                )
+                            }
+
+                            cartItems.forEach { item ->
+                                CartItemRow(
+                                    item = item,
+                                    onDelete = { onRemoveFromCart(item.produk) },
+                                    onDecrement = {
+                                        onUpdateQuantity(
+                                            item.produk,
+                                            item.quantity - 1
+                                        )
+                                    },
+                                    onIncrement = {
+                                        onUpdateQuantity(
+                                            item.produk,
+                                            item.quantity + 1
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // ── PRODUK SECTION HEADER + SEARCH ────────────────────────────
                 item {
                     Column(
                         modifier = Modifier
@@ -234,148 +380,103 @@ private fun PenjualanContent(
                             .padding(top = 24.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        // Header keranjang
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Keranjang",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF1E293B)
-                            )
-                            Text(
-                                text = "Hapus Semua",
-                                fontSize = 14.sp,
-                                color = Color(0xFFEF4444),
-                                modifier = Modifier.clickable { onClearCart() }
-                            )
-                        }
-
-                        // Cart items
-                        cartItems.forEach { item ->
-                            CartItemRow(
-                                item = item,
-                                onDelete = { onRemoveFromCart(item.produk) },
-                                onDecrement = { onUpdateQuantity(item.produk, item.quantity - 1) },
-                                onIncrement = { onUpdateQuantity(item.produk, item.quantity + 1) }
-                            )
-                        }
-                    }
-                }
-            }
-
-            // ── PRODUK SECTION HEADER + SEARCH ────────────────────────────
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .padding(top = 24.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = "Produk",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E293B)
-                    )
-
-                    // Search bar
-                    TextField(
-                        value = searchQuery,
-                        onValueChange = onSearchQueryChange,
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = {
-                            Text("Cari Produk", color = Color(0xFF6B7280), fontSize = 14.sp)
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = null,
-                                tint = Color(0xFF6B7280),
-                                modifier = Modifier.size(16.dp)
-                            )
-                        },
-                        singleLine = true,
-                        shape = RoundedCornerShape(12.dp),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color(0xFFEDF6F0),
-                            unfocusedContainerColor = Color(0xFFEDF6F0),
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            focusedTextColor = Color(0xFF1E293B),
-                            unfocusedTextColor = Color(0xFF1E293B)
+                        Text(
+                            text = "Produk",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1E293B)
                         )
-                    )
+
+                        TextField(
+                            value = searchQuery,
+                            onValueChange = onSearchQueryChange,
+                            modifier = Modifier.fillMaxWidth(),
+                            placeholder = {
+                                Text("Cari Produk", color = Color(0xFF6B7280), fontSize = 14.sp)
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = null,
+                                    tint = Color(0xFF6B7280),
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            },
+                            singleLine = true,
+                            shape = RoundedCornerShape(12.dp),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color(0xFFEDF6F0),
+                                unfocusedContainerColor = Color(0xFFEDF6F0),
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                focusedTextColor = Color(0xFF1E293B),
+                                unfocusedTextColor = Color(0xFF1E293B)
+                            )
+                        )
+                    }
                 }
-            }
 
-            // ── PRODUCT GRID ──────────────────────────────────────────────
-            item {
-                when (dataState) {
-                    is PenjualanDataUiState.Loading -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("Memuat produk...", color = Color.Gray)
-                        }
-                    }
-
-                    is PenjualanDataUiState.Error -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(dataState.message, color = Color.Red, fontSize = 14.sp)
-                        }
-                    }
-
-                    is PenjualanDataUiState.Success -> {
-                        val filtered = dataState.produkList.filter {
-                            it.nama.contains(searchQuery, ignoreCase = true)
+                // ── PRODUCT GRID ──────────────────────────────────────────────
+                item {
+                    when (dataState) {
+                        is PenjualanDataUiState.Loading -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("Memuat produk...", color = Color.Gray)
+                            }
                         }
 
-                        // LazyVerticalGrid tidak bisa di dalam LazyColumn,
-                        // jadi kita render grid secara manual dalam rows
-                        val rows = filtered.chunked(2)
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                                .padding(top = 12.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            rows.forEach { rowItems ->
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    rowItems.forEach { produk ->
-                                        ProductCard(
-                                            produk = produk,
-                                            modifier = Modifier.weight(1f),
-                                            onAddClick = { onAddToCart(produk) }
-                                        )
-                                    }
-                                    // Jika row ganjil, isi dengan spacer
-                                    if (rowItems.size == 1) {
-                                        Spacer(modifier = Modifier.weight(1f))
+                        is PenjualanDataUiState.Error -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(dataState.message, color = Color.Red, fontSize = 14.sp)
+                            }
+                        }
+
+                        is PenjualanDataUiState.Success -> {
+                            val filtered = dataState.produkList.filter {
+                                it.nama.contains(searchQuery, ignoreCase = true)
+                            }
+
+                            val rows = filtered.chunked(2)
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                                    .padding(top = 12.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                rows.forEach { rowItems ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    ) {
+                                        rowItems.forEach { produk ->
+                                            ProductCard(
+                                                produk = produk,
+                                                modifier = Modifier.weight(1f),
+                                                onAddClick = { onAddToCart(produk) }
+                                            )
+                                        }
+                                        if (rowItems.size == 1) {
+                                            Spacer(modifier = Modifier.weight(1f))
+                                        }
                                     }
                                 }
+                                Spacer(modifier = Modifier.height(8.dp))
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
                         }
-                    }
 
-                    else -> {}
+                        else -> {}
+                    }
                 }
             }
         }
@@ -391,103 +492,6 @@ private fun PenjualanContent(
                 cartItems = cartItems,
                 onProcessClick = onProcessPaymentClick
             )
-        }
-    }
-}
-
-// ─── Header ─────────────────────────────────────────────────────────────────
-
-@Composable
-private fun PenjualanHeader(
-    totalTransaksi: Int,
-    cartItemCount: Int,
-    onHistoryClick: () -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color = GreenPrimary,
-                shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-            )
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        // Title row
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = "Penjualan",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    text = "Sistem Transaksi Cepat",
-                    fontSize = 14.sp,
-                    color = Color(0xFFBFDBFE)
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(Color(0x8A7CE2BD))
-                    .clickable { onHistoryClick() },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.history),
-                    contentDescription = "Riwayat Penjualan",
-                    tint = Color.White,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
-        }
-
-        // Total balance card
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.White.copy(alpha = 0.1f))
-                .padding(20.dp)
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = "Transaksi Saat Ini",
-                    fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f)
-                )
-                Text(
-                    text = formatRupiah(totalTransaksi.toDouble()),
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    letterSpacing = (-0.5).sp
-                )
-            }
-            // Item count badge
-            if (cartItemCount > 0) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .clip(RoundedCornerShape(50))
-                        .background(Color.White.copy(alpha = 0.5f))
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        text = "$cartItemCount item",
-                        fontSize = 12.sp,
-                        color = Color.White
-                    )
-                }
-            }
         }
     }
 }
